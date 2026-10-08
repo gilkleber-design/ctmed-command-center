@@ -77,6 +77,64 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
 .mobile-cta{display:none}
 @media(max-width:960px){.topmeta>span{display:none}.hero{min-height:auto}.hero-inner{min-height:auto;grid-template-columns:1fr;padding:0}.hero-copy{grid-column:1;justify-self:start;max-width:720px;padding:400px 0 68px}.hero-monitor::after{background:linear-gradient(180deg,rgba(3,10,17,.02) 0%,rgba(7,17,29,.22) 40%,rgba(7,17,29,.95) 70%,#07111d 90%)}.trace{width:112%;left:-6%}.trace.ecg{top:8%}.trace.pleth{top:22%}.trace.capno{top:34%}.monitor-data{top:8%;left:22px;grid-template-columns:repeat(3,125px)}.monitor-label{display:none}.statement-grid,.section-head{grid-template-columns:1fr;gap:20px}.decision{grid-template-columns:50px 1fr}.decision p{grid-column:2}.offer{grid-template-columns:1fr}.offer-side{border-left:0;border-top:1px solid rgba(255,255,255,.08)}.audience{grid-template-columns:1fr}.aud{border-left:0;border-top:1px solid rgba(255,255,255,.08)}.aud:first-child{border-top:0}}
 @media(max-width:640px){.wrap{width:min(var(--max),calc(100% - 30px))}.topin{height:68px}.logo{width:112px;height:50px}.hero-copy{padding:330px 0 58px}.monitor-data{grid-template-columns:repeat(3,1fr);left:15px;right:15px;gap:7px}.vbox{padding:9px}.vbox strong{font-size:26px}.trace{width:132%;left:-14%}.trace.ecg{top:10%}.trace.pleth{top:24%}.trace.capno{top:36%}h1{font-size:43px}.lead{font-size:16px}.hero-proof{gap:6px}.proof{font-size:10px}.top .btn{display:none}.statement,.section{padding:62px 0}.section h2,.statement h2{font-size:34px}.bigcopy{font-size:17px}.decision{grid-template-columns:38px 1fr;gap:14px}.case-strip{grid-template-columns:1fr}.case-item{padding:18px 0;border-left:0;border-top:1px solid rgba(255,255,255,.08)}.case-item:first-child{border-top:0}.deliveries{grid-template-columns:1fr}.offer-wrap{padding:68px 0}.offer-main,.offer-side{padding:30px 24px}.offer h2{font-size:34px}.price{font-size:58px}.foot{align-items:flex-start;flex-direction:column}.mobile-cta{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:60}.mobile-cta .btn{width:100%;padding:15px 18px;box-shadow:0 18px 50px rgba(0,0,0,.45)}}
+
+/* V5 — fotos reais + direção premium */
+.hero{min-height:780px}
+.hero-monitor::after{background:linear-gradient(90deg,#07111d 0%,rgba(7,17,29,.91) 29%,rgba(7,17,29,.58) 52%,rgba(7,17,29,.58) 72%,#07111d 100%)}
+.hero-inner{grid-template-columns:1.04fr .96fr;gap:42px}
+.hero-copy{grid-column:1;justify-self:start;max-width:650px;padding:96px 0 90px}
+.hero-photo{grid-column:2;align-self:end;justify-self:end;width:min(460px,100%);height:660px;position:relative;margin-top:70px}
+.hero-photo::before{content:"";position:absolute;inset:7% -22px 5% 18%;border:1px solid rgba(255,122,26,.28);background:linear-gradient(180deg,rgba(255,122,26,.08),transparent 45%);transform:translate(18px,-10px);z-index:-1}
+.hero-photo::after{content:"";position:absolute;right:-3px;top:9%;bottom:7%;width:2px;background:linear-gradient(180deg,transparent,var(--orange),transparent)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;border:1px solid rgba(255,255,255,.08);box-shadow:0 30px 80px rgba(0,0,0,.36);mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%)}
+.hero-photo-note{position:absolute;left:-24px;bottom:58px;padding:10px 12px;border-left:2px solid var(--orange);background:rgba(5,13,22,.72);backdrop-filter:blur(10px);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#b9c7d6}
+
+.people-section{padding:92px 0;border-top:1px solid rgba(255,255,255,.06)}
+.people-head{display:grid;grid-template-columns:.72fr 1.28fr;gap:70px;align-items:end;margin-bottom:36px}
+.people-head p{margin:0;color:#99aabd;font-size:15px;line-height:1.7;max-width:700px}
+.teachers{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.teacher{display:grid;grid-template-columns:220px 1fr;min-height:330px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(145deg,rgba(14,31,49,.74),rgba(7,18,30,.64));overflow:hidden}
+.teacher-photo{position:relative;background:#0a1624;overflow:hidden}
+.teacher-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(7,17,29,.82) 100%),linear-gradient(120deg,rgba(8,29,49,.10),rgba(255,122,26,.10));pointer-events:none}
+.teacher-photo img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;filter:saturate(.82) contrast(1.03)}
+.teacher.diego .teacher-photo img{filter:grayscale(1) contrast(1.08) brightness(.83)}
+.teacher.diego .teacher-photo::after{background:linear-gradient(180deg,rgba(7,17,29,.12),rgba(7,17,29,.82)),linear-gradient(135deg,rgba(13,49,79,.28),rgba(255,122,26,.14));mix-blend-mode:normal}
+.teacher-copy{padding:30px 30px 28px;display:flex;flex-direction:column;justify-content:flex-end}
+.teacher-tag{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:#ff9c50;font-weight:850}
+.teacher h3{font-size:26px;letter-spacing:-.035em;margin:8px 0 8px}
+.teacher p{margin:0;color:#94a6b9;font-size:13px;line-height:1.65}
+.teacher-role{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);color:#c5d1de;font-size:11px;line-height:1.5}
+
+.final{padding:0;border-top:1px solid rgba(255,255,255,.06);text-align:left}
+.final-premium{display:grid;grid-template-columns:1.08fr .92fr;min-height:510px;align-items:stretch}
+.final-copy{padding:90px 68px 94px 0;display:flex;flex-direction:column;justify-content:center}
+.final-copy h2{margin:0;font-size:clamp(38px,4.5vw,62px);line-height:1.02;letter-spacing:-.05em;max-width:740px}
+.final-copy p{margin:20px 0 28px;color:#9cacbd;line-height:1.65;max-width:620px}
+.final-photo{position:relative;overflow:hidden;min-height:510px;background:#08131f}
+.final-photo::before{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,#07111d 0%,rgba(7,17,29,.38) 28%,transparent 62%),linear-gradient(180deg,transparent 55%,rgba(7,17,29,.58))}
+.final-photo img{width:100%;height:100%;object-fit:cover;object-position:center 18%;display:block;filter:saturate(.84) contrast(1.03)}
+
+@media(max-width:960px){
+  .hero-inner{grid-template-columns:1fr}
+  .hero-copy{grid-column:1;padding:72px 0 34px;max-width:720px}
+  .hero-photo{grid-column:1;width:min(520px,88vw);height:620px;margin:0 auto 0}
+  .hero-photo-note{left:12px}
+  .people-head{grid-template-columns:1fr;gap:18px}
+  .teachers{grid-template-columns:1fr}
+  .teacher{grid-template-columns:210px 1fr}
+  .final-premium{grid-template-columns:1fr}
+  .final-copy{padding:72px 0 54px}
+  .final-photo{min-height:520px}
+}
+@media(max-width:620px){
+  .hero-photo{height:510px;width:100%}
+  .hero-photo::before{display:none}
+  .teacher{grid-template-columns:1fr}
+  .teacher-photo{height:360px}
+  .teacher-copy{padding:24px}
+  .final-photo{min-height:430px}
+}
+
 </style>
 </head>
 <body>
@@ -89,9 +147,9 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
 
 <main>
 <section class="hero">
-  <div class="hero-monitor" aria-hidden="true">
+  <div class="hero-monitor">
     <div class="monitor-grid"></div>
-    <svg class="trace ecg" viewBox="0 0 1200 150" fill="none"><polyline points="0,82 70,82 84,78 96,88 112,26 126,132 142,82 220,82 280,82 294,76 308,90 326,24 340,132 356,82 436,82 496,82 510,76 524,90 542,24 556,132 572,82 652,82 712,82 726,76 740,90 758,24 772,132 788,82 868,82 928,82 942,76 956,90 974,24 988,132 1004,82 1084,82 1200,82" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="trace ecg" viewBox="0 0 1200 120" fill="none"><polyline points="0,72 64,72 82,68 98,78 122,24 142,105 160,72 220,72 284,72 302,68 318,78 342,24 362,105 380,72 440,72 504,72 522,68 538,78 562,24 582,105 600,72 660,72 724,72 742,68 758,78 782,24 802,105 820,72 880,72 944,72 962,68 978,78 1002,24 1022,105 1040,72 1100,72 1200,72" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <svg class="trace pleth" viewBox="0 0 1200 120" fill="none"><polyline points="0,80 40,80 62,78 84,56 116,36 142,80 188,80 210,78 232,56 264,36 290,80 336,80 358,78 380,56 412,36 438,80 484,80 506,78 528,56 560,36 586,80 632,80 654,78 676,56 708,36 734,80 780,80 802,78 824,56 856,36 882,80 928,80 950,78 972,56 1004,36 1030,80 1076,80 1098,78 1120,56 1152,36 1178,80 1200,80" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <svg class="trace capno" viewBox="0 0 1200 120" fill="none"><polyline points="0,82 62,82 74,82 90,46 162,46 180,82 248,82 260,82 276,46 348,46 366,82 434,82 446,82 462,46 534,46 552,82 620,82 632,82 648,46 720,46 738,82 806,82 818,82 834,46 906,46 924,82 992,82 1004,82 1020,46 1092,46 1110,82 1178,82 1200,82" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <div class="monitor-data">
@@ -108,6 +166,10 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
       <p class="lead">Da decisão de intubar ao plano B quando a primeira tentativa falha. Uma live construída em cima de casos, escolhas e consequências — como o plantão exige.</p>
       <div class="hero-proof"><span class="proof">Ao vivo</span><span class="proof">Replay por 14 dias</span><span class="proof">Checklist pré-IOT</span><span class="proof">Algoritmo ISR</span><span class="proof">Fluxo de resgate</span></div>
       <div class="hero-actions"><a class="btn btn-primary checkout-link" href="#inscricao">Quero participar por R$ 67</a><span class="note">Para internos, recém-formados<br>e médicos nos primeiros plantões.</span></div>
+    </div>
+    <div class="hero-photo">
+      <img src="assets/gil-hero.webp" alt="Gil Kléber, CT-MED Academy">
+      <div class="hero-photo-note">conteúdo clínico · condução da live</div>
     </div>
   </div>
 </section>
@@ -133,9 +195,28 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
   </div>
 </section>
 
+<section class="people-section">
+  <div class="wrap">
+    <div class="people-head">
+      <div><div class="secnum">03 · Quem está por trás</div><h2>Experiência clínica na frente.<br>Operação redonda por trás.</h2></div>
+      <p>A proposta é simples: conteúdo clínico direto ao ponto, experiência de aula organizada e nenhum ruído entre inscrição, transmissão e material de apoio.</p>
+    </div>
+    <div class="teachers">
+      <article class="teacher">
+        <div class="teacher-photo"><img src="assets/gil-hero.webp" alt="Gil Kléber"></div>
+        <div class="teacher-copy"><div class="teacher-tag">CT-MED Academy</div><h3>Gil Kléber</h3><p>Anestesiologista e professor. Responsável pelo conteúdo clínico, estrutura pedagógica e condução da live.</p><div class="teacher-role">Conteúdo clínico · Produto · Pedagogia</div></div>
+      </article>
+      <article class="teacher diego">
+        <div class="teacher-photo"><img src="assets/diego.webp" alt="Diego Abel"></div>
+        <div class="teacher-copy"><div class="teacher-tag">CT-MED Academy</div><h3>Diego Abel</h3><p>Responsável pela operação, organização comercial e experiência da turma do primeiro contato à entrega.</p><div class="teacher-role">Operação · Comercial · Experiência da turma</div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section class="section">
   <div class="wrap">
-    <div class="section-head"><div><div class="secnum">03 · Entregáveis</div><h2>Material para voltar<br>quando precisar decidir.</h2></div><div class="section-copy"><p>Não é um pacote de “bônus”. São ferramentas de consulta rápida pensadas para acompanhar o raciocínio da live e continuar úteis depois dela.</p></div></div>
+    <div class="section-head"><div><div class="secnum">04 · Entregáveis</div><h2>Material para voltar<br>quando precisar decidir.</h2></div><div class="section-copy"><p>Não é um pacote de “bônus”. São ferramentas de consulta rápida pensadas para acompanhar o raciocínio da live e continuar úteis depois dela.</p></div></div>
     <div class="deliveries">
       <div class="deliver"><div class="topline"><span class="code">AO VIVO</span><span>01</span></div><h3>Live prática baseada em casos</h3><p>Decisões clínicas em tempo real, discussão e raciocínio aplicado.</p></div>
       <div class="deliver"><div class="topline"><span class="code">14 DIAS</span><span>02</span></div><h3>Replay da aula</h3><p>Volte aos pontos críticos e reveja o raciocínio depois da transmissão.</p></div>
@@ -149,7 +230,7 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
 
 <section class="section">
   <div class="wrap">
-    <div class="section-head"><div><div class="secnum">04 · Para quem é</div><h2>Para quem sabe que, em algum momento, a decisão será sua.</h2></div><div class="section-copy"><p>A proposta não é formar especialista em via aérea em uma noite. É entregar uma estrutura mental melhor para o momento em que você precisar assumir a condução.</p></div></div>
+    <div class="section-head"><div><div class="secnum">05 · Para quem é</div><h2>Para quem sabe que, em algum momento, a decisão será sua.</h2></div><div class="section-copy"><p>A proposta não é formar especialista em via aérea em uma noite. É entregar uma estrutura mental melhor para o momento em que você precisar assumir a condução.</p></div></div>
     <div class="audience"><div class="aud"><small>Internos</small><h3>Você já viu a teoria.</h3><p>Agora precisa entender como ela se organiza quando o paciente está deteriorando na sua frente.</p></div><div class="aud"><small>Recém-formados</small><h3>Os primeiros plantões chegaram.</h3><p>Menos improviso, mais prioridade e uma sequência mental que ajuda a não travar.</p></div><div class="aud"><small>Médicos de plantão</small><h3>Você já faz pronto atendimento.</h3><p>Use a live para revisar decisões críticas, atualizar o raciocínio e identificar lacunas.</p></div></div>
   </div>
 </section>
@@ -157,17 +238,17 @@ footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;f
 <section class="offer-wrap" id="inscricao">
   <div class="wrap">
     <div class="offer">
-      <div class="offer-main"><div class="secnum">05 · Inscrição</div><h2>Sua primeira intubação sozinho na UPA. E agora?</h2><p>Uma noite para transformar “eu sei a teoria” em uma sequência de decisão que você consegue usar quando o paciente está na sua frente.</p><div class="meta-list"><div class="meta-row"><span>Data</span><b>05/11/2026</b></div><div class="meta-row"><span>Horário</span><b id="horaTexto">a confirmar</b></div><div class="meta-row"><span>Formato</span><b>Online e ao vivo</b></div><div class="meta-row"><span>Replay</span><b>14 dias</b></div><div class="meta-row"><span>Materiais</span><b>Incluídos</b></div></div></div>
+      <div class="offer-main"><div class="secnum">06 · Inscrição</div><h2>Sua primeira intubação sozinho na UPA. E agora?</h2><p>Uma noite para transformar “eu sei a teoria” em uma sequência de decisão que você consegue usar quando o paciente está na sua frente.</p><div class="meta-list"><div class="meta-row"><span>Data</span><b>05/11/2026</b></div><div class="meta-row"><span>Horário</span><b id="horaTexto">a confirmar</b></div><div class="meta-row"><span>Formato</span><b>Online e ao vivo</b></div><div class="meta-row"><span>Replay</span><b>14 dias</b></div><div class="meta-row"><span>Materiais</span><b>Incluídos</b></div></div></div>
       <div class="offer-side"><div class="price-label">Inscrição · pagamento único</div><div class="price"><sup>R$</sup>67</div><a class="btn btn-primary checkout-link" href="#">Garantir minha vaga</a><div class="subnote">Primeira edição · vagas limitadas à operação da transmissão</div></div>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <div class="wrap section-head"><div><div class="secnum">06 · Dúvidas</div><h2>Perguntas frequentes</h2></div><div class="faq"><details><summary>Preciso já saber intubar?</summary><p>Não. A live não pressupõe experiência avançada em via aérea. Ela foi desenhada para organizar o raciocínio de quem está se preparando para assumir mais responsabilidade clínica.</p></details><details><summary>Vai ter gravação?</summary><p>Sim. O replay ficará disponível por 14 dias após a transmissão.</p></details><details><summary>É uma aula só de técnica de laringoscopia?</summary><p>Não. O foco é conduzir a ISR inteira: decisão, preparo, fisiologia, drogas, execução, falha da primeira tentativa, confirmação e pós-IOT.</p></details><details><summary>Serve para quem já trabalha em pronto atendimento?</summary><p>Sim. Também é útil para médicos que já fazem plantão e querem revisar e estruturar melhor decisões críticas de via aérea.</p></details></div></div>
+  <div class="wrap section-head"><div><div class="secnum">07 · Dúvidas</div><h2>Perguntas frequentes</h2></div><div class="faq"><details><summary>Preciso já saber intubar?</summary><p>Não. A live não pressupõe experiência avançada em via aérea. Ela foi desenhada para organizar o raciocínio de quem está se preparando para assumir mais responsabilidade clínica.</p></details><details><summary>Vai ter gravação?</summary><p>Sim. O replay ficará disponível por 14 dias após a transmissão.</p></details><details><summary>É uma aula só de técnica de laringoscopia?</summary><p>Não. O foco é conduzir a ISR inteira: decisão, preparo, fisiologia, drogas, execução, falha da primeira tentativa, confirmação e pós-IOT.</p></details><details><summary>Serve para quem já trabalha em pronto atendimento?</summary><p>Sim. Também é útil para médicos que já fazem plantão e querem revisar e estruturar melhor decisões críticas de via aérea.</p></details></div></div>
 </section>
 
-<section class="final"><div class="wrap"><h2>Quando todo mundo olhar para você, qual é a sua próxima decisão?</h2><p>Menos decoreba. Mais prioridade, segurança e raciocínio aplicável ao plantão.</p><a class="btn btn-primary checkout-link" href="#inscricao">Participar por R$ 67</a></div></section>
+<section class="final"><div class="wrap final-premium"><div class="final-copy"><div class="kicker">A decisão vai ser sua</div><h2>Quando todo mundo olhar para você, qual é a sua próxima decisão?</h2><p>Menos decoreba. Mais prioridade, segurança e raciocínio aplicável ao plantão.</p><div><a class="btn btn-primary checkout-link" href="#inscricao">Participar por R$ 67</a></div></div><div class="final-photo"><img src="assets/gil-cta.webp" alt="Gil Kléber, CT-MED Academy"></div></div></section>
 </main>
 
 <footer><div class="wrap foot"><img class="logo" src="ctmed-header.png" alt="CT-MED Academy"><div>Conteúdo educacional. Não substitui treinamento prático supervisionado nem protocolos institucionais.</div></div></footer>
