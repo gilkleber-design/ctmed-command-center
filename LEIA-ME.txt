@@ -1,0 +1,7 @@
+CT-MED Command Center — imagens de marca
+
+Coloque nesta pasta:
+1. ctmed-login-3d.png  -> logo 3D usada na tela de login
+2. ctmed-header.png    -> logo horizontal usada no cabeçalho
+
+Os dois arquivos devem ser PNG (preferencialmente com fundo transparente).
