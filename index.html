@@ -2,257 +2,180 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Sua primeira intubação sozinho na UPA. E agora? | CT-MED Academy</title>
-<meta name="description" content="Live prática da CT-MED Academy sobre raciocínio, preparo e condução da intubação em sequência rápida no plantão." />
+<meta name="description" content="Live prática da CT-MED Academy sobre decisão, preparo e condução da intubação em sequência rápida no plantão." />
 <style>
 :root{
-  --bg:#06101d;
-  --bg2:#0b1728;
-  --card:#101f34;
-  --card2:#0d1a2c;
-  --text:#f6f8fb;
-  --muted:#aab9cc;
-  --line:#223a5b;
-  --orange:#f5a524;
-  --orange2:#ffb43b;
-  --green:#39d9a0;
-  --red:#ff6b6b;
-  --blue:#73afff;
-  --shadow:0 22px 70px rgba(0,0,0,.34);
-  --r:22px;
+  --ink:#f6f4ef;
+  --muted:#9cacbe;
+  --bg:#07111d;
+  --bg2:#0a1725;
+  --panel:#0b1826;
+  --line:rgba(164,191,220,.14);
+  --orange:#ff7a1a;
+  --orange2:#f5a524;
+  --green:#43dfa8;
+  --yellow:#ffd166;
+  --blue:#74b8ff;
+  --red:#ff7272;
+  --max:1220px;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:radial-gradient(circle at 80% -10%,rgba(245,165,36,.16),transparent 32%),radial-gradient(circle at 0% 20%,rgba(58,117,198,.12),transparent 28%),var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-a{text-decoration:none;color:inherit}
-.wrap{max-width:1160px;margin:auto;padding:0 22px}
-.top{position:sticky;top:0;z-index:30;background:rgba(6,16,29,.84);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
-.topin{height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.brand{display:flex;align-items:center;gap:12px}
-.brand img{width:52px;height:52px;object-fit:contain}
-.brand strong{display:block;font-size:14px;letter-spacing:.08em}
-.brand small{color:var(--muted);font-size:11px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:13px;padding:14px 20px;font-weight:900;font-size:14px;cursor:pointer;transition:.2s}
-.btn.primary{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#101826;box-shadow:0 12px 32px rgba(245,165,36,.22)}
-.btn.primary:hover{transform:translateY(-1px);box-shadow:0 16px 38px rgba(245,165,36,.30)}
-.btn.ghost{background:#10213a;color:#e8eef8;border:1px solid var(--line)}
-.hero{padding:80px 0 60px;position:relative;overflow:hidden}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);gap:44px;align-items:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid rgba(245,165,36,.36);background:rgba(245,165,36,.08);color:#ffc45b;font-size:11px;font-weight:950;letter-spacing:.11em;text-transform:uppercase}
-.hero h1{font-size:58px;line-height:.98;letter-spacing:-.045em;margin:16px 0 20px;max-width:760px}
-.hero h1 em{font-style:normal;color:var(--orange2)}
-.lead{font-size:19px;line-height:1.55;color:#c3cede;max-width:720px;margin:0 0 24px}
-.hero-points{display:grid;gap:10px;margin:26px 0}
-.hero-point{display:flex;gap:11px;align-items:flex-start;color:#dbe4f0;font-size:14px;line-height:1.45}
-.tick{flex:0 0 22px;width:22px;height:22px;border-radius:7px;background:rgba(57,217,160,.13);border:1px solid rgba(57,217,160,.32);color:var(--green);display:grid;place-items:center;font-weight:950}
-.hero-cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:26px}
-.mini{font-size:11px;color:var(--muted)}
-.hero-card{background:linear-gradient(180deg,rgba(18,34,56,.97),rgba(10,24,42,.97));border:1px solid rgba(255,255,255,.08);border-radius:28px;padding:24px;box-shadow:var(--shadow);position:relative}
-.hero-card:before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(245,165,36,.55),transparent 40%,rgba(80,140,220,.32));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.case-head{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:#93a9c4;font-weight:900}
-.monitor{margin-top:14px;background:#07111e;border:1px solid #1f3450;border-radius:18px;padding:17px;display:grid;gap:14px}
-.vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.vital{padding:10px;border-radius:12px;background:#0d1b2d;border:1px solid #1f3553}
-.vital small{display:block;font-size:9px;color:#8297b1;text-transform:uppercase;font-weight:850;letter-spacing:.08em}
-.vital strong{font-size:24px;display:block;margin-top:2px}
-.vital.bad strong{color:#ff8b8b}.vital.warn strong{color:#ffd174}.vital.good strong{color:#7ee8bd}
-.case-text{font-size:14px;line-height:1.55;color:#d5dfec}
-.question{padding:15px;border-radius:15px;background:linear-gradient(135deg,rgba(245,165,36,.13),rgba(245,165,36,.04));border:1px solid rgba(245,165,36,.28);font-weight:850;line-height:1.45}
-.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.answer{padding:10px;border-radius:10px;border:1px solid #294462;background:#102039;color:#bfcde0;font-size:11px;font-weight:750;text-align:center}
-.section{padding:76px 0;border-top:1px solid rgba(255,255,255,.06)}
-.sec-tag{color:#ffc45b;font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:950}
-.section h2{font-size:40px;letter-spacing:-.035em;line-height:1.06;margin:10px 0 15px}
-.section-intro{max-width:760px;color:#aebed1;font-size:16px;line-height:1.6;margin:0 0 34px}
-.problem-grid,.deliver-grid,.who-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.problem-card,.deliver-card,.who-card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px}
-.problem-card b,.deliver-card b,.who-card b{display:block;font-size:15px;margin:8px 0}
-.problem-card p,.deliver-card p,.who-card p{font-size:13px;color:#9fb0c6;line-height:1.55;margin:0}
-.icon{width:36px;height:36px;border-radius:11px;background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.25);display:grid;place-items:center;color:#ffc45b;font-weight:950}
-.timeline{display:grid;gap:10px;max-width:900px}
-.trow{display:grid;grid-template-columns:54px 1fr;gap:16px;align-items:start;padding:18px 0;border-bottom:1px solid #1b304b}
-.tnum{width:48px;height:48px;border-radius:15px;background:#13253d;border:1px solid #2a4568;display:grid;place-items:center;color:#ffc45b;font-weight:950}
-.trow h3{margin:1px 0 5px;font-size:16px}.trow p{margin:0;color:#9fb0c6;font-size:13px;line-height:1.55}
-.offer{background:linear-gradient(145deg,rgba(245,165,36,.12),rgba(13,29,49,.96) 40%,rgba(13,29,49,.99));border:1px solid rgba(245,165,36,.28);border-radius:28px;padding:32px;box-shadow:var(--shadow);display:grid;grid-template-columns:1fr 330px;gap:30px;align-items:center}
-.offer h2{margin-top:0}.pricebox{background:#07111e;border:1px solid #243c5b;border-radius:20px;padding:24px;text-align:center}
-.pricebox small{color:#91a4bb;font-weight:800}.price{font-size:54px;font-weight:950;letter-spacing:-.05em;margin:6px 0}.price sup{font-size:20px;vertical-align:top;margin-right:3px}.pricebox .btn{width:100%;margin-top:10px}
-.offer-list{display:grid;gap:9px;margin-top:22px}.offer-item{font-size:13px;color:#d4deea;display:flex;gap:9px;align-items:flex-start}
-.faq{display:grid;gap:10px;max-width:900px}.faq details{border:1px solid #213955;background:#0d1b2d;border-radius:14px;padding:15px 17px}.faq summary{cursor:pointer;font-weight:850}.faq p{color:#a8b8cb;font-size:13px;line-height:1.55}
-.final{padding:80px 0 100px;text-align:center}.final h2{font-size:44px;max-width:850px;margin:0 auto 16px;letter-spacing:-.035em}.final p{max-width:680px;margin:0 auto 24px;color:#adbed1;font-size:16px;line-height:1.6}
-footer{border-top:1px solid rgba(255,255,255,.07);padding:28px 0;color:#7f93ad;font-size:11px}.foot{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}.foot img{width:42px}
-.sticky-mobile{display:none}
-@media(max-width:900px){.hero{padding-top:52px}.hero-grid{grid-template-columns:1fr}.hero h1{font-size:47px}.hero-card{max-width:620px}.problem-grid,.deliver-grid,.who-grid{grid-template-columns:1fr 1fr}.offer{grid-template-columns:1fr}.pricebox{max-width:440px}}
-@media(max-width:620px){.wrap{padding:0 16px}.topin{height:66px}.brand img{width:42px;height:42px}.brand strong{font-size:12px}.top .btn{display:none}.hero h1{font-size:39px}.lead{font-size:16px}.hero-card{padding:16px}.vitals{grid-template-columns:1fr 1fr 1fr}.vital strong{font-size:20px}.problem-grid,.deliver-grid,.who-grid{grid-template-columns:1fr}.section{padding:58px 0}.section h2{font-size:32px}.offer{padding:22px}.final h2{font-size:34px}.sticky-mobile{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:40}.sticky-mobile .btn{width:100%;box-shadow:0 12px 40px rgba(0,0,0,.45)}}
+body{margin:0;color:var(--ink);background:linear-gradient(180deg,#06101b 0%,#07111d 45%,#091523 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(var(--max),calc(100% - 44px));margin:auto}
+.top{position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,16,27,.76);backdrop-filter:blur(18px)}
+.topin{height:78px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.logo{width:132px;height:58px;object-fit:contain;object-position:left center;filter:brightness(0) invert(1);opacity:.96}
+.topmeta{display:flex;align-items:center;gap:18px;color:#9aacbd;font-size:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;cursor:pointer;font-weight:850;letter-spacing:-.01em;transition:.2s}
+.btn-primary{padding:13px 18px;border-radius:999px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#111925;box-shadow:0 14px 34px rgba(255,122,26,.18)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(255,122,26,.25)}
+
+.hero{position:relative;min-height:760px;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.06)}
+.hero-monitor{position:absolute;inset:0;overflow:hidden;background:#030a11}
+.hero-monitor::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,10,17,.06) 0%,rgba(3,10,17,.12) 25%,rgba(7,17,29,.52) 50%,rgba(7,17,29,.90) 72%,#07111d 88%)}
+.monitor-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(95,145,189,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(95,145,189,.05) 1px,transparent 1px);background-size:38px 38px;mask-image:linear-gradient(90deg,#000 0%,rgba(0,0,0,.85) 54%,transparent 88%)}
+.trace{position:absolute;left:-4%;width:71%;filter:drop-shadow(0 0 10px currentColor)}
+.trace.ecg{top:18%;height:145px;color:var(--green);opacity:.72}
+.trace.pleth{top:41%;height:112px;color:var(--blue);opacity:.62}
+.trace.capno{top:61%;height:112px;color:var(--yellow);opacity:.66}
+.monitor-data{position:absolute;left:6.5%;top:12%;display:grid;grid-template-columns:repeat(3,145px);gap:12px;z-index:2}
+.vbox{padding:13px 14px 12px;border:1px solid rgba(136,174,211,.16);background:rgba(3,10,17,.50);backdrop-filter:blur(8px)}
+.vbox small{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#7f95ab;font-weight:800}
+.vbox strong{display:block;font-size:34px;letter-spacing:-.05em;line-height:1;margin-top:5px}.vbox.red strong{color:var(--red)}.vbox.yellow strong{color:var(--yellow)}.vbox.green strong{color:var(--green)}
+.monitor-label{position:absolute;left:6.5%;bottom:11%;z-index:2;color:#71879d;font-size:11px;letter-spacing:.18em;text-transform:uppercase}
+.hero-inner{position:relative;z-index:3;display:grid;grid-template-columns:.82fr 1.18fr;min-height:760px;align-items:center}
+.hero-copy{grid-column:2;max-width:670px;justify-self:end;padding:86px 0 82px}
+.kicker{display:flex;align-items:center;gap:10px;color:#d5b06c;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}
+.kicker::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--orange),transparent)}
+h1{margin:22px 0 22px;font-size:clamp(50px,5.6vw,82px);line-height:.94;letter-spacing:-.06em;font-weight:760}
+h1 .orange{color:#ff8a2c}
+.lead{margin:0;max-width:630px;color:#b6c2d0;font-size:19px;line-height:1.58}
+.hero-proof{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 30px}.proof{padding:8px 11px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:#b8c6d5;background:rgba(12,28,44,.55);font-size:11px}
+.hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.hero-actions .note{font-size:11px;color:#8799ac;line-height:1.5}
+
+.statement{padding:88px 0}.statement-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:74px;align-items:start}.secnum{color:#6d8197;font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:800}.statement h2,.section h2{margin:10px 0 0;font-size:clamp(34px,4vw,56px);line-height:1.02;letter-spacing:-.045em;font-weight:720}.bigcopy{font-size:20px;line-height:1.65;color:#b6c3d2;margin:2px 0 0}.bigcopy b{color:#fff;font-weight:700}
+
+.section{padding:84px 0;border-top:1px solid rgba(255,255,255,.06)}
+.section-head{display:grid;grid-template-columns:.78fr 1.22fr;gap:74px;margin-bottom:44px}.section-copy{max-width:720px}.section-copy p{color:#9fafc1;font-size:15px;line-height:1.7;margin:16px 0 0}
+.decision-list{border-top:1px solid rgba(255,255,255,.08)}.decision{display:grid;grid-template-columns:72px 1fr 1fr;gap:26px;padding:26px 0;border-bottom:1px solid rgba(255,255,255,.08);align-items:start}.decision .n{font-size:13px;color:#ff9a4f;font-weight:850;letter-spacing:.08em}.decision h3{margin:0;font-size:18px;letter-spacing:-.02em}.decision p{margin:0;color:#93a6b9;font-size:13px;line-height:1.62}
+
+.case-strip{margin-top:52px;padding:24px 0;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}.case-item{padding:0 28px;border-left:1px solid rgba(255,255,255,.08)}.case-item:first-child{padding-left:0;border-left:0}.case-item small{display:block;color:#6f849a;text-transform:uppercase;letter-spacing:.16em;font-size:9px}.case-item b{display:block;margin-top:8px;font-size:16px;line-height:1.4}.case-item span{display:block;margin-top:6px;color:#90a3b7;font-size:12px;line-height:1.5}
+
+.deliveries{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}.deliver{padding:22px 24px;border:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(15,31,48,.55),rgba(10,22,35,.42))}.deliver .topline{display:flex;align-items:center;justify-content:space-between;gap:14px}.deliver .code{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#ff9b50}.deliver h3{font-size:16px;margin:12px 0 6px}.deliver p{margin:0;color:#92a5b9;font-size:13px;line-height:1.55}
+
+.audience{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}.aud{padding:30px 28px;border-left:1px solid rgba(255,255,255,.08)}.aud:first-child{border-left:0}.aud small{font-size:10px;color:#ff9d55;letter-spacing:.14em;text-transform:uppercase}.aud h3{font-size:18px;margin:10px 0 7px}.aud p{margin:0;color:#93a5b8;font-size:13px;line-height:1.6}
+
+.offer-wrap{padding:96px 0}.offer{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.09);background:linear-gradient(135deg,#0d1d2d 0%,#0a1624 50%,#0b1826 100%);display:grid;grid-template-columns:1fr 390px;min-height:430px}.offer::before{content:"";position:absolute;left:-100px;bottom:-180px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(255,122,26,.17),transparent 65%)}.offer-main{padding:52px;position:relative;z-index:1}.offer-side{padding:52px 42px;border-left:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1;background:rgba(4,12,20,.28)}.offer h2{font-size:44px;margin:10px 0 18px;letter-spacing:-.04em}.offer p{color:#9fb0c2;line-height:1.65;font-size:14px}.meta-list{display:grid;gap:10px;margin-top:24px}.meta-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:12px}.meta-row span{color:#8296aa}.meta-row b{font-weight:700}.price-label{font-size:10px;color:#8194a8;letter-spacing:.16em;text-transform:uppercase}.price{font-size:68px;font-weight:760;letter-spacing:-.07em;margin:6px 0 4px}.price sup{font-size:22px;vertical-align:top;margin-right:6px}.offer-side .btn{width:100%;margin-top:22px}.subnote{text-align:center;color:#73879b;font-size:10px;margin-top:10px;line-height:1.5}
+
+.faq{max-width:900px;margin-left:auto}.faq details{border-top:1px solid rgba(255,255,255,.09);padding:20px 0}.faq details:last-child{border-bottom:1px solid rgba(255,255,255,.09)}.faq summary{cursor:pointer;font-weight:700;font-size:15px}.faq p{color:#93a5b8;font-size:13px;line-height:1.7;max-width:760px}
+.final{padding:100px 0 120px;text-align:center;border-top:1px solid rgba(255,255,255,.06)}.final h2{max-width:900px;margin:0 auto;font-size:clamp(38px,4.5vw,62px);line-height:1.02;letter-spacing:-.05em}.final p{max-width:650px;margin:20px auto 28px;color:#9cacbd;line-height:1.65}.final .btn{padding:15px 24px}
+footer{padding:28px 0;border-top:1px solid rgba(255,255,255,.06);color:#71859a;font-size:10px}.foot{display:flex;justify-content:space-between;gap:26px;align-items:center}.foot .logo{width:110px;height:52px}
+.mobile-cta{display:none}
+@media(max-width:960px){.topmeta>span{display:none}.hero{min-height:auto}.hero-inner{min-height:auto;grid-template-columns:1fr;padding:0}.hero-copy{grid-column:1;justify-self:start;max-width:720px;padding:400px 0 68px}.hero-monitor::after{background:linear-gradient(180deg,rgba(3,10,17,.02) 0%,rgba(7,17,29,.22) 40%,rgba(7,17,29,.95) 70%,#07111d 90%)}.trace{width:112%;left:-6%}.trace.ecg{top:8%}.trace.pleth{top:22%}.trace.capno{top:34%}.monitor-data{top:8%;left:22px;grid-template-columns:repeat(3,125px)}.monitor-label{display:none}.statement-grid,.section-head{grid-template-columns:1fr;gap:20px}.decision{grid-template-columns:50px 1fr}.decision p{grid-column:2}.offer{grid-template-columns:1fr}.offer-side{border-left:0;border-top:1px solid rgba(255,255,255,.08)}.audience{grid-template-columns:1fr}.aud{border-left:0;border-top:1px solid rgba(255,255,255,.08)}.aud:first-child{border-top:0}}
+@media(max-width:640px){.wrap{width:min(var(--max),calc(100% - 30px))}.topin{height:68px}.logo{width:112px;height:50px}.hero-copy{padding:330px 0 58px}.monitor-data{grid-template-columns:repeat(3,1fr);left:15px;right:15px;gap:7px}.vbox{padding:9px}.vbox strong{font-size:26px}.trace{width:132%;left:-14%}.trace.ecg{top:10%}.trace.pleth{top:24%}.trace.capno{top:36%}h1{font-size:43px}.lead{font-size:16px}.hero-proof{gap:6px}.proof{font-size:10px}.top .btn{display:none}.statement,.section{padding:62px 0}.section h2,.statement h2{font-size:34px}.bigcopy{font-size:17px}.decision{grid-template-columns:38px 1fr;gap:14px}.case-strip{grid-template-columns:1fr}.case-item{padding:18px 0;border-left:0;border-top:1px solid rgba(255,255,255,.08)}.case-item:first-child{border-top:0}.deliveries{grid-template-columns:1fr}.offer-wrap{padding:68px 0}.offer-main,.offer-side{padding:30px 24px}.offer h2{font-size:34px}.price{font-size:58px}.foot{align-items:flex-start;flex-direction:column}.mobile-cta{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:60}.mobile-cta .btn{width:100%;padding:15px 18px;box-shadow:0 18px 50px rgba(0,0,0,.45)}}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="wrap topin">
-    <div class="brand"><img src="ctmed-header.png" alt="CT-MED Academy"><div><strong>CT-MED ACADEMY</strong><small>Do conhecimento à conduta.</small></div></div>
-    <a class="btn primary" href="#inscricao">Quero participar</a>
+    <img class="logo" src="ctmed-header.png" alt="CT-MED Academy">
+    <div class="topmeta"><span>05 NOV 2026 · ONLINE AO VIVO</span><a class="btn btn-primary" href="#inscricao">Garantir vaga · R$ 67</a></div>
   </div>
 </header>
 
 <main>
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <div class="eyebrow">Live paga · 05 de novembro de 2026</div>
-      <h1>Sua primeira intubação <em>sozinho na UPA.</em><br>E agora?</h1>
-      <p class="lead">Uma live baseada em casos para você entender como pensar, preparar e conduzir uma sequência rápida de intubação — da decisão de intubar ao plano B quando a primeira tentativa falha.</p>
-      <div class="hero-points">
-        <div class="hero-point"><span class="tick">✓</span><span>Não é aula de decoreba de droga e dose.</span></div>
-        <div class="hero-point"><span class="tick">✓</span><span>Você vai treinar decisões clínicas antes, durante e depois da laringoscopia.</span></div>
-        <div class="hero-point"><span class="tick">✓</span><span>Feita para internos, recém-formados e médicos nos primeiros plantões.</span></div>
-      </div>
-      <div class="hero-cta">
-        <a class="btn primary checkout-link" href="#inscricao">Garantir minha vaga por R$ 67</a>
-        <span class="mini">Ao vivo · replay por 14 dias · materiais de apoio</span>
-      </div>
+  <div class="hero-monitor" aria-hidden="true">
+    <div class="monitor-grid"></div>
+    <svg class="trace ecg" viewBox="0 0 1200 150" fill="none"><polyline points="0,82 70,82 84,78 96,88 112,26 126,132 142,82 220,82 280,82 294,76 308,90 326,24 340,132 356,82 436,82 496,82 510,76 524,90 542,24 556,132 572,82 652,82 712,82 726,76 740,90 758,24 772,132 788,82 868,82 928,82 942,76 956,90 974,24 988,132 1004,82 1084,82 1200,82" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="trace pleth" viewBox="0 0 1200 120" fill="none"><polyline points="0,80 40,80 62,78 84,56 116,36 142,80 188,80 210,78 232,56 264,36 290,80 336,80 358,78 380,56 412,36 438,80 484,80 506,78 528,56 560,36 586,80 632,80 654,78 676,56 708,36 734,80 780,80 802,78 824,56 856,36 882,80 928,80 950,78 972,56 1004,36 1030,80 1076,80 1098,78 1120,56 1152,36 1178,80 1200,80" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="trace capno" viewBox="0 0 1200 120" fill="none"><polyline points="0,82 62,82 74,82 90,46 162,46 180,82 248,82 260,82 276,46 348,46 366,82 434,82 446,82 462,46 534,46 552,82 620,82 632,82 648,46 720,46 738,82 806,82 818,82 834,46 906,46 924,82 992,82 1004,82 1020,46 1092,46 1110,82 1178,82 1200,82" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="monitor-data">
+      <div class="vbox red"><small>PA</small><strong>78/42</strong></div>
+      <div class="vbox yellow"><small>SpO₂</small><strong>86%</strong></div>
+      <div class="vbox green"><small>FR</small><strong>38</strong></div>
     </div>
+    <div class="monitor-label">Paciente crítico · Pneumonia grave · Sala vermelha</div>
+  </div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <div class="kicker">Live prática CT-MED · 05/11/2026</div>
+      <h1>Sua primeira intubação <span class="orange">sozinho na UPA.</span><br>E agora?</h1>
+      <p class="lead">Da decisão de intubar ao plano B quando a primeira tentativa falha. Uma live construída em cima de casos, escolhas e consequências — como o plantão exige.</p>
+      <div class="hero-proof"><span class="proof">Ao vivo</span><span class="proof">Replay por 14 dias</span><span class="proof">Checklist pré-IOT</span><span class="proof">Algoritmo ISR</span><span class="proof">Fluxo de resgate</span></div>
+      <div class="hero-actions"><a class="btn btn-primary checkout-link" href="#inscricao">Quero participar por R$ 67</a><span class="note">Para internos, recém-formados<br>e médicos nos primeiros plantões.</span></div>
+    </div>
+  </div>
+</section>
 
-    <div class="hero-card" aria-label="Caso clínico ilustrativo">
-      <div class="case-head">Você está no plantão</div>
-      <div class="monitor">
-        <div class="vitals">
-          <div class="vital bad"><small>PA</small><strong>78/42</strong></div>
-          <div class="vital warn"><small>SpO₂</small><strong>86%</strong></div>
-          <div class="vital bad"><small>FR</small><strong>38</strong></div>
-        </div>
-        <div class="case-text"><b>Homem, 67 anos.</b> Pneumonia grave, confuso, exausto, piorando apesar de oxigênio.</div>
-        <div class="question">Ele precisa ser intubado. Mas ele aguenta ser intubado agora?</div>
-        <div class="answer-grid"><div class="answer">Qual o primeiro passo?</div><div class="answer">Qual indutor?</div><div class="answer">Como pré-oxigenar?</div><div class="answer">E se não passar?</div></div>
-      </div>
+<section class="statement">
+  <div class="wrap statement-grid">
+    <div><div class="secnum">01 · O problema real</div><h2>Você estudou ISR.<br>Mas consegue conduzir uma?</h2></div>
+    <p class="bigcopy">Na hora do plantão, o problema não é lembrar uma tabela. É decidir <b>se o paciente precisa ser intubado, se ele tolera a indução, como você vai pré-oxigenar e o que fará se a primeira tentativa falhar.</b> É aí que conhecimento vira conduta.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><div><div class="secnum">02 · Como será a live</div><h2>Você decide primeiro.<br>A teoria entra depois.</h2></div><div class="section-copy"><p>A lógica da CT-MED é simples: <b>caso → decisão → consequência → raciocínio → nova decisão.</b> O conteúdo entra exatamente onde a decisão clínica exige.</p></div></div>
+    <div class="decision-list">
+      <div class="decision"><div class="n">01</div><h3>Precisa intubar?</h3><p>Indicação, prioridade e o erro de confundir “precisa de via aérea” com “posso empurrar as drogas agora”.</p></div>
+      <div class="decision"><div class="n">02</div><h3>Ele aguenta a indução?</h3><p>Hipoxemia, choque, acidose e reserva fisiológica: o risco não começa na laringoscopia.</p></div>
+      <div class="decision"><div class="n">03</div><h3>Agora sim: sequência rápida.</h3><p>Indutor, bloqueador, dose e contexto. O paciente muda a escolha — não a tabela.</p></div>
+      <div class="decision"><div class="n">04</div><h3>Primeira tentativa falhou.</h3><p>Reoxigenação, otimização, bougie, videolaringoscopia, supraglótico e hora de parar de insistir.</p></div>
+      <div class="decision"><div class="n">05</div><h3>O tubo passou. Ainda não acabou.</h3><p>Capnografia, sedoanalgesia, hipotensão pós-IOT e ventilação inicial.</p></div>
+    </div>
+    <div class="case-strip"><div class="case-item"><small>Caso 01</small><b>PA 78/42. SpO₂ 86%. FR 38.</b><span>Você intuba agora ou prepara o paciente primeiro?</span></div><div class="case-item"><small>Caso 02</small><b>A laringoscopia não mostrou o que você esperava.</b><span>Você repete igual ou muda a estratégia?</span></div><div class="case-item"><small>Caso 03</small><b>O tubo passou. A pressão despencou.</b><span>O que você deveria ter previsto antes?</span></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><div><div class="secnum">03 · Entregáveis</div><h2>Material para voltar<br>quando precisar decidir.</h2></div><div class="section-copy"><p>Não é um pacote de “bônus”. São ferramentas de consulta rápida pensadas para acompanhar o raciocínio da live e continuar úteis depois dela.</p></div></div>
+    <div class="deliveries">
+      <div class="deliver"><div class="topline"><span class="code">AO VIVO</span><span>01</span></div><h3>Live prática baseada em casos</h3><p>Decisões clínicas em tempo real, discussão e raciocínio aplicado.</p></div>
+      <div class="deliver"><div class="topline"><span class="code">14 DIAS</span><span>02</span></div><h3>Replay da aula</h3><p>Volte aos pontos críticos e reveja o raciocínio depois da transmissão.</p></div>
+      <div class="deliver"><div class="topline"><span class="code">CHECKLIST</span><span>03</span></div><h3>Checklist pré-IOT</h3><p>O que precisa estar organizado antes de administrar indutor e bloqueador.</p></div>
+      <div class="deliver"><div class="topline"><span class="code">ALGORITMO</span><span>04</span></div><h3>Algoritmo visual da ISR</h3><p>Decisão → preparo → indução → intubação → confirmação → resgate.</p></div>
+      <div class="deliver"><div class="topline"><span class="code">FÁRMACOS</span><span>05</span></div><h3>Guia rápido de drogas</h3><p>Doses usuais, contexto de escolha e contraindicações relevantes.</p></div>
+      <div class="deliver"><div class="topline"><span class="code">PLANO B</span><span>06</span></div><h3>Fluxograma de resgate</h3><p>O que fazer quando a primeira tentativa falha sem repetir o mesmo erro.</p></div>
     </div>
   </div>
 </section>
 
 <section class="section">
   <div class="wrap">
-    <div class="sec-tag">O problema real</div>
-    <h2>Você pode ter estudado ISR. Isso não significa que está pronto para conduzir uma.</h2>
-    <p class="section-intro">Na hora do plantão, o problema não é lembrar uma lista. É decidir o que fazer primeiro, adaptar a técnica ao paciente e continuar funcionando quando o plano A não sai como esperado.</p>
-    <div class="problem-grid">
-      <div class="problem-card"><div class="icon">01</div><b>“Ele precisa ser intubado?”</b><p>Reconhecer indicação é só o começo. Você precisa enxergar a trajetória clínica e a urgência real.</p></div>
-      <div class="problem-card"><div class="icon">02</div><b>“Ele tolera a indução?”</b><p>Hipoxemia, choque e acidose mudam completamente a margem de segurança da sua sequência.</p></div>
-      <div class="problem-card"><div class="icon">03</div><b>“E se eu não conseguir?”</b><p>Primeira tentativa falhou? O objetivo nunca foi apenas passar o tubo. É manter o paciente oxigenado e vivo.</p></div>
-    </div>
+    <div class="section-head"><div><div class="secnum">04 · Para quem é</div><h2>Para quem sabe que, em algum momento, a decisão será sua.</h2></div><div class="section-copy"><p>A proposta não é formar especialista em via aérea em uma noite. É entregar uma estrutura mental melhor para o momento em que você precisar assumir a condução.</p></div></div>
+    <div class="audience"><div class="aud"><small>Internos</small><h3>Você já viu a teoria.</h3><p>Agora precisa entender como ela se organiza quando o paciente está deteriorando na sua frente.</p></div><div class="aud"><small>Recém-formados</small><h3>Os primeiros plantões chegaram.</h3><p>Menos improviso, mais prioridade e uma sequência mental que ajuda a não travar.</p></div><div class="aud"><small>Médicos de plantão</small><h3>Você já faz pronto atendimento.</h3><p>Use a live para revisar decisões críticas, atualizar o raciocínio e identificar lacunas.</p></div></div>
   </div>
 </section>
 
-<section class="section">
-  <div class="wrap">
-    <div class="sec-tag">Como será a live</div>
-    <h2>Você decide primeiro. A teoria entra depois.</h2>
-    <p class="section-intro">A CT-MED vai conduzir a live como um plantão, não como capítulo de livro: caso → decisão → consequência → raciocínio → nova decisão.</p>
-    <div class="timeline">
-      <div class="trow"><div class="tnum">1</div><div><h3>Precisa intubar?</h3><p>Indicação, prioridade e o erro de confundir “precisa de via aérea” com “posso empurrar as drogas agora”.</p></div></div>
-      <div class="trow"><div class="tnum">2</div><div><h3>O que pode dar errado antes da laringoscopia?</h3><p>Via aérea anatômica e fisiologicamente difícil, reserva de oxigênio, pressão e plano de resgate.</p></div></div>
-      <div class="trow"><div class="tnum">3</div><div><h3>Agora sim: ISR.</h3><p>Indutores, bloqueadores, doses e contexto. O paciente muda a escolha — não a tabela.</p></div></div>
-      <div class="trow"><div class="tnum">4</div><div><h3>Primeira tentativa falhou.</h3><p>Reoxigenação, mudança de estratégia, bougie, supraglótico e como não transformar insistência em desastre.</p></div></div>
-      <div class="trow"><div class="tnum">5</div><div><h3>O tubo passou. Você ainda não terminou.</h3><p>Capnografia, sedoanalgesia, hipotensão pós-IOT e ventilação inicial.</p></div></div>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <div class="sec-tag">Você recebe</div>
-    <h2>Não é só acesso a uma transmissão.</h2>
-    <p class="section-intro">Os materiais foram pensados para virar consulta rápida antes e durante os primeiros plantões.</p>
-    <div class="deliver-grid">
-      <div class="deliver-card"><div class="icon">LIVE</div><b>Live prática baseada em casos</b><p>Decisões clínicas em tempo real, com enquete, discussão e raciocínio aplicado.</p></div>
-      <div class="deliver-card"><div class="icon">14D</div><b>Replay por 14 dias</b><p>Você pode rever a aula e voltar aos pontos críticos depois da transmissão.</p></div>
-      <div class="deliver-card"><div class="icon">✓</div><b>Checklist pré-IOT</b><p>O que checar antes de administrar indutor e bloqueador.</p></div>
-      <div class="deliver-card"><div class="icon">ISR</div><b>Algoritmo visual da sequência</b><p>Decisão → preparo → indução → intubação → confirmação → resgate.</p></div>
-      <div class="deliver-card"><div class="icon">Rx</div><b>Guia rápido de drogas</b><p>Indutores e bloqueadores com doses usuais, contexto de escolha e contraindicações relevantes.</p></div>
-      <div class="deliver-card"><div class="icon">B</div><b>Fluxograma de resgate</b><p>O que fazer quando a primeira tentativa falha sem cair na armadilha de repetir igual.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <div class="sec-tag">Para quem é</div>
-    <h2>Feita para quem sabe que em algum momento a decisão vai ser sua.</h2>
-    <div class="who-grid">
-      <div class="who-card"><div class="icon">I</div><b>Internos</b><p>Que já estudaram via aérea, mas ainda não têm uma estrutura mental para conduzir a situação real.</p></div>
-      <div class="who-card"><div class="icon">R</div><b>Recém-formados</b><p>Que estão começando plantões e querem reduzir improviso na hora de uma emergência respiratória.</p></div>
-      <div class="who-card"><div class="icon">PS</div><b>Médicos de plantão</b><p>Que querem organizar melhor o raciocínio da ISR e revisar pontos críticos de segurança.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="inscricao">
+<section class="offer-wrap" id="inscricao">
   <div class="wrap">
     <div class="offer">
-      <div>
-        <div class="sec-tag">Inscrição</div>
-        <h2>Sua primeira intubação sozinho na UPA. E agora?</h2>
-        <p class="section-intro" style="margin-bottom:0">Uma noite para transformar “eu sei a teoria” em uma sequência mental que você consegue usar quando o paciente está na sua frente.</p>
-        <div class="offer-list">
-          <div class="offer-item"><span class="tick">✓</span><span>Data: <b>05/11/2026</b></span></div>
-          <div class="offer-item"><span class="tick">✓</span><span>Horário: <b id="horaTexto">a confirmar</b></span></div>
-          <div class="offer-item"><span class="tick">✓</span><span>Formato: <b>online e ao vivo</b></span></div>
-          <div class="offer-item"><span class="tick">✓</span><span>Replay: <b>14 dias</b></span></div>
-          <div class="offer-item"><span class="tick">✓</span><span>Materiais de apoio incluídos</span></div>
-        </div>
-      </div>
-      <div class="pricebox">
-        <small>INSCRIÇÃO</small>
-        <div class="price"><sup>R$</sup>67</div>
-        <small>pagamento único</small>
-        <a class="btn primary checkout-link" href="#" id="checkoutBtn">Quero garantir minha vaga</a>
-        <div class="mini" style="margin-top:10px">Vagas para a primeira edição</div>
-      </div>
+      <div class="offer-main"><div class="secnum">05 · Inscrição</div><h2>Sua primeira intubação sozinho na UPA. E agora?</h2><p>Uma noite para transformar “eu sei a teoria” em uma sequência de decisão que você consegue usar quando o paciente está na sua frente.</p><div class="meta-list"><div class="meta-row"><span>Data</span><b>05/11/2026</b></div><div class="meta-row"><span>Horário</span><b id="horaTexto">a confirmar</b></div><div class="meta-row"><span>Formato</span><b>Online e ao vivo</b></div><div class="meta-row"><span>Replay</span><b>14 dias</b></div><div class="meta-row"><span>Materiais</span><b>Incluídos</b></div></div></div>
+      <div class="offer-side"><div class="price-label">Inscrição · pagamento único</div><div class="price"><sup>R$</sup>67</div><a class="btn btn-primary checkout-link" href="#">Garantir minha vaga</a><div class="subnote">Primeira edição · vagas limitadas à operação da transmissão</div></div>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <div class="wrap">
-    <div class="sec-tag">Dúvidas</div>
-    <h2>Perguntas frequentes</h2>
-    <div class="faq">
-      <details><summary>Preciso já saber intubar?</summary><p>Não. A live não pressupõe experiência avançada em via aérea. Ela foi desenhada para organizar o raciocínio de quem está se preparando para assumir mais responsabilidade clínica.</p></details>
-      <details><summary>Vai ter gravação?</summary><p>Sim. O replay ficará disponível por 14 dias após a transmissão.</p></details>
-      <details><summary>É uma aula só de técnica de laringoscopia?</summary><p>Não. O foco é conduzir a ISR inteira: decisão, preparo, fisiologia, drogas, execução, falha da primeira tentativa, confirmação e pós-IOT.</p></details>
-      <details><summary>Serve para quem já trabalha em pronto atendimento?</summary><p>Sim. A proposta também é útil para médicos que já fazem plantão e querem revisar e estruturar melhor decisões críticas de via aérea.</p></details>
-    </div>
-  </div>
+  <div class="wrap section-head"><div><div class="secnum">06 · Dúvidas</div><h2>Perguntas frequentes</h2></div><div class="faq"><details><summary>Preciso já saber intubar?</summary><p>Não. A live não pressupõe experiência avançada em via aérea. Ela foi desenhada para organizar o raciocínio de quem está se preparando para assumir mais responsabilidade clínica.</p></details><details><summary>Vai ter gravação?</summary><p>Sim. O replay ficará disponível por 14 dias após a transmissão.</p></details><details><summary>É uma aula só de técnica de laringoscopia?</summary><p>Não. O foco é conduzir a ISR inteira: decisão, preparo, fisiologia, drogas, execução, falha da primeira tentativa, confirmação e pós-IOT.</p></details><details><summary>Serve para quem já trabalha em pronto atendimento?</summary><p>Sim. Também é útil para médicos que já fazem plantão e querem revisar e estruturar melhor decisões críticas de via aérea.</p></details></div></div>
 </section>
 
-<section class="final">
-  <div class="wrap">
-    <h2>Quando todo mundo olhar para você, qual é a sua próxima decisão?</h2>
-    <p>A live foi criada para essa hora: menos decoreba, mais prioridade, segurança e raciocínio aplicável ao plantão.</p>
-    <a class="btn primary checkout-link" href="#inscricao">Participar por R$ 67</a>
-  </div>
-</section>
+<section class="final"><div class="wrap"><h2>Quando todo mundo olhar para você, qual é a sua próxima decisão?</h2><p>Menos decoreba. Mais prioridade, segurança e raciocínio aplicável ao plantão.</p><a class="btn btn-primary checkout-link" href="#inscricao">Participar por R$ 67</a></div></section>
 </main>
 
-<footer><div class="wrap foot"><div class="brand"><img src="ctmed-header.png" alt="CT-MED Academy"><div><strong>CT-MED ACADEMY</strong><small>Do conhecimento à conduta.</small></div></div><div>Conteúdo educacional. Não substitui treinamento prático supervisionado nem protocolos institucionais.</div></div></footer>
-
-<div class="sticky-mobile"><a class="btn primary checkout-link" href="#inscricao">Garantir vaga · R$ 67</a></div>
-
+<footer><div class="wrap foot"><img class="logo" src="ctmed-header.png" alt="CT-MED Academy"><div>Conteúdo educacional. Não substitui treinamento prático supervisionado nem protocolos institucionais.</div></div></footer>
+<div class="mobile-cta"><a class="btn btn-primary checkout-link" href="#inscricao">Garantir vaga · R$ 67</a></div>
 <script>
-/* EDITE SOMENTE ESTES CAMPOS QUANDO TIVER AS INFORMAÇÕES FINAIS */
-const LIVE_CONFIG = {
-  checkoutUrl: "",      // Ex.: https://pay.kiwify.com.br/xxxx
-  horario: "a confirmar" // Ex.: 19h30
-};
-
-document.getElementById('horaTexto').textContent = LIVE_CONFIG.horario || 'a confirmar';
-
-document.querySelectorAll('.checkout-link').forEach(link => {
-  link.addEventListener('click', e => {
-    if (LIVE_CONFIG.checkoutUrl) {
-      e.preventDefault();
-      window.location.href = LIVE_CONFIG.checkoutUrl;
-    }
-  });
-});
+const LIVE_CONFIG={checkoutUrl:"",horario:"a confirmar"};
+document.getElementById('horaTexto').textContent=LIVE_CONFIG.horario||'a confirmar';
+document.querySelectorAll('.checkout-link').forEach(link=>link.addEventListener('click',e=>{if(LIVE_CONFIG.checkoutUrl){e.preventDefault();location.href=LIVE_CONFIG.checkoutUrl}}));
 </script>
 </body>
 </html>
