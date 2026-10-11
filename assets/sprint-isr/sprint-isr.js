@@ -10,7 +10,7 @@
   var CONFIG = {
     checkoutUrl: '',
     certificado: '',
-    inicio: '2026-11-05T19:00:00-03:00'
+    inicio: '2026-11-11T19:00:00-03:00'
   };
 
   var doc = document;
