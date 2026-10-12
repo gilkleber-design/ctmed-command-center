@@ -147,25 +147,43 @@
   <section class="sec sec--caso" aria-labelledby="t-caso">
     <div class="sec__inner">
       <div class="sec__head">
-        <p class="eyebrow">Um caso que você vai aprender a conduzir</p>
-        <h2 id="t-caso">Paciente hipoxêmico.<br class="br-d"> Instável.<br class="br-d"> A equipe olha para você.</h2>
+        <p class="eyebrow">Decisões de plantão</p>
+        <h2 id="t-caso">Você decidiu<br class="br-d"> pela intubação.<br class="br-d"> E agora?</h2>
+        <p class="caso__contexto">Paciente na sala vermelha, com insuficiência respiratória grave e instabilidade hemodinâmica. Você vai conduzir a sequência rápida de intubação.</p>
       </div>
       <div class="caso">
         <dl class="caso__vitais" aria-label="Sinais vitais do paciente">
           <div><dt>SpO₂</dt><dd>81<small>%</small></dd></div>
           <div><dt>FC</dt><dd>142<small>bpm</small></dd></div>
           <div><dt>PA</dt><dd>82/46<small>mmHg</small></dd></div>
-          <div><dt>FR</dt><dd>34<small>irpm</small></dd></div>
+          <div class="is-ambar"><dt>FR</dt><dd>34<small>irpm</small></dd></div>
         </dl>
-        <p class="caso__pergunta" id="caso-q">Qual é o primeiro passo?</p>
+        <h3 class="caso__pergunta" id="caso-q">Qual frente você priorizaria agora?</h3>
+        <p class="caso__ajuda">Escolha uma opção e veja o que seu raciocínio precisa considerar.</p>
         <div class="caso__opcoes" id="caso-opcoes" role="group" aria-labelledby="caso-q">
-          <button type="button" aria-pressed="false">Preparo o material</button>
-          <button type="button" aria-pressed="false">Pré-oxigeno</button>
-          <button type="button" aria-pressed="false">Otimizo a hemodinâmica</button>
-          <button type="button" aria-pressed="false">Escolho os fármacos</button>
+          <button type="button" aria-pressed="false" data-fb="1">Preparo o material</button>
+          <button type="button" aria-pressed="false" data-fb="2">Melhoro a oxigenação</button>
+          <button type="button" aria-pressed="false" data-fb="3">Otimizo a hemodinâmica</button>
+          <button type="button" aria-pressed="false" data-fb="4">Escolho os fármacos</button>
         </div>
-        <p class="caso__resposta" id="caso-resposta" aria-live="polite"></p>
-        <p class="caso__fecho">A live vai trabalhar a sequência de decisões, e não só decorar a ordem dos procedimentos.</p>
+        <div class="caso__retorno" id="caso-retorno" aria-live="polite">
+          <div class="caso__painel" id="caso-painel" hidden>
+            <div class="caso__painel-in">
+              <h4>Vamos pensar na sua escolha.</h4>
+              <p class="caso__fb" data-fb="1" hidden>Você vai precisar de laringoscópio, tubo, aspirador, capnografia e plano de resgate. Mas, enquanto organiza tudo, a SpO₂ continua em 81% e o paciente está hipotenso. Quem pode preparar os equipamentos enquanto você aborda as ameaças imediatas?</p>
+              <p class="caso__fb" data-fb="2" hidden>A hipoxemia grave exige atenção imediata. Você precisa de uma estratégia eficaz de oxigenação e ventilação antes da tentativa. Mas a PA está em 82/46 mmHg. O que você vai fazer para reduzir o risco de colapso circulatório na indução?</p>
+              <p class="caso__fb" data-fb="3" hidden>A hipotensão torna a indução especialmente arriscada. Antecipar o suporte hemodinâmico é fundamental. Mas o paciente também está profundamente hipoxêmico. Como estabilizar os dois problemas sem atrasar desnecessariamente uma intervenção urgente?</p>
+              <p class="caso__fb" data-fb="4" hidden>Os agentes e suas doses precisam considerar a instabilidade clínica. Mas a escolha farmacológica, isoladamente, não resolve a hipoxemia, a hipotensão nem a possibilidade de falha na primeira tentativa.</p>
+              <p class="caso__virada">Percebeu o problema?</p>
+              <p>Você não precisa apenas saber intubar. Precisa reconhecer ameaças simultâneas, definir prioridades, distribuir tarefas e antecipar o que pode dar errado.</p>
+              <div class="caso__live">
+                <p><b>É esse raciocínio que vamos desenvolver na live.</b></p>
+                <p>Casos reais, decisões comentadas e os pontos críticos que fazem diferença na emergência.</p>
+              </div>
+              <button type="button" class="caso__de-novo" id="caso-de-novo">Tentar novamente</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

@@ -251,22 +251,35 @@ h1 span,.final__title span{color:var(--orange)}
 
 .sec__note{margin-top:16px;font-size:calc(var(--fs-card) * .93);line-height:1.5;color:var(--muted);max-width:68ch}
 
-/* caso clínico */
+/* microcaso: sinais vitais, pergunta, quatro frentes e painel de discussão */
+.caso__contexto{margin-top:1em;max-width:46ch;font-size:var(--fs-body);line-height:1.5;color:var(--soft)}
 .caso{padding:20px 18px 22px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(10,23,42,.9),rgba(6,15,29,.9))}
-.caso__vitais{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:600}
-.caso__vitais div{padding:7px 9px 8px;border:1px solid rgba(255,45,45,.5);border-radius:8px;background:rgba(255,45,45,.08)}
-.caso__vitais dt{font-size:13px;letter-spacing:.05em;color:#ff7070}
-.caso__vitais dd{font-size:clamp(25px,7.2cqw,40px);line-height:1;white-space:nowrap;color:#ff3d3d;text-shadow:0 0 16px rgba(255,45,45,.55)}
-.caso__vitais small{margin-left:.22em;font-size:.36em;letter-spacing:.03em;color:#ff9a9a;text-shadow:none}
+.caso__vitais{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:600}
+.caso__vitais div{--cor:#ff4545;--brilho:rgba(255,45,45,.5);padding:9px 6px 10px;border:1px solid #24406a;border-radius:10px;background:#050d19}
+.caso__vitais .is-ambar{--cor:#ffc61a;--brilho:rgba(255,198,26,.4)}
+.caso__vitais dt{font-size:14px;letter-spacing:.06em;color:#9fb1c9}
+.caso__vitais dd{margin-top:2px;font-size:clamp(25px,7.2cqw,40px);line-height:1;white-space:nowrap;color:var(--cor);text-shadow:0 0 16px var(--brilho)}
+.caso__vitais small{margin-left:.2em;font-size:.38em;letter-spacing:.03em;opacity:.82;text-shadow:none}
 @media (max-width:519px){.caso__vitais{grid-template-columns:repeat(2,minmax(0,1fr))}.caso__vitais dd{font-size:34px}}
-.caso__pergunta{margin-top:22px;font-size:calc(var(--fs-h2) * .8);font-weight:800;line-height:1.15;letter-spacing:-.015em}
+.caso__pergunta{margin-top:22px;padding-top:20px;border-top:1px solid var(--line-soft);font-size:calc(var(--fs-h2) * .76);font-weight:800;line-height:1.15;letter-spacing:-.015em}
+.caso__ajuda{margin-top:.5em;font-size:calc(var(--fs-card) * .95);line-height:1.4;color:var(--muted)}
 .caso__opcoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
-.caso__opcoes button{padding:.85em .95em;border:1.5px solid #2f4f7d;border-radius:10px;background:rgba(8,19,36,.85);font-size:var(--fs-card);font-weight:600;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .18s ease,background-color .18s ease}
+.caso__opcoes button{min-height:3.6em;padding:.85em .95em;border:1.5px solid #2f4f7d;border-radius:10px;background:rgba(8,19,36,.85);font-size:var(--fs-card);font-weight:600;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .18s ease,background-color .18s ease}
 .caso__opcoes button:hover{border-color:var(--orange)}
-.caso__opcoes button[aria-pressed="true"]{border-color:var(--orange);background:rgba(255,122,15,.16)}
-.caso__resposta{margin-top:14px;font-size:var(--fs-card);font-weight:600;line-height:1.4;color:var(--orange-hi)}
-.caso__resposta:empty{display:none}
-.caso__fecho{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:var(--fs-card);line-height:1.45;color:var(--soft)}
+.caso__opcoes button[aria-pressed="true"]{border-color:var(--orange);background:rgba(255,122,15,.16);box-shadow:inset 0 0 0 1px var(--orange)}
+.caso__retorno{display:grid;grid-template-rows:0fr;transition:grid-template-rows .34s ease}
+.caso__retorno.is-open{grid-template-rows:1fr}
+.caso__painel{min-height:0;overflow:hidden}
+.caso__painel-in{padding-top:20px;font-size:var(--fs-card);line-height:1.52;color:var(--soft)}
+.caso__painel h4{margin:0;font-size:calc(var(--fs-card-t) * .98);font-weight:800;line-height:1.25;color:#fff}
+.caso__fb{margin-top:.6em;max-width:68ch}
+.caso__virada{margin-top:1.3em;font-size:calc(var(--fs-card-t) * .98);font-weight:800;line-height:1.25;color:var(--orange-hi)}
+.caso__virada + p{margin-top:.4em;max-width:68ch}
+.caso__live{margin-top:1.3em;padding:.2em 0 .25em 1em;border-left:3px solid var(--orange)}
+.caso__live b{color:#fff}
+.caso__live p + p{margin-top:.25em}
+.caso__de-novo{margin-top:1.2em;padding:.35em 0;border:0;background:none;font-size:calc(var(--fs-card) * .95);font-weight:600;color:#c7d3e3;text-decoration:underline;text-underline-offset:.22em;cursor:pointer}
+.caso__de-novo:hover{color:#fff}
 
 
 /* depoimentos em vídeo: capa + play; o vídeo só é baixado quando a pessoa clica */
@@ -330,11 +343,12 @@ h1 span,.final__title span{color:var(--orange)}
   .sec--como{--head:calc(var(--u) * 26.8);--gap:calc(var(--u) * .8)}
   .sec--faq{--head:calc(var(--u) * 33.4)}
   .caso{padding:calc(var(--u) * 1.9) calc(var(--u) * 2.1) calc(var(--u) * 2)}
-  .caso__vitais{gap:calc(var(--u) * .6);max-width:calc(var(--u) * 44)}
-  .caso__vitais div{padding:.6em .9em .7em}
+  .caso__vitais{gap:calc(var(--u) * .6)}
+  .caso__vitais div{padding:.75em .5em .85em}
   .caso__vitais dd{font-size:calc(var(--u) * 2.9)}
-  .caso__pergunta{margin-top:calc(var(--u) * 1.8)}
-  .caso__opcoes{grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u) * .6);margin-top:calc(var(--u) * 1.1)}
+  .caso__pergunta{margin-top:calc(var(--u) * 1.7);padding-top:calc(var(--u) * 1.6)}
+  .caso__opcoes{gap:calc(var(--u) * .6);margin-top:calc(var(--u) * 1.1)}
+  .caso__painel-in{padding-top:calc(var(--u) * 1.7)}
   .sec__note{margin-top:calc(var(--u) * 1.1)}
 
   .sec--aprender{padding-bottom:calc(var(--u) * 1.8)}
