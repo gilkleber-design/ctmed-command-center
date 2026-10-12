@@ -6,10 +6,12 @@
      checkoutUrl : link da página de pagamento. Enquanto estiver vazio, os botões
                    levam ao fim da página e o último avisa que a inscrição não abriu.
      certificado : resposta para "Vou receber certificado?". Vazio = pergunta oculta.
+     duracao     : duração da live (ex.: '2 horas'). Vazio = não aparece.
      inicio      : data e hora da live (horário de Brasília). */
   var CONFIG = {
     checkoutUrl: '',
     certificado: '',
+    duracao: '',
     inicio: '2026-11-11T19:00:00-03:00'
   };
 
@@ -42,6 +44,23 @@
     $('.faq__a p', cert).textContent = CONFIG.certificado;
     cert.hidden = false;
   }
+  if (CONFIG.duracao) {
+    $$('.js-horario').forEach(function (el) { el.textContent = 'Brasília, duração de ' + CONFIG.duracao; });
+  }
+
+  /* ---------- caso clínico: o visitante escolhe o primeiro passo ---------- */
+  (function () {
+    var box = $('#caso-opcoes'), out = $('#caso-resposta');
+    if (!box || !out) return;
+    var btns = $$('button', box);
+    btns.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        btns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+        out.textContent = 'Na live, você vai ver quando esse é o primeiro passo e quando outro vem antes.';
+      });
+    });
+  })();
+
   $$('.faq__item button').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var open = btn.getAttribute('aria-expanded') !== 'true';
