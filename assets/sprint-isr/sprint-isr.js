@@ -48,17 +48,31 @@
     $$('.js-horario').forEach(function (el) { el.textContent = 'Brasília, duração de ' + CONFIG.duracao; });
   }
 
-  /* ---------- caso clínico: o visitante escolhe o primeiro passo ---------- */
+  /* ---------- microcaso: cada frente escolhida abre a sua discussão ---------- */
   (function () {
-    var box = $('#caso-opcoes'), out = $('#caso-resposta');
-    if (!box || !out) return;
-    var btns = $$('button', box);
-    btns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        btns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
-        out.textContent = 'Na live, você vai ver quando esse é o primeiro passo e quando outro vem antes.';
-      });
-    });
+    var box = $('#caso-opcoes'), wrap = $('#caso-retorno'), painel = $('#caso-painel'), deNovo = $('#caso-de-novo');
+    if (!box || !wrap || !painel) return;
+    var btns = $$('button', box), textos = $$('.caso__fb', painel), fechar = 0;
+    function escolher(btn) {
+      var alvo = btn.getAttribute('data-fb');
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      textos.forEach(function (t) { t.hidden = t.getAttribute('data-fb') !== alvo; });
+      clearTimeout(fechar);
+      if (painel.hidden) {
+        painel.hidden = false;
+        void wrap.offsetHeight;                      // garante a transição de abertura
+      }
+      wrap.classList.add('is-open');
+    }
+    function reiniciar() {
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      wrap.classList.remove('is-open');
+      clearTimeout(fechar);
+      fechar = setTimeout(function () { painel.hidden = true; textos.forEach(function (t) { t.hidden = true; }); }, REDUCED ? 0 : 360);
+      btns[0].focus({ preventScroll: true });
+    }
+    btns.forEach(function (btn) { btn.addEventListener('click', function () { escolher(btn); }); });
+    if (deNovo) deNovo.addEventListener('click', reiniciar);
   })();
 
   $$('.faq__item button').forEach(function (btn) {
