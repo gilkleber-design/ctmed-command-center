@@ -11,6 +11,13 @@
 <meta property="og:site_name" content="CT-MED Academy">
 <meta property="og:title" content="Sua primeira intubação sozinho na UPA. E agora?">
 <meta property="og:description" content="Como pensar, preparar e conduzir uma sequência rápida de intubação quando a decisão é sua.">
+<meta property="og:url" content="https://ctmed-command-center-sprint-isr.vercel.app/">
+<meta property="og:image" content="https://ctmed-command-center-sprint-isr.vercel.app/assets/sprint-isr/capa-compartilhamento.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Sprint ISR, live prática 100% online da CT-MED Academy, com os professores Diego Leite e Gil Kléber.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/sprint-isr/favicon.png">
 <link rel="apple-touch-icon" href="assets/sprint-isr/apple-touch-icon.png">
 <link rel="preload" href="assets/sprint-isr/fonts/figtree-var.woff2" as="font" type="font/woff2" crossorigin>
@@ -85,7 +92,7 @@
 
       <dl class="facts">
         <div class="fact"><svg class="ic"><use href="#i-calendar"/></svg><div><dt>Data</dt><dd>11/11/2026</dd><dd class="fact__note">Quarta-feira</dd></div></div>
-        <div class="fact"><svg class="ic"><use href="#i-clock"/></svg><div><dt>Horário</dt><dd>19:00</dd><dd class="fact__note">Horário de Brasília</dd></div></div>
+        <div class="fact"><svg class="ic"><use href="#i-clock"/></svg><div><dt>Horário</dt><dd>19:00</dd><dd class="fact__note js-horario">Horário de Brasília</dd></div></div>
         <div class="fact"><svg class="ic"><use href="#i-screen"/></svg><div><dt>Formato</dt><dd>Online ao vivo</dd><dd class="fact__note">Com interação</dd></div></div>
         <div class="fact"><svg class="ic"><use href="#i-ticket"/></svg><div><dt>Investimento</dt><dd>R$ 67</dd><dd class="fact__note">Acesso à aula ao vivo</dd></div></div>
       </dl>
@@ -95,7 +102,7 @@
       <ul class="trust">
         <li><svg class="ic"><use href="#i-card"/></svg>Apenas R$ 67</li>
         <li><svg class="ic"><use href="#i-lock"/></svg>Pagamento seguro</li>
-        <li><svg class="ic"><use href="#i-play"/></svg>Acesso à gravação</li>
+        <li><svg class="ic"><use href="#i-play"/></svg>Gravação por 14 dias</li>
       </ul>
     </div>
 
@@ -141,6 +148,32 @@
     </div>
   </section>
 
+  <section class="sec sec--caso" aria-labelledby="t-caso">
+    <div class="sec__inner">
+      <div class="sec__head">
+        <p class="eyebrow">Um caso que você vai aprender a conduzir</p>
+        <h2 id="t-caso">Paciente hipoxêmico.<br class="br-d"> Instável.<br class="br-d"> A equipe olha para você.</h2>
+      </div>
+      <div class="caso">
+        <dl class="caso__vitais" aria-label="Sinais vitais do paciente">
+          <div><dt>SpO₂</dt><dd>81<small>%</small></dd></div>
+          <div><dt>FC</dt><dd>142<small>bpm</small></dd></div>
+          <div><dt>PA</dt><dd>82/46<small>mmHg</small></dd></div>
+          <div><dt>FR</dt><dd>34<small>irpm</small></dd></div>
+        </dl>
+        <p class="caso__pergunta" id="caso-q">Qual é o primeiro passo?</p>
+        <div class="caso__opcoes" id="caso-opcoes" role="group" aria-labelledby="caso-q">
+          <button type="button" aria-pressed="false">Preparo o material</button>
+          <button type="button" aria-pressed="false">Pré-oxigeno</button>
+          <button type="button" aria-pressed="false">Otimizo a hemodinâmica</button>
+          <button type="button" aria-pressed="false">Escolho os fármacos</button>
+        </div>
+        <p class="caso__resposta" id="caso-resposta" aria-live="polite"></p>
+        <p class="caso__fecho">A live vai trabalhar a sequência de decisões, e não só decorar a ordem dos procedimentos.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="sec sec--aprender" aria-labelledby="t-aprender">
     <img class="sec__photo" src="assets/sprint-isr/laringoscopio-foto.webp" srcset="assets/sprint-isr/laringoscopio-foto-800.webp 800w, assets/sprint-isr/laringoscopio-foto.webp 1448w" sizes="(min-width:1100px) 44vw, 96vw" alt="" width="1448" height="1086" loading="lazy" decoding="async">
     <div class="sec__inner">
@@ -165,6 +198,7 @@
         <p class="eyebrow">O que você recebe</p>
         <h2 id="t-recebe">Ferramentas práticas<br class="br-d"> para aplicar no seu plantão<br class="br-d"> desde o primeiro dia.</h2>
       </div>
+      <div class="sec__body">
       <ul class="kit">
         <li><svg class="ic"><use href="#i-play"/></svg><h3>Live ao vivo</h3><p>Com interação e casos reais.</p></li>
         <li><svg class="ic"><use href="#i-replay"/></svg><h3>Replay por 14&nbsp;dias</h3><p>Assista quantas vezes quiser.</p></li>
@@ -173,6 +207,8 @@
         <li><svg class="ic"><use href="#i-doc"/></svg><h3>Guia rápido de drogas</h3><p>Com doses e principais cenários.</p></li>
         <li><svg class="ic"><use href="#i-rescue"/></svg><h3>Fluxograma de resgate</h3><p>Para situações de falha na IOT.</p></li>
       </ul>
+      <p class="sec__note">Live online de discussão de casos reais, com raciocínio passo a passo. Não equivale a treinamento prático supervisionado de intubação.</p>
+      </div>
     </div>
   </section>
 
@@ -230,24 +266,32 @@
       </div>
       <div class="faq" id="faq">
         <div class="faq__item">
-          <h3><button type="button" aria-expanded="false" aria-controls="faq-1">A live fica gravada?<span class="faq__plus" aria-hidden="true"></span></button></h3>
-          <div class="faq__a" id="faq-1"><div><p>Sim. A gravação fica disponível por 14 dias depois da transmissão.</p></div></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-1">A live fica gravada? Por quanto tempo terei acesso?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-1"><div><p>Sim. A gravação fica disponível por 14 dias depois da transmissão e, nesse período, você assiste quantas vezes quiser.</p></div></div>
         </div>
         <div class="faq__item">
-          <h3><button type="button" aria-expanded="false" aria-controls="faq-2">Por quanto tempo terei acesso?<span class="faq__plus" aria-hidden="true"></span></button></h3>
-          <div class="faq__a" id="faq-2"><div><p>Por 14 dias depois da live. Nesse período, você assiste ao replay quantas vezes quiser.</p></div></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-2">Como funciona a interação durante a live?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-2"><div><p>A live é ao vivo: os professores discutem casos reais da UPA e do PS, mostram o raciocínio passo a passo e respondem às suas dúvidas em tempo real.</p></div></div>
         </div>
         <div class="faq__item">
-          <h3><button type="button" aria-expanded="false" aria-controls="faq-3">Preciso ser médico para participar?<span class="faq__plus" aria-hidden="true"></span></button></h3>
-          <div class="faq__a" id="faq-3"><div><p>Não. A live foi pensada para internos, estudantes, recém-formados e plantonistas da UPA e do PS.</p></div></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-3">Quais materiais vou receber?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-3"><div><p>Checklist pré-IOT, algoritmo visual da ISR, guia rápido de drogas, com doses e principais cenários, e fluxograma de resgate para situações de falha na IOT.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-4">Preciso ser médico para participar?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-4"><div><p>Não. A live foi pensada para internos, estudantes, recém-formados e plantonistas da UPA e do PS.</p></div></div>
+        </div>
+        <div class="faq__item">
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-5">A live substitui um treinamento prático de intubação?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-5"><div><p>Não. É uma live online de discussão de casos, com raciocínio passo a passo. Ela não equivale a treinamento prático supervisionado de intubação.</p></div></div>
         </div>
         <div class="faq__item" id="faq-certificado" hidden>
-          <h3><button type="button" aria-expanded="false" aria-controls="faq-4">Vou receber certificado?<span class="faq__plus" aria-hidden="true"></span></button></h3>
-          <div class="faq__a" id="faq-4"><div><p></p></div></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-6">Vou receber certificado?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-6"><div><p></p></div></div>
         </div>
         <div class="faq__item">
-          <h3><button type="button" aria-expanded="false" aria-controls="faq-5">Como funciona o acesso?<span class="faq__plus" aria-hidden="true"></span></button></h3>
-          <div class="faq__a" id="faq-5"><div><p>Depois da inscrição, você recebe as instruções de acesso à transmissão e ao replay.</p></div></div>
+          <h3><button type="button" aria-expanded="false" aria-controls="faq-7">Como funciona o acesso?<span class="faq__plus" aria-hidden="true"></span></button></h3>
+          <div class="faq__a" id="faq-7"><div><p>Depois da inscrição, você recebe as instruções de acesso à transmissão e ao replay.</p></div></div>
         </div>
       </div>
     </div>
@@ -276,18 +320,19 @@
 
       <dl class="facts">
         <div class="fact"><svg class="ic"><use href="#i-calendar"/></svg><div><dt>Data</dt><dd>11/11/2026</dd><dd class="fact__note">Quarta-feira</dd></div></div>
-        <div class="fact"><svg class="ic"><use href="#i-clock"/></svg><div><dt>Horário</dt><dd>19:00</dd><dd class="fact__note">Horário de Brasília</dd></div></div>
+        <div class="fact"><svg class="ic"><use href="#i-clock"/></svg><div><dt>Horário</dt><dd>19:00</dd><dd class="fact__note js-horario">Horário de Brasília</dd></div></div>
         <div class="fact"><svg class="ic"><use href="#i-screen"/></svg><div><dt>Formato</dt><dd>Online ao vivo</dd><dd class="fact__note">Com interação</dd></div></div>
         <div class="fact"><svg class="ic"><use href="#i-ticket"/></svg><div><dt>Investimento</dt><dd>R$ 67</dd><dd class="fact__note">Acesso à aula ao vivo</dd></div></div>
       </dl>
 
+      <p class="final__inclui"><b>Inclui:</b> gravação por 14 dias, checklist pré-IOT, algoritmo visual da ISR, guia rápido de drogas e fluxograma de resgate.</p>
       <a class="cta js-checkout" id="cta-final" href="#garantir">Garantir minha vaga <svg class="ic"><use href="#i-chevron"/></svg></a>
       <p class="final__when js-countdown" data-prefix="Faltam " hidden></p>
 
       <ul class="trust">
         <li><svg class="ic"><use href="#i-card"/></svg>Apenas R$ 67</li>
         <li><svg class="ic"><use href="#i-lock"/></svg>Pagamento seguro</li>
-        <li><svg class="ic"><use href="#i-play"/></svg>Acesso à gravação</li>
+        <li><svg class="ic"><use href="#i-play"/></svg>Gravação por 14 dias</li>
       </ul>
     </div>
   </div>

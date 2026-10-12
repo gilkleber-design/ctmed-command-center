@@ -240,6 +240,25 @@ h1 span,.final__title span{color:var(--orange)}
 .js .steps:not(.is-in) .step__n{opacity:0;transform:scale(.3)}
 .js .steps:not(.is-in) .step::before{transform:scaleY(0)}
 
+.sec__note{margin-top:16px;font-size:calc(var(--fs-card) * .93);line-height:1.5;color:var(--muted);max-width:68ch}
+
+/* caso clínico */
+.caso{padding:20px 18px 22px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,rgba(10,23,42,.9),rgba(6,15,29,.9))}
+.caso__vitais{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:600}
+.caso__vitais div{padding:7px 9px 8px;border:1px solid rgba(255,45,45,.5);border-radius:8px;background:rgba(255,45,45,.08)}
+.caso__vitais dt{font-size:13px;letter-spacing:.05em;color:#ff7070}
+.caso__vitais dd{font-size:clamp(25px,7.2cqw,40px);line-height:1;white-space:nowrap;color:#ff3d3d;text-shadow:0 0 16px rgba(255,45,45,.55)}
+.caso__vitais small{margin-left:.22em;font-size:.36em;letter-spacing:.03em;color:#ff9a9a;text-shadow:none}
+@media (max-width:519px){.caso__vitais{grid-template-columns:repeat(2,minmax(0,1fr))}.caso__vitais dd{font-size:34px}}
+.caso__pergunta{margin-top:22px;font-size:calc(var(--fs-h2) * .8);font-weight:800;line-height:1.15;letter-spacing:-.015em}
+.caso__opcoes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.caso__opcoes button{padding:.85em .95em;border:1.5px solid #2f4f7d;border-radius:10px;background:rgba(8,19,36,.85);font-size:var(--fs-card);font-weight:600;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .18s ease,background-color .18s ease}
+.caso__opcoes button:hover{border-color:var(--orange)}
+.caso__opcoes button[aria-pressed="true"]{border-color:var(--orange);background:rgba(255,122,15,.16)}
+.caso__resposta{margin-top:14px;font-size:var(--fs-card);font-weight:600;line-height:1.4;color:var(--orange-hi)}
+.caso__resposta:empty{display:none}
+.caso__fecho{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft);font-size:var(--fs-card);line-height:1.45;color:var(--soft)}
+
 .duo{display:grid;gap:34px}
 .prof--lg h3{font-size:clamp(22px,5.8cqw,28px);font-weight:700}
 .prof--lg h3::after{content:"";display:block;width:1.75em;height:3px;margin-top:.5em;background:var(--orange)}
@@ -270,6 +289,13 @@ h1 span,.final__title span{color:var(--orange)}
   .sec--como{--head:calc(var(--u) * 26.8);--gap:calc(var(--u) * .8)}
   .sec--quemconduz{--head:calc(var(--u) * 32.4);--gap:calc(var(--u) * 3.2)}
   .sec--faq{--head:calc(var(--u) * 33.4)}
+  .caso{padding:calc(var(--u) * 1.9) calc(var(--u) * 2.1) calc(var(--u) * 2)}
+  .caso__vitais{gap:calc(var(--u) * .6);max-width:calc(var(--u) * 44)}
+  .caso__vitais div{padding:.6em .9em .7em}
+  .caso__vitais dd{font-size:calc(var(--u) * 2.9)}
+  .caso__pergunta{margin-top:calc(var(--u) * 1.8)}
+  .caso__opcoes{grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u) * .6);margin-top:calc(var(--u) * 1.1)}
+  .sec__note{margin-top:calc(var(--u) * 1.1)}
 
   .sec--aprender{padding-bottom:calc(var(--u) * 1.8)}
   .sec__photo{left:0;right:auto;top:auto;bottom:calc(var(--u) * -6.5);width:calc(var(--u) * 40);opacity:1;filter:brightness(.86);
@@ -319,6 +345,8 @@ h1 span,.final__title span{color:var(--orange)}
 .final .facts{margin-top:24px}
 .final .cta{margin-top:16px}
 .final .trust{margin-top:18px}
+.final__inclui{margin-top:16px;font-size:14.5px;line-height:1.45;color:var(--soft)}
+.final__inclui b{color:#fff}
 .final__when{margin-top:12px;font-size:14px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
 
 @media (min-width:1100px){
@@ -335,6 +363,7 @@ h1 span,.final__title span{color:var(--orange)}
   .final .hero__lead{margin-top:calc(var(--u) * .6)}
   .final .facts{margin-top:calc(var(--u) * 1.5)}
   .final .fact{min-height:calc(var(--u) * 6.1);padding:.7em .5em .7em .8em;font-size:.93em}
+  .final__inclui{margin-top:calc(var(--u) * 1);font-size:max(13px,calc(var(--u) * 1.02))}
   .final .cta{margin-top:calc(var(--u) * .9)}
   .final__when{margin-top:calc(var(--u) * .7);font-size:max(12.5px,calc(var(--u) * .98))}
   .final .trust{margin-top:calc(var(--u) * .9);justify-content:space-between;gap:.5em 1.2em}
