@@ -6,13 +6,11 @@
      checkoutUrl : link da página de pagamento. Enquanto estiver vazio, os botões
                    levam ao fim da página e o último avisa que a inscrição não abriu.
      certificado : resposta para "Vou receber certificado?". Vazio = pergunta oculta.
-     duracao     : duração da live (ex.: '2 horas'). Vazio = não aparece.
-     inicio      : data e hora da live (horário de Brasília). */
+     duracao     : duração da live (ex.: '2 horas'). Vazio = não aparece. */
   var CONFIG = {
     checkoutUrl: '',
     certificado: '',
-    duracao: '',
-    inicio: '2026-11-11T19:00:00-03:00'
+    duracao: ''
   };
 
   var doc = document;
@@ -95,13 +93,7 @@
     if (!lista.length) return;
 
     function el(tag, cls, text) { var n = doc.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
-    function parar(card) {
-      var v = $('video', card);
-      if (v) { v.pause(); v.removeAttribute('src'); v.load(); v.remove(); }
-      card.classList.remove('is-playing');
-    }
-    function tocar(card, d) {
-      $$('.depo__card.is-playing', trilho).forEach(parar);
+    function montar(d) {
       var v = doc.createElement('video');
       v.controls = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.poster = d.capa; v.src = d.video;
       if (d.legendas) {
@@ -109,10 +101,34 @@
         t.kind = 'captions'; t.srclang = 'pt-BR'; t.label = 'Português'; t.src = d.legendas; t.default = true;
         v.appendChild(t);
       }
-      v.addEventListener('ended', function () { parar(card); });
-      card.appendChild(v); card.classList.add('is-playing');
+      return v;
+    }
+    function soltar(v) { if (v) { v.pause(); v.removeAttribute('src'); v.load(); v.remove(); } }
+
+    /* o vídeo abre numa janela, inteiro (9:16); o cartão continua mostrando só a capa */
+    var cine = $('#cine'), palco = $('#cine-palco'), fecharCine = $('#cine-fechar');
+    var temJanela = !!(cine && palco && cine.showModal);
+    if (temJanela) {
+      cine.addEventListener('close', function () { soltar($('video', palco)); });
+      cine.addEventListener('click', function (e) { if (e.target === cine) cine.close(); });
+      fecharCine.addEventListener('click', function () { cine.close(); });
+    }
+    function parar(card) { soltar($('video', card)); card.classList.remove('is-playing'); }
+    function tocar(card, d) {
+      var v = montar(d);
+      if (temJanela) {
+        soltar($('video', palco));
+        cine.setAttribute('aria-label', 'Depoimento de ' + d.nome);
+        v.addEventListener('ended', function () { if (cine.open) cine.close(); });
+        palco.appendChild(v);
+        if (!cine.open) cine.showModal();
+      } else {                                        // navegador sem <dialog>: toca dentro do cartão, sem corte
+        $$('.depo__card.is-playing', trilho).forEach(parar);
+        v.addEventListener('ended', function () { parar(card); });
+        card.appendChild(v); card.classList.add('is-playing');
+      }
       var p = v.play(); if (p && p.catch) p.catch(function () {});
-      v.focus();
+      v.focus({ preventScroll: true });
     }
 
     lista.forEach(function (d) {
@@ -158,31 +174,6 @@
     window.addEventListener('resize', ask);
     sync();
   })();
-
-  /* ---------- contagem regressiva ---------- */
-  var startAt = new Date(CONFIG.inicio).getTime();
-  var counters = $$('.js-countdown');
-  function tickCountdown() {
-    var d = startAt - Date.now();
-    if (!(d > 0)) {
-      counters.forEach(function (el) { if (el.classList.contains('final__when')) el.hidden = true; });
-      return false;
-    }
-    var days = Math.floor(d / 864e5), h = Math.floor(d % 864e5 / 36e5),
-        m = Math.floor(d % 36e5 / 6e4), s = Math.floor(d % 6e4 / 1e3), txt;
-    if (days > 0) txt = days + (days === 1 ? ' dia, ' : ' dias, ') + h + ' h e ' + m + ' min';
-    else if (h > 0) txt = h + ' h, ' + m + ' min e ' + s + ' s';
-    else txt = m + ' min e ' + s + ' s';
-    var one = days === 1 || (days === 0 && h === 1) || (days === 0 && h === 0 && m === 1);
-    counters.forEach(function (el) {
-      var prefix = el.getAttribute('data-prefix') || '';
-      if (prefix === 'Faltam ' && one) prefix = 'Falta ';
-      el.textContent = prefix + txt;
-      el.hidden = false;
-    });
-    return true;
-  }
-  if (tickCountdown()) setInterval(tickCountdown, 1000);
 
   /* ---------- barras fixas (topo no desktop, rodapé no celular) ---------- */
   var topbar = $('#topbar'), dock = $('#dock');
