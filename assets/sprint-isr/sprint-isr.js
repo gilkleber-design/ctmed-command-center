@@ -69,6 +69,82 @@
     });
   });
 
+  /* ---------- depoimentos em vídeo ----------
+     Os dados vêm do <script id="depoimentos-dados"> no HTML. Só a capa é carregada;
+     o vídeo é baixado quando a pessoa aperta o play, e nunca toca sozinho. */
+  (function () {
+    var sec = $('#depoimentos'), trilho = $('#depo-trilho'), pontos = $('#depo-pontos'), dados = $('#depoimentos-dados');
+    if (!sec || !trilho || !dados) return;
+    var lista;
+    try { lista = JSON.parse(dados.textContent || '[]'); } catch (e) { lista = []; }
+    lista = (lista || []).filter(function (d) { return d && d.video && d.capa && d.nome; });
+    if (!lista.length) return;
+
+    function el(tag, cls, text) { var n = doc.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
+    function parar(card) {
+      var v = $('video', card);
+      if (v) { v.pause(); v.removeAttribute('src'); v.load(); v.remove(); }
+      card.classList.remove('is-playing');
+    }
+    function tocar(card, d) {
+      $$('.depo__card.is-playing', trilho).forEach(parar);
+      var v = doc.createElement('video');
+      v.controls = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.poster = d.capa; v.src = d.video;
+      if (d.legendas) {
+        var t = doc.createElement('track');
+        t.kind = 'captions'; t.srclang = 'pt-BR'; t.label = 'Português'; t.src = d.legendas; t.default = true;
+        v.appendChild(t);
+      }
+      v.addEventListener('ended', function () { parar(card); });
+      card.appendChild(v); card.classList.add('is-playing');
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+      v.focus();
+    }
+
+    lista.forEach(function (d) {
+      var card = el('li', 'depo__card');
+      var img = el('img', 'depo__capa'); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.src = d.capa;
+      card.appendChild(img);
+      if (d.duracao) card.appendChild(el('span', 'depo__tempo', d.duracao));
+      var btn = el('button', 'depo__play'); btn.type = 'button'; btn.setAttribute('aria-label', 'Assistir ao depoimento de ' + d.nome);
+      btn.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-tri"/></svg>';
+      btn.addEventListener('click', function () { tocar(card, d); });
+      card.appendChild(btn);
+      var txt = el('div', 'depo__txt');
+      if (d.frase || d.destaque) {
+        var q = el('p', 'depo__frase');
+        q.appendChild(doc.createTextNode('\u201C' + (d.frase || '') + (d.frase && d.destaque ? ' ' : '')));
+        if (d.destaque) q.appendChild(el('b', '', d.destaque));
+        q.appendChild(doc.createTextNode('\u201D'));
+        txt.appendChild(q);
+      }
+      txt.appendChild(el('p', 'depo__nome', d.nome));
+      if (d.papel) txt.appendChild(el('p', 'depo__papel', d.papel));
+      card.appendChild(txt);
+      trilho.appendChild(card);
+    });
+    sec.hidden = false;
+
+    /* carrossel: setas no desktop, arrastar no celular, pontos indicam a posição */
+    var ant = $('.depo__seta--ant', sec), prox = $('.depo__seta--prox', sec), box = $('.depo', sec), raf = 0;
+    function passo() { var c = trilho.children[0]; return c ? c.getBoundingClientRect().width + parseFloat(getComputedStyle(trilho).columnGap || 0) : 1; }
+    function sync() {
+      raf = 0;
+      var max = trilho.scrollWidth - trilho.clientWidth, n = max > 4 ? Math.round(max / passo()) + 1 : 1;
+      box.classList.toggle('depo--estatico', n <= 1);
+      if (pontos.children.length !== n) { pontos.innerHTML = ''; for (var i = 0; i < n; i++) pontos.appendChild(doc.createElement('i')); }
+      var at = Math.min(n - 1, Math.round(trilho.scrollLeft / passo()));
+      for (var k = 0; k < n; k++) pontos.children[k].classList.toggle('is-on', k === at);
+      ant.disabled = trilho.scrollLeft < 4; prox.disabled = trilho.scrollLeft > max - 4;
+    }
+    function ask() { if (!raf) raf = requestAnimationFrame(sync); }
+    ant.addEventListener('click', function () { trilho.scrollBy({ left: -passo(), behavior: REDUCED ? 'auto' : 'smooth' }); });
+    prox.addEventListener('click', function () { trilho.scrollBy({ left: passo(), behavior: REDUCED ? 'auto' : 'smooth' }); });
+    trilho.addEventListener('scroll', ask, { passive: true });
+    window.addEventListener('resize', ask);
+    sync();
+  })();
+
   /* ---------- contagem regressiva ---------- */
   var startAt = new Date(CONFIG.inicio).getTime();
   var counters = $$('.js-countdown');

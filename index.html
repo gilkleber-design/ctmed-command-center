@@ -50,6 +50,9 @@
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14.5 3.5v4h4M8.5 12h7M8.5 15.5h7M8.5 8.5h3"/></symbol>
   <symbol id="i-rescue" viewBox="0 0 24 24"><path d="M6.5 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14.5 3.5v4h4M8.5 11.5h2.5l2 5h2.5M8.5 16.5h1.5M13.5 11.5h2"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 5.5l6.5 6.5L9 18.5"/></symbol>
+  <symbol id="i-gem" viewBox="0 0 24 24"><path d="M7 4h10l4 5.5L12 20.5 3 9.5z"/><path d="M3 9.5h18M9.5 4 8 9.5l4 11 4-11L14.5 4"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10.3 9.2v5.6l4.6-2.8z"/></symbol>
+  <symbol id="i-tri" viewBox="0 0 24 24"><path d="M8.5 5.5v13l10.5-6.5z" fill="currentColor" stroke-width="1.6"/></symbol>
   <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.6v5.6c0 4.3-2.9 8-7 9.8-4.1-1.8-7-5.5-7-9.8V5.6z"/><path d="M9 12l2.2 2.2L15.2 10"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7.5 16.5l9-9M9 7.5h7.5V15"/></symbol>
 </svg>
@@ -108,24 +111,17 @@
 
     <div class="hero__profs">
       <p class="eyebrow">Com quem você vai aprender</p>
+      <p class="profs__lead">Dois anestesiologistas, professores da Afya e preceptores de residência médica.</p>
       <div class="profs">
         <div class="prof">
-          <h2>Prof. <b>Diego Leite</b></h2>
-          <ul class="bullets">
-            <li>Anestesiologista</li>
-            <li>Professor da Afya</li>
-            <li>Preceptor de residência médica de Anestesiologia</li>
-            <li>Foco no ensino de Anestesiologia</li>
-          </ul>
+          <h2>Diego Leite</h2>
+          <p class="prof__foco">Raciocínio clínico</p>
+          <p>Da avaliação do paciente à escolha da conduta na emergência.</p>
         </div>
         <div class="prof">
-          <h2>Prof. <b>Gil Kléber</b></h2>
-          <ul class="bullets">
-            <li>Anestesiologista</li>
-            <li>Professor da Afya</li>
-            <li>Preceptor de residência médica de Anestesiologia</li>
-            <li>Foco em simulação e prática</li>
-          </ul>
+          <h2>Gil Kléber</h2>
+          <p class="prof__foco">Simulação e prática</p>
+          <p>Do preparo da via aérea à execução e aos planos de resgate.</p>
         </div>
       </div>
     </div>
@@ -227,34 +223,30 @@
     </div>
   </section>
 
-  <section class="sec sec--quemconduz" aria-labelledby="t-conduz">
-    <div class="sec__inner">
-      <div class="sec__head">
-        <p class="eyebrow">Quem vai conduzir</p>
-        <h2 id="t-conduz">Experiência real<br class="br-d"> de quem vive e ensina<br class="br-d"> a emergência todos os dias.</h2>
+  <!-- Depoimentos em vídeo. A seção só aparece quando a lista abaixo tiver itens:
+       {"video":"assets/sprint-isr/depoimentos/nome.mp4","capa":"assets/sprint-isr/depoimentos/nome.webp","duracao":"0:21",
+        "frase":"A didática é muito boa e realmente","destaque":"aproxima a teoria da prática.","nome":"Nome","papel":"Acadêmica de Medicina",
+        "legendas":"assets/sprint-isr/depoimentos/nome.vtt"} -->
+  <script type="application/json" id="depoimentos-dados">[]</script>
+  <section class="sec sec--depo" id="depoimentos" aria-labelledby="t-depo" hidden>
+    <div class="depo">
+      <div class="depo__head">
+        <p class="eyebrow">Quem já aprendeu com a gente</p>
+        <h2 id="t-depo">Veja o que os <em>alunos dizem</em> sobre nossas aulas.</h2>
+        <p class="depo__sub">Relatos reais de quem já participou dos nossos cursos e vivenciou a prática com a CT-MED Academy.</p>
       </div>
-      <div class="duo">
-        <div class="prof prof--lg">
-          <h3>Prof. Diego Leite</h3>
-          <ul class="bullets">
-            <li>Anestesiologista</li>
-            <li>Professor da Afya</li>
-            <li>Preceptor de residência médica de Anestesiologia</li>
-            <li>Foco no ensino de Anestesiologia</li>
-            <li>Linguagem direta, didática e aplicável à realidade do plantão.</li>
-          </ul>
-        </div>
-        <div class="prof prof--lg">
-          <h3>Prof. Gil Kléber</h3>
-          <ul class="bullets">
-            <li>Anestesiologista</li>
-            <li>Professor da Afya</li>
-            <li>Preceptor de residência médica de Anestesiologia</li>
-            <li>Foco em simulação e prática</li>
-            <li>Experiência no ensino de procedimentos em cenários críticos.</li>
-          </ul>
-        </div>
+      <div class="depo__carrossel">
+        <button class="depo__seta depo__seta--ant" type="button" aria-label="Depoimentos anteriores"><svg class="ic" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+        <ul class="depo__trilho" id="depo-trilho"></ul>
+        <button class="depo__seta depo__seta--prox" type="button" aria-label="Próximos depoimentos"><svg class="ic" aria-hidden="true"><use href="#i-chevron"/></svg></button>
       </div>
+      <div class="depo__pontos" id="depo-pontos" aria-hidden="true"></div>
+      <ul class="depo__selos">
+        <li><svg class="ic" aria-hidden="true"><use href="#i-gem"/></svg><p><b>Depoimentos reais</b>de alunos e internos</p></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-clip"/></svg><p><b>Vídeos curtos</b>e sem roteiro</p></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-cap"/></svg><p><b>Diferentes instituições</b>e estágios da graduação</p></li>
+        <li><svg class="ic" aria-hidden="true"><use href="#i-team"/></svg><p><b>Experiências</b>com a CT-MED Academy</p></li>
+      </ul>
     </div>
   </section>
 
