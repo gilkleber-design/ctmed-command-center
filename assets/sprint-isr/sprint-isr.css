@@ -275,7 +275,7 @@ h1 span,.final__title span{color:var(--orange)}
 .depo__trilho{display:flex;gap:12px;margin-inline:calc(var(--pad) * -1);padding-inline:var(--pad);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);scrollbar-width:none;overscroll-behavior-x:contain}
 .depo__trilho::-webkit-scrollbar{display:none}
 .depo__card{position:relative;isolation:isolate;flex:0 0 78%;aspect-ratio:3/4;overflow:hidden;scroll-snap-align:start;border:1px solid var(--line);border-radius:16px;background:#0a1626}
-.depo__capa{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.depo__capa{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 28%}
 .depo__card::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(0deg,rgba(4,11,21,.95) 5%,rgba(4,11,21,.6) 36%,transparent 62%)}
 .depo__tempo{position:absolute;z-index:2;top:12px;right:12px;padding:.32em .62em;border-radius:8px;background:rgba(4,11,21,.8);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
 .depo__play{position:absolute;z-index:3;left:50%;top:45%;display:grid;place-items:center;width:68px;height:68px;border:0;border-radius:50%;background:rgba(10,16,26,.84);color:var(--orange);cursor:pointer;transform:translate(-50%,-50%);transition:transform .18s ease,background-color .18s ease}
@@ -288,7 +288,8 @@ h1 span,.final__title span{color:var(--orange)}
 .depo__nome{margin-top:.95em;font-size:17px;font-weight:800;line-height:1.25}
 .depo__nome::before{content:"";display:block;width:42px;height:3px;margin-bottom:.8em;background:var(--orange)}
 .depo__papel{font-size:13.5px;color:var(--muted)}
-.depo__card video{position:absolute;inset:0;z-index:4;width:100%;height:100%;object-fit:cover;background:#000}
+.depo__card video{position:absolute;inset:0;z-index:4;width:100%;height:100%;object-fit:cover;object-position:50% 28%;background:#000}
+.depo__card video::cue{font-family:"Figtree",system-ui,sans-serif;font-size:.95em;line-height:1.3;background:rgba(4,11,21,.78);color:#fff}
 .depo__card.is-playing::after,.depo__card.is-playing .depo__txt,.depo__card.is-playing .depo__play,.depo__card.is-playing .depo__tempo{visibility:hidden}
 .depo__seta{display:none}
 .depo__pontos{display:flex;justify-content:center;gap:10px;margin-top:16px}
