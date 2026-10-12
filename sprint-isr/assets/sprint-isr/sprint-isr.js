@@ -5,12 +5,9 @@
   /* ================= CONFIGURAÇÃO =================
      checkoutUrl : link da página de pagamento. Enquanto estiver vazio, os botões
                    levam ao fim da página e o último avisa que a inscrição não abriu.
-     certificado : resposta para "Vou receber certificado?". Vazio = pergunta oculta.
-     duracao     : duração da live (ex.: '2 horas'). Vazio = não aparece. */
+                   Data, horário, duração e certificado ficam escritos no index.html. */
   var CONFIG = {
-    checkoutUrl: '',
-    certificado: '',
-    duracao: ''
+    checkoutUrl: ''
   };
 
   var doc = document;
@@ -37,15 +34,6 @@
   });
 
   /* ---------- perguntas frequentes ---------- */
-  if (CONFIG.certificado) {
-    var cert = $('#faq-certificado');
-    $('.faq__a p', cert).textContent = CONFIG.certificado;
-    cert.hidden = false;
-  }
-  if (CONFIG.duracao) {
-    $$('.js-horario').forEach(function (el) { el.textContent = 'Brasília, duração de ' + CONFIG.duracao; });
-  }
-
   /* ---------- microcaso: cada frente escolhida abre a sua discussão ---------- */
   (function () {
     var box = $('#caso-opcoes'), wrap = $('#caso-retorno'), painel = $('#caso-painel'), deNovo = $('#caso-de-novo');
