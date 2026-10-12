@@ -43,17 +43,18 @@
   <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14.5 3.5v4h4M8.5 12h7M8.5 15.5h7M8.5 8.5h3"/></symbol>
   <symbol id="i-rescue" viewBox="0 0 24 24"><path d="M6.5 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5H6.5A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M14.5 3.5v4h4M8.5 11.5h2.5l2 5h2.5M8.5 16.5h1.5M13.5 11.5h2"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M9 5.5l6.5 6.5L9 18.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 2.6v5.6c0 4.3-2.9 8-7 9.8-4.1-1.8-7-5.5-7-9.8V5.6z"/><path d="M9 12l2.2 2.2L15.2 10"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7.5 16.5l9-9M9 7.5h7.5V15"/></symbol>
 </svg>
 
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
 <div class="topbar" id="topbar" hidden>
   <a class="topbar__brand" href="#topo" aria-label="Sprint ISR, voltar ao topo">
-    <img src="assets/sprint-isr/ctmed-escudo.webp" alt="" width="213" height="240">
-    <span>Sprint <b>ISR</b></span>
+    <svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>
+    <span class="topbar__name"><b>Sprint <em>ISR</em></b><small>Live prática · CT-MED</small></span>
   </a>
-  <p class="topbar__when"><span class="js-countdown" data-prefix="Live online em ">Live online, 11/11/2026, às 19h</span></p>
-  <a class="cta cta--sm js-checkout" href="#garantir">Garantir minha vaga</a>
+  <a class="cta cta--sm js-checkout" href="#garantir">Quero participar <svg class="ic" aria-hidden="true"><use href="#i-arrow"/></svg></a>
 </div>
 
 <div class="page">
@@ -305,8 +306,7 @@
 </div><!-- /.page -->
 
 <div class="dock" id="dock" hidden>
-  <p><b>R$ 67</b><span>Online, 11/11, 19h</span></p>
-  <a class="cta cta--sm js-checkout" href="#garantir">Garantir minha vaga</a>
+  <a class="cta js-checkout" href="#garantir">Garantir minha vaga <svg class="ic" aria-hidden="true"><use href="#i-chevron"/></svg></a>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
