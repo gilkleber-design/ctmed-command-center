@@ -159,7 +159,7 @@ h1 span,.final__title span{color:var(--orange)}
 
   .hero__inner{display:grid;grid-template-columns:calc(var(--u) * 52.1) minmax(0,1fr);width:var(--frame);max-width:none;margin:0 auto;padding:calc(var(--u) * 1.8) var(--pad) calc(var(--u) * 1.7)}
   .hero .brand,.hero__copy>.brand{position:static;font-size:calc(var(--u) * 2.3)}
-  .hero__copy{padding-bottom:calc(var(--u) * 8.4)}
+  .hero__copy{padding-bottom:0}
   .live-tag{font-size:max(14px,calc(var(--u) * 1.24));letter-spacing:.1em}
   .hero .live-tag{margin-top:calc(var(--u) * 2.7)}
   .hero h1{margin-top:calc(var(--u) * 1.15);max-width:calc(var(--u) * 36);text-wrap:initial;white-space:nowrap}
@@ -172,13 +172,16 @@ h1 span,.final__title span{color:var(--orange)}
   .hero .cta{margin-top:calc(var(--u) * 1.4);width:calc(var(--u) * 46)}
   .hero .trust{margin-top:calc(var(--u) * 1.5)}
   .trust{gap:.5em 2.4em}
-  .hero__profs{align-self:end;margin:0 0 0 calc(var(--u) * .9);padding:calc(var(--u) * 1.35) calc(var(--u) * 1.5) calc(var(--u) * 1.45);border-radius:calc(var(--u) * 1.1)}
-  .profs__lead{margin-top:calc(var(--u) * .9);font-size:max(13.5px,calc(var(--u) * 1.2))}
-  .profs{gap:calc(var(--u) * 1.3);margin-top:calc(var(--u) * 1)}
-  .prof{padding-top:calc(var(--u) * .95)}
+  /* cartão dos professores: faixa inteira embaixo do botão e da linha "Apenas R$ 67" */
+  .hero__profs{grid-column:1 / -1;display:grid;grid-template-columns:calc(var(--u) * 31) minmax(0,1fr);column-gap:calc(var(--u) * 2.4);margin:calc(var(--u) * 2.1) 0 0;padding:calc(var(--u) * 1.6) calc(var(--u) * 2.1) calc(var(--u) * 1.7);border-radius:calc(var(--u) * 1.1)}
+  .hero__profs .eyebrow{grid-column:1;align-self:end}
+  .profs__lead{grid-column:1;align-self:start;margin-top:calc(var(--u) * .9);font-size:max(14px,calc(var(--u) * 1.3))}
+  .profs{grid-column:2;grid-row:1 / span 2;gap:0;margin:0}
+  .prof{padding:calc(var(--u) * .2) calc(var(--u) * 1.6) calc(var(--u) * .2) calc(var(--u) * 2.2);border-top:0;border-left:1px solid rgba(140,165,205,.3)}
+  .prof:last-child{padding-right:0}
   .prof h2{font-size:calc(var(--u) * 1.72)}
   .prof__foco{font-size:max(13px,calc(var(--u) * 1.16))}
-  .prof__foco + p{font-size:max(13px,calc(var(--u) * 1.12))}
+  .prof__foco + p{font-size:max(13px,calc(var(--u) * 1.14))}
 }
 @media (min-width:1640px){
   /* acima da largura útil a foto deixa de encostar na borda da janela: some suavemente */
