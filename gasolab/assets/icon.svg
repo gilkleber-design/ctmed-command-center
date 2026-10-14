@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="GasoLab"><rect width="256" height="256" rx="56" fill="#040b15"/><g transform="translate(33 24) scale(.95)"><defs><clipPath id="in-i"><path d="M100 36C109 50 152 92 152 130A52 52 0 0 1 48 130C48 92 91 50 100 36Z"/></clipPath></defs>
+<path d="M100 8C112 26 170 84 170 130A70 70 0 0 1 30 130C30 84 88 26 100 8Z" fill="none" stroke="#f3f6fb" stroke-width="12" stroke-linejoin="round"/>
+<g clip-path="url(#in-i)"><rect x="0" y="0" width="200" height="215" fill="#163a6e"/><path d="M0 208L200 32L200 215L0 215Z" fill="#ff7a0f"/><path d="M0 208L200 32" stroke="#040b15" stroke-width="4"/></g>
+<g fill="none" stroke="#f3f6fb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+<path d="M100 47V66"/><path d="M95 78V72l5-6 5 6v6"/>
+<rect x="88" y="78" width="24" height="60" rx="3" fill="#163a6e"/>
+<path d="M82 140H118M100 140V158M90 159H110"/></g><path d="M90 88h5" stroke="#f3f6fb" stroke-width="3" stroke-linecap="round"/><path d="M90 97h5" stroke="#f3f6fb" stroke-width="3" stroke-linecap="round"/><path d="M90 106h5" stroke="#f3f6fb" stroke-width="3" stroke-linecap="round"/><path d="M90 115h5" stroke="#f3f6fb" stroke-width="3" stroke-linecap="round"/><path d="M90 124h5" stroke="#f3f6fb" stroke-width="3" stroke-linecap="round"/></g></svg>
