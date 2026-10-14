@@ -7,7 +7,7 @@
                    levam ao fim da página e o último avisa que a inscrição não abriu.
                    Data, horário, duração e certificado ficam escritos no index.html. */
   var CONFIG = {
-    checkoutUrl: ''
+    checkoutUrl: 'https://pay.cakto.com.br/4otgbkg_1200665'
   };
 
   var doc = document;
