@@ -248,6 +248,12 @@ h1 span{color:var(--orange)}
 .js .steps:not(.is-in) .step__n{opacity:0;transform:scale(.3)}
 .js .steps:not(.is-in) .step::before{transform:scaleY(0)}
 
+.bonus{display:flex;align-items:center;gap:14px;margin-top:14px;padding:14px 16px;border:1px solid rgba(255,122,15,.55);border-radius:calc(var(--radius) * .75);background:rgba(255,122,15,.09);color:inherit;text-decoration:none;transition:border-color .18s ease,background-color .18s ease}
+.bonus:hover{border-color:var(--orange);background:rgba(255,122,15,.15)}
+.bonus__tag{flex:none;padding:.35em .7em;border-radius:999px;background:var(--orange);color:#170f06;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.bonus__txt{flex:1;font-size:calc(var(--fs-card) * .95);line-height:1.4;color:var(--soft)}
+.bonus__txt b{color:#fff}
+.bonus .ic{flex:none;width:1.3em;height:1.3em;stroke-width:2.2;color:var(--orange)}
 .sec__note{margin-top:16px;font-size:calc(var(--fs-card) * .93);line-height:1.5;color:var(--muted);max-width:68ch}
 
 /* microcaso: sinais vitais, pergunta, quatro frentes e painel de discussão */
@@ -353,6 +359,8 @@ html:has(.cine[open]){overflow:hidden}
   .caso__pergunta{margin-top:calc(var(--u) * 1.7);padding-top:calc(var(--u) * 1.6)}
   .caso__opcoes{gap:calc(var(--u) * .6);margin-top:calc(var(--u) * 1.1)}
   .caso__painel-in{padding-top:calc(var(--u) * 1.7)}
+  .bonus{margin-top:calc(var(--u) * .9);padding:calc(var(--u) * 1) calc(var(--u) * 1.4)}
+  .bonus__txt{font-size:max(13px,calc(var(--u) * 1.1))}
   .sec__note{margin-top:calc(var(--u) * 1.1)}
 
   .sec--aprender{padding-bottom:calc(var(--u) * 1.8)}
