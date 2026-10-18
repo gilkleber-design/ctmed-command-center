@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Validar certificado · CT-MED Academy</title>
+<meta name="robots" content="noindex">
+<link rel="preload" href="../../assets/sprint-isr/fonts/figtree-var.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Fontes do próprio site, sem CDN externo. */
+@font-face{font-family:"Figtree";src:url(../../assets/sprint-isr/fonts/figtree-var.woff2) format("woff2");font-weight:300 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Barlow Condensed";src:url(../../assets/sprint-isr/fonts/barlow-condensed-600.woff2) format("woff2");font-weight:500 600;font-style:normal;font-display:swap}
+:root{--bg:#040b15;--panel:rgba(8,19,36,.74);--line:#1a3050;--text:#f3f6fb;--muted:#a9b8cc;--orange:#ff7a0f;--ok:#3ecf8e;--bad:#ff6b6b;
+  --f:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--fl:"Barlow Condensed","Arial Narrow",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 var(--f);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}
+.wrap{max-width:620px;margin:0 auto;padding-block:32px 64px;display:grid;gap:22px}
+header{display:flex;gap:12px;align-items:center;font-weight:800}
+header img{width:32px}
+.eyebrow{font:600 13px/1 var(--fl);letter-spacing:.24em;text-transform:uppercase;color:var(--orange)}
+h1{font-weight:900;font-size:clamp(30px,7vw,44px);line-height:1.05;letter-spacing:-.03em;margin:8px 0 0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;display:grid;gap:14px}
+label{font:600 13px/1 var(--fl);letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+input{flex:1 1 220px;min-width:0;font:600 17px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--text);background:#061020;border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+input:focus{outline:2px solid var(--orange);border-color:transparent}
+button{border:0;border-radius:10px;background:var(--orange);color:#170f06;font:800 15px/1 var(--f);letter-spacing:.06em;text-transform:uppercase;padding:15px 20px;cursor:pointer}
+.res{border-radius:12px;padding:18px;display:grid;gap:6px}
+.res.ok{background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.45)}
+.res.bad{background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.45)}
+.res .st{font:600 14px/1 var(--fl);letter-spacing:.2em;text-transform:uppercase}
+.res.ok .st{color:var(--ok)} .res.bad .st{color:var(--bad)}
+.res strong{font-size:22px;font-weight:900;letter-spacing:-.01em}
+.res p{margin:0;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><img src="../assets/escudo.png" alt="">CT-MED Academy</header>
+  <div><p class="eyebrow">Autenticidade</p><h1>Validar certificado</h1></div>
+  <form class="panel" id="f">
+    <label for="c">Código do certificado</label>
+    <div class="row"><input id="c" placeholder="ISR26-XXXX-XXXX" autocomplete="off"><button type="submit">Validar</button></div>
+  </form>
+  <div id="out" class="res" hidden></div>
+</div>
+<script src="../compradores.js"></script>
+<script>
+(function(){
+  var D=window.CERT_DATA||{compradores:{}}, codes={};
+  Object.keys(D.compradores).forEach(function(h){codes[D.compradores[h]]=1});
+  var p=new URLSearchParams(location.search), out=document.getElementById("out");
+  function check(code,nome){
+    code=(code||"").trim().toUpperCase();
+    out.hidden=false; out.textContent="";
+    var st=document.createElement("span"); st.className="st";
+    var main=document.createElement("strong"), info=document.createElement("p");
+    if(codes[code]){
+      out.className="res ok"; st.textContent="Certificado válido";
+      main.textContent=nome||"Participante confirmado";
+      info.textContent="Código "+code+". Participou da live prática “Preciso intubar, e agora?”, realizada online e ao vivo pela CT-MED Academy em 11/11/2026, com carga horária de 3 horas.";
+    }else{
+      out.className="res bad"; st.textContent="Código não encontrado";
+      main.textContent=code||"Sem código";
+      info.textContent="Esse código não corresponde a nenhum certificado emitido pela CT-MED Academy. Confira se foi digitado exatamente como aparece no certificado.";
+    }
+    out.append(st,main,info);
+  }
+  document.getElementById("f").addEventListener("submit",function(e){e.preventDefault();check(document.getElementById("c").value,"")});
+  if(p.get("c")){document.getElementById("c").value=p.get("c");check(p.get("c"),p.get("n"))}
+})();
+</script>
+</body>
+</html>

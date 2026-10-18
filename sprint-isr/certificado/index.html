@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Certificado ISR · CT-MED Academy</title>
+<meta name="robots" content="noindex">
+<link rel="preload" href="../assets/sprint-isr/fonts/figtree-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/sprint-isr/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Fontes servidas pelo próprio site (as mesmas da landing da live): o certificado
+   não pode depender de CDN externo para sair com a tipografia certa. */
+@font-face{font-family:"Figtree";src:url(../assets/sprint-isr/fonts/figtree-var.woff2) format("woff2");font-weight:300 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Barlow Condensed";src:url(../assets/sprint-isr/fonts/barlow-condensed-600.woff2) format("woff2");font-weight:500 600;font-style:normal;font-display:swap}
+/* Layout: página escura no padrão do site ISR (emissão) + certificado claro A4 paisagem (impressão) */
+:root{
+  --navy-950:#040b15; --navy-900:#061020; --navy-850:#08152a; --brand-navy:#122b40;
+  --line:#1a3050; --text:#f3f6fb; --soft:#dbe3ee; --muted:#a9b8cc;
+  --orange:#ff7a0f; --orange-hi:#ff9530; --danger:#ff6b6b; --ok:#3ecf8e;
+  --paper:#f8fafc; --ink:#0d1f33; --ink-soft:#4a5b70; --rule:#d7dee8;
+  --f-display:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-label:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:radial-gradient(1200px 600px at 80% -10%,#0d2340 0,transparent 60%),var(--navy-950);color:var(--text);font:16px/1.55 var(--f-display);min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 64px;display:flex;flex-direction:column;gap:28px}
+header.top{display:flex;align-items:center;gap:12px}
+header.top img{width:34px;height:auto}
+header.top .brand{font-weight:800;letter-spacing:.02em;line-height:1}
+header.top .brand small{display:block;font:500 10px/1.2 var(--f-label);letter-spacing:.32em;color:var(--muted);margin-top:3px}
+.eyebrow{font:600 13px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--orange)}
+h1{font-weight:900;font-size:clamp(34px,6vw,56px);line-height:1.02;letter-spacing:-.03em;margin:8px 0 0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--orange)}
+.lead{color:var(--soft);max-width:60ch;margin:12px 0 0;font-size:17px}
+.panel{background:rgba(8,19,36,.74);border:1px solid var(--line);border-radius:14px;padding:24px;display:grid;gap:18px;max-width:640px}
+label{display:block;font:600 13px/1 var(--f-label);letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+input[type=email],input[type=text]{width:100%;font:500 17px/1.3 var(--f-display);color:var(--text);background:var(--navy-900);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+input:focus{outline:2px solid var(--orange);outline-offset:1px;border-color:transparent}
+.hint{font-size:13.5px;color:var(--muted);margin:8px 0 0}
+.btn{appearance:none;border:0;border-radius:10px;cursor:pointer;font:800 15px/1 var(--f-display);letter-spacing:.06em;text-transform:uppercase;padding:17px 22px;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary{background:linear-gradient(180deg,var(--orange-hi),var(--orange));color:#170f06}
+.btn-ghost{background:transparent;color:var(--soft);border:1px solid var(--line)}
+.btn:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.btn[disabled]{opacity:.55;cursor:progress}
+.msg{border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.45}
+.msg.err{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.4);color:#ffd4d4}
+.msg.info{background:rgba(255,122,15,.08);border:1px solid rgba(255,122,15,.35);color:#ffe3c9}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.result{display:grid;gap:18px}
+.result .tip{color:var(--muted);font-size:14px;max-width:70ch}
+
+/* ===== Certificado (A4 paisagem = 297 x 210 mm → 1123 x 794 px) ===== */
+.stage{width:100%;overflow:hidden;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.stage-inner{width:1123px;height:794px;transform-origin:0 0}
+.cert{width:1123px;height:794px;position:relative;display:grid;grid-template-columns:250px 1fr;background:var(--paper);color:var(--ink);overflow:hidden;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cert .band{background:linear-gradient(170deg,#163352 0,var(--brand-navy) 45%,#0b1b2d 100%);color:#fff;display:flex;flex-direction:column;align-items:center;padding:56px 26px 40px;position:relative}
+.cert .band::after{content:"";position:absolute;top:0;right:0;width:6px;height:100%;background:var(--orange)}
+.cert .band img{width:132px;height:auto}
+.cert .band .wm{margin-top:18px;text-align:center;font:900 30px/1 var(--f-display);letter-spacing:-.01em}
+.cert .band .wm small{display:block;font:600 13px/1 var(--f-label);letter-spacing:.42em;margin-top:8px;color:#cdd8e6;padding-left:.42em}
+.cert .band .motto{margin-top:auto;writing-mode:vertical-rl;transform:rotate(180deg);font:600 14px/1 var(--f-label);letter-spacing:.34em;text-transform:uppercase;color:#8fa6c2}
+.cert .body{padding:58px 70px 54px 64px;display:flex;flex-direction:column;position:relative}
+.cert .kicker{display:flex;align-items:center;gap:14px;font:600 17px/1 var(--f-label);letter-spacing:.3em;text-transform:uppercase;color:var(--orange)}
+.cert .kicker::after{content:"";flex:1;height:1px;background:var(--rule)}
+.cert .intro{margin:34px 0 6px;font-size:17px;color:var(--ink-soft)}
+.cert .name{font:900 46px/1.05 var(--f-display);letter-spacing:-.025em;color:var(--brand-navy);margin:0;min-height:50px;text-wrap:balance}
+.cert .text{margin:18px 0 0;font-size:17.5px;line-height:1.6;color:var(--ink);max-width:640px}
+.cert .text strong{font-weight:800}
+.cert .facts{display:flex;gap:0;margin-top:26px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.cert .fact{flex:1;padding:12px 18px 12px 0}
+.cert .fact+.fact{padding-left:18px;border-left:1px solid var(--rule)}
+.cert .fact b{display:block;font:600 12.5px/1 var(--f-label);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px}
+.cert .fact span{font:800 18px/1.2 var(--f-display);color:var(--brand-navy);font-variant-numeric:tabular-nums}
+.cert .signs{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:auto;padding-top:20px}
+.cert .sign{display:flex;flex-direction:column;align-items:flex-start}
+.cert .sign .sig{height:74px;display:flex;align-items:flex-end;padding-left:10px}
+.cert .sign .sig img{max-height:92px;max-width:230px;object-fit:contain;margin-bottom:-6px;position:relative;z-index:1}
+.cert .sign .rule{width:100%;height:1px;background:var(--ink);opacity:.55;margin:4px 0 14px}
+.cert .sign strong{font:800 16px/1.2 var(--f-display)}
+.cert .sign small{white-space:pre-line;font-size:13px;color:var(--ink-soft);line-height:1.4}
+.cert .foot{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-top:26px}
+.cert .foot .legal{white-space:pre-line;font-size:11.5px;line-height:1.5;color:var(--ink-soft);max-width:520px}
+.cert .foot .legal code{font:700 12.5px/1 ui-monospace,"SFMono-Regular",Menlo,monospace;color:var(--ink);letter-spacing:.04em}
+.cert .qr{display:flex;align-items:center;gap:12px;text-align:right;font-size:11px;color:var(--ink-soft);line-height:1.35}
+.cert .qr svg{width:76px;height:76px;display:block}
+.cert .capno{position:absolute;left:250px;right:0;bottom:0;height:34px;opacity:.9}
+
+@media (max-width:560px){ .panel{padding:18px} .actions .btn{flex:1 1 100%} }
+@media (prefers-reduced-motion:no-preference){ .result{animation:rise .35s ease-out} @keyframes rise{from{transform:translateY(8px)}to{transform:none}} }
+
+@page{size:A4 landscape;margin:0}
+@media print{
+  /* A folha tem 297x210mm; o desenho tem 1123x794px (=297,13x210,1mm).
+     Sem o encaixe abaixo sobra ~0,1mm e o PDF sai com uma segunda página em branco. */
+  html,body{background:#fff!important;padding:0!important;margin:0!important;min-height:0;width:297mm;height:210mm;overflow:hidden}
+  .wrap>*:not(.result), .result>*:not(.stage){display:none!important}
+  .wrap{padding:0;margin:0;max-width:none;width:297mm;height:210mm;overflow:hidden}
+  .stage{box-shadow:none;border-radius:0;overflow:hidden;width:297mm!important;height:210mm!important;margin:0}
+  .stage-inner{width:1123px;height:794px;transform:scale(.9995)!important;transform-origin:top left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img src="assets/escudo.png" alt="">
+    <div class="brand">CT-MED<small>ACADEMY</small></div>
+  </header>
+
+  <section id="intro">
+    <p class="eyebrow">Live prática · Certificado</p>
+    <h1>Preciso intubar, <em>e agora?</em></h1>
+    <p class="lead">Emita seu certificado de participação de 3 horas. Use o mesmo e-mail da compra e escreva seu nome exatamente como quer que ele apareça.</p>
+  </section>
+
+  <form class="panel" id="form" novalidate>
+    <div>
+      <label for="email">E-mail da compra</label>
+      <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="voce@email.com" required>
+    </div>
+    <div>
+      <label for="nome">Nome completo no certificado</label>
+      <input id="nome" type="text" autocomplete="name" maxlength="70" placeholder="Ex.: Maria Fernanda de Souza Lima" required>
+      <p class="hint">Confira acentos e nome social. Você pode emitir de novo se precisar corrigir.</p>
+    </div>
+    <div id="msg" class="msg err" role="alert" hidden></div>
+    <div class="actions"><button class="btn btn-primary" id="go" type="submit">Gerar certificado</button></div>
+  </form>
+
+  <section class="result" id="result" hidden>
+    <div class="actions">
+      <button class="btn btn-primary" id="print" type="button">Salvar PDF / Imprimir</button>
+      <button class="btn btn-ghost" id="edit" type="button">Corrigir nome</button>
+    </div>
+    <p class="tip">No computador, escolha “Salvar como PDF” como impressora e deixe a orientação em paisagem. No celular, toque em Salvar PDF e use “Imprimir → compartilhar → Salvar em Arquivos” (iPhone) ou “Salvar como PDF” (Android).</p>
+    <div class="stage" id="stage"><div class="stage-inner" id="stageInner">
+      <article class="cert" id="cert" aria-label="Certificado">
+        <aside class="band">
+          <img src="assets/escudo.png" alt="Escudo CT-MED">
+          <div class="wm">CT-MED<small>ACADEMY</small></div>
+          <div class="motto">Do conhecimento à conduta</div>
+        </aside>
+        <div class="body">
+          <div class="kicker">Certificado de participação</div>
+          <p class="intro">A CT-MED Academy certifica que</p>
+          <h2 class="name" id="cName">Nome do participante</h2>
+          <p class="text">participou da live prática <strong>“Preciso intubar, e agora?”</strong>, sobre como pensar, preparar e conduzir uma sequência rápida de intubação no plantão, realizada online e ao vivo, com carga horária total de <strong>3 (três) horas</strong>: 2 horas de aula e 1 hora de discussão de casos, dúvidas e dicas práticas.</p>
+          <div class="facts">
+            <div class="fact"><b>Data</b><span id="cDate">11/11/2026</span></div>
+            <div class="fact"><b>Carga horária</b><span>3 horas</span></div>
+            <div class="fact"><b>Formato</b><span>Online ao vivo</span></div>
+          </div>
+          <div class="signs">
+            <div class="sign">
+              <div class="sig"><img src="assets/assinatura-diego.png" alt="" onerror="this.remove()"></div>
+              <div class="rule"></div>
+              <strong>Dr. Diego Abel Leite Sousa</strong>
+              <small id="sDiego">Médico anestesiologista · Diretor da CT-MED Academy</small>
+            </div>
+            <div class="sign">
+              <div class="sig"><img src="assets/assinatura-gil.png" alt="" onerror="this.remove()"></div>
+              <div class="rule"></div>
+              <strong>Dr. Gil Kléber Leão da Cruz</strong>
+              <small id="sGil">Médico anestesiologista · Diretor da CT-MED Academy</small>
+            </div>
+          </div>
+          <div class="foot">
+            <p class="legal" id="cLegal">Código de autenticidade <code id="cCode">ISR26-0000-0000</code>
+<span id="cEmit"></span></p>
+            <div class="qr"><span>Valide em<br><b id="cHost">isr.ctmedacademy.com.br</b><br>/certificado/validar</span><span id="cQr"></span></div>
+          </div>
+        </div>
+        <svg class="capno" viewBox="0 0 873 34" preserveAspectRatio="none" aria-hidden="true">
+          <path id="capPath" fill="none" stroke="#ff7a0f" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </article>
+    </div></div>
+  </section>
+</div>
+
+<script src="vendor/qrcode.js"></script>
+<script src="compradores.js"></script>
+<script>
+(function(){
+  /* ===== Configuração (Gil: ajuste aqui) ===== */
+  var CFG = {
+    base: "https://isr.ctmedacademy.com.br/certificado",
+    crmDiego: "CRM-BA 21.186",
+    crmGil: "CRM-BA 35.222",
+    cnpj: "65.709.886/0001-92",
+    dataLive: "11/11/2026"
+  };
+  var D = window.CERT_DATA || {salt:"",compradores:{},teste:[]};
+  var $ = function(id){return document.getElementById(id)};
+
+  // Traçado de capnografia (o rodapé do certificado): platôs de CO2 expirado
+  (function(){
+    var d="M0 30", x=0, w=873;
+    while(x<w){ d+=" L"+(x+44)+" 30 L"+(x+50)+" 10 Q"+(x+72)+" 7 "+(x+93)+" 5 L"+(x+97)+" 30"; x+=97; }
+    $("capPath").setAttribute("d",d);
+  })();
+
+  if(CFG.crmDiego) $("sDiego").textContent = "Médico anestesiologista · "+CFG.crmDiego+"\nSócio-fundador da CT-MED Academy";
+  if(CFG.crmGil) $("sGil").textContent = "Médico anestesiologista · "+CFG.crmGil+"\nSócio-fundador da CT-MED Academy";
+
+  function hex(buf){return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0")}).join("")}
+  function sha(s){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(hex)}
+  function cleanName(s){return s.replace(/\s+/g," ").trim()}
+  function showErr(t){var m=$("msg");m.className="msg err";m.textContent=t;m.hidden=false}
+
+  function fit(){
+    var st=$("stage"), inner=$("stageInner"); var k=st.clientWidth/1123;
+    inner.style.transform="scale("+k+")"; st.style.height=(794*k)+"px";
+  }
+  window.addEventListener("resize",fit);
+
+  function fitName(){
+    var n=$("cName"), size=46; n.style.fontSize=size+"px";
+    while(n.scrollHeight>110 && size>28){size-=2;n.style.fontSize=size+"px"}
+  }
+
+  function render(nome, code){
+    $("cName").textContent=nome; fitName();
+    $("cCode").textContent=code;
+    var hoje=new Date().toLocaleDateString("pt-BR");
+    $("cEmit").textContent="Emitido em "+hoje+" por CT-MED Centro de Treinamento Médico LTDA (CT-MED Academy)"+(CFG.cnpj?"\nCNPJ "+CFG.cnpj:"")+" · Salvador/BA";
+    var url=CFG.base+"/validar/?c="+encodeURIComponent(code)+"&n="+encodeURIComponent(nome);
+    try{
+      if(typeof qrcode!=="function") throw new Error("qrcode indisponivel");
+      var q=qrcode(0,"M");q.addData(url);q.make();
+      $("cQr").innerHTML=q.createSvgTag({cellSize:2,margin:0,scalable:true});
+    }catch(e){
+      $("cQr").textContent="";
+      var m=$("msg");m.className="msg err";
+      m.textContent="O certificado foi gerado, mas o QR de validação não pôde ser desenhado. Recarregue a página antes de imprimir; se persistir, use o código de autenticidade "+code+" na página de validação.";
+      m.hidden=false;
+    }
+    $("form").hidden=true; $("intro").hidden=true; $("result").hidden=false; fit();
+    $("result").scrollIntoView({block:"start"});
+  }
+
+  $("form").addEventListener("submit",function(ev){
+    ev.preventDefault(); $("msg").hidden=true;
+    var email=$("email").value.trim().toLowerCase(), nome=cleanName($("nome").value);
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showErr("Digite um e-mail válido, o mesmo usado na compra.");
+    if(nome.split(" ").length<2) return showErr("Escreva seu nome completo, com sobrenome, como deve sair no certificado.");
+    if(!window.crypto||!crypto.subtle) return showErr("Seu navegador não conseguiu gerar o certificado. Abra este link no Chrome ou Safari atualizado.");
+    $("go").disabled=true;
+    sha(D.salt+email).then(function(h){
+      $("go").disabled=false;
+      var code=D.compradores[h];
+      if(!code) return showErr("Não encontramos esse e-mail entre os participantes. Use o e-mail da compra na Cakto (o mesmo do login da área de membros). Se não der certo, chame a equipe no grupo do WhatsApp.");
+      var isTest=(D.teste||[]).indexOf(h)>-1;
+      if(!isTest && D.liberadoEm && new Date()<new Date(D.liberadoEm)){
+        var m=$("msg");m.className="msg info";m.textContent="Tudo certo com seu e-mail. O certificado fica disponível logo após o fim da live, na noite de "+CFG.dataLive+".";m.hidden=false;return;
+      }
+      render(nome, code);
+    });
+  });
+
+  $("print").addEventListener("click",function(){window.print()});
+  $("edit").addEventListener("click",function(){$("result").hidden=true;$("form").hidden=false;$("intro").hidden=false;$("nome").focus()});
+  window.__certRender = render; // usado pela prévia
+})();
+</script>
+</body>
+</html>
