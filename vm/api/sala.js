@@ -43,7 +43,7 @@ async function redis(cmd) {
   if (!r.ok) throw new Error('kv ' + r.status);
   return (await r.json()).result;
 }
-const vazio = () => ({ set: {}, seq: 0, rev: 0, num: {} });
+const vazio = () => ({ set: {}, seq: 0, rev: 0, num: {}, cena: 0 });
 
 async function le(sala) {
   if (!KV.url) return MEM.get(sala) || vazio();
@@ -61,16 +61,16 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const e = await le(sala);
-      return res.status(200).json({ set: e.set, seq: e.seq, rev: e.rev, num: e.num, kv: !!KV.url, via: KV.via });
+      return res.status(200).json({ set: e.set, seq: e.seq, rev: e.rev, num: e.num, cena: e.cena || 0, kv: !!KV.url, via: KV.via });
     }
     if (req.method === 'POST') {
       const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
       const e = await le(sala);
       switch (b.acao) {
         case 'set':   Object.assign(e.set, b.v || {}); break;
-        case 'cena':  e.set = Object.assign({}, b.v || {}); break;
+        case 'cena':  e.set = Object.assign({}, b.v || {}); e.cena = (e.cena || 0) + 1; break;
         case 'rev':   e.rev = e.rev ? 0 : 1; break;
-        case 'zerar': e.set = {}; e.rev = 0; break;
+        case 'zerar': e.set = {}; e.rev = 0; e.cena = (e.cena || 0) + 1; break;
         case 'num':   e.num = b.v || {}; await grava(sala, e); return res.status(200).json({ ok: true });
         default:      return res.status(400).json({ ok: false, motivo: 'acao' });
       }

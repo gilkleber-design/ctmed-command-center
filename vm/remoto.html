@@ -107,7 +107,8 @@ async function cmd(body){
 }
 /* valor atual de um controle: o que o professor mexeu, senão o padrão da tela */
 const PADRAO = {modo:'VCV',disp:'ar',vc:400,fluxo:31.5,dp:24,ti:.8,fr:14,peep:5,fio2:.21,
-  C:55,R:8,shunt:.05,lmin:3,vtx:.31,mnr:12,ps:10,epap:5,frEsp:22};
+  C:55,R:8,shunt:.05,lmin:3,vtx:.31,mnr:12,ps:10,epap:5,frEsp:22,
+  gasdur:10,som:'on',vol:.8};
 const val = k => (SET[k] !== undefined ? SET[k] : PADRAO[k]);
 const fmt = (c,v) => c.pct ? Math.round(v*100)+'%' : (c.step<1 ? (+v).toFixed(1).replace('.',',') : Math.round(v)) + (c.un ? ' '+c.un : '');
 

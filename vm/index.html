@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Simulador de ventilação mecânica</title>
+<script src="assets/qrcode.js"></script>
 <script src="ctls.js"></script>
 <style>
 @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:500;font-display:block;src:url(assets/bricolage-grotesque-latin-500-normal.woff2) format('woff2')}
@@ -1532,6 +1533,8 @@ const VS = {
   pac:{nome:'Seu Antônio', sexo:'M', altura:170, peso:120},
   modo:'VCV',            // VCV · PCV · O2 (suporte de oxigênio, respiração espontânea)
   vc:400, fluxo:31.5, dp:24, ti:0.8, pausa:true,
+  gasdur:10,             // s até a gasometria praticamente estabilizar (0 = instantâneo)
+  som:'on', vol:.8,      // som do monitor
   fr:14, peep:5, fio2:0.21,
   C:55, R:8, shunt:0.05,          // os três botões da fisiologia
   vco2:180, hb:15, hco3:24,
@@ -1688,11 +1691,9 @@ function simPaint(){
   $('#vnDp').textContent=o2?'—':n1(r.dp); $('#vnVc').textContent=n0(r.vc);
   $('#vnFr').textContent=n0(r.fr); $('#vnPeep').textContent=n1(r.peep);
   $('#vnFio2').textContent=n0(r.fio2*100);
-  $('#vvSpo').textContent=n0(r.sao2); $('#vvPao').textContent=n0(r.pao2); $('#vvPf').textContent=n0(r.pf);
-  $$('.vv')[0].className='vv'+(r.sao2<90?' bad':r.sao2<94?' warn':'');
-  $$('.vv')[2].className='vv'+(r.pf<150?' bad':r.pf<300?' warn':'');
   $('.vn.hot').className='vn hot'+(r.dp>15?' bad':'');
-  gasV.jump({'pH':r.ph,'PaCO₂':r.paco2,'PaO₂':r.pao2,'HCO₃⁻':r.hco3,'SaO₂':r.sao2,'FiO₂':r.fio2});
+  gasAlvo={'pH':r.ph,'PaCO₂':r.paco2,'PaO₂':r.pao2,'HCO₃⁻':r.hco3,'SaO₂':r.sao2,'FiO₂':r.fio2};
+  gasPinta();   // SpO₂ · PaO₂ · P/F saem do sangue, que demora a responder
   $('#voC').textContent=n0(r.C);
   {const d=r.C-r.C0, e=$('#voCs');
    e.textContent = Math.abs(d)<1 ? 'mL/cmH₂O'
@@ -1703,11 +1704,81 @@ function simPaint(){
   $('#vsNome').textContent=p.nome;
   $('#vsPac').textContent=(p.sexo==='F'?'mulher':'homem')+' · '+(p.altura/100).toFixed(2).replace('.',',')+' m · '+p.peso+' kg · predito '+n0(r.pbw)+' kg';
 }
+
+/* ============ O SANGUE DEMORA A RESPONDER ============
+   Mecânica (pico, platô, ΔP, volume) muda no ciclo seguinte: continua
+   instantânea. Troca gasosa e pH levam minutos na vida real; aqui levam
+   SIM.gasdur segundos até praticamente estabilizar (0 = instantâneo).
+   FiO₂ não entra: é ajuste do aparelho, não resposta do paciente.
+   Trocar de cenário é outro paciente — entra de uma vez. */
+const GAS_LENTOS=['pH','PaCO₂','PaO₂','HCO₃⁻','SaO₂'];
+let gasAlvo=null, gasAtual=null, gasSalto=true, gasT0=performance.now();
+function gasPinta(){
+  const g=gasAtual||gasAlvo; if(!g) return;
+  const spo=g['SaO₂'], pao=g['PaO₂'], fio=g['FiO₂']||SIM.fio2||.21, pf=pao/fio;
+  $('#vvSpo').textContent=n0(spo); $('#vvPao').textContent=n0(pao); $('#vvPf').textContent=n0(pf);
+  $$('.vv')[0].className='vv'+(spo<90?' bad':spo<94?' warn':'');
+  $$('.vv')[2].className='vv'+(pf<150?' bad':pf<300?' warn':'');
+}
+function gasPasso(agora){
+  if(!gasAlvo) return;
+  const t95=Math.max(0,+SIM.gasdur||0);
+  if(!gasAtual || gasSalto || t95<=0){
+    gasAtual=Object.assign({},gasAlvo); gasSalto=false; gasT0=agora;
+    gasV.jump(gasAtual); gasPinta(); return;
+  }
+  const dt=Math.min(.25,(agora-gasT0)/1000); gasT0=agora;
+  const k=1-Math.exp(-3*dt/t95);          // 3 constantes de tempo ≈ 95% do caminho
+  const saida={'FiO₂':gasAlvo['FiO₂']};
+  GAS_LENTOS.forEach(n=>{ gasAtual[n]+=(gasAlvo[n]-gasAtual[n])*k; saida[n]=gasAtual[n]; });
+  gasAtual['FiO₂']=gasAlvo['FiO₂'];
+  gasV.jump(saida); gasPinta();
+}
+(function laco(agora){ try{gasPasso(agora);}catch(e){} requestAnimationFrame(laco); })(performance.now());
+
+/* ============ SOM DO MONITOR ============
+   O motor Sound (acima) já toca os samples reais e baixa o tom do beep
+   conforme a SpO₂ cai. Aqui só decidimos quando tocar, a partir da
+   saturação que o aluno está vendo — a atrasada, não a instantânea.
+   O navegador só libera áudio depois de um gesto na página; quando o som
+   está ligado e ainda travado, avisamos na tela. */
+const somAviso=document.createElement('div');
+somAviso.className='vs-somoff'; somAviso.textContent='clique na tela para liberar o som';
+somAviso.style.cssText='position:fixed;left:18px;bottom:18px;z-index:60;display:none;'
+ +'background:rgba(7,10,18,.9);border:1px solid #2b3a5c;border-radius:10px;padding:8px 12px;'
+ +'font:700 12px/1.2 var(--body,sans-serif);color:#ffc45b;backdrop-filter:blur(6px)';
+document.body.appendChild(somAviso);
+let somPulsoT=0, somAlarmeT=0;
+function somTick(){
+  const lig=SIM.som!=='off';
+  Sound.on=lig; Sound.setVol(lig?(SIM.vol==null?.8:+SIM.vol):0);
+  somAviso.style.display=(lig && !Sound.running())?'block':'none';
+  if(!lig){ Sound.stop('alarm'); Sound.stop('critical'); return; }
+  const g=gasAtual||gasAlvo; if(!g) return;
+  const spo=g['SaO₂'], agora=performance.now();
+  if(agora-somPulsoT>60000/72){ somPulsoT=agora; Sound.pulse(spo); }   // 72/min: o modelo não tem FC
+  const nivel=nivelParam('spo',spo);
+  if(nivel===0){ somAlarmeT=0; Sound.stop('alarm'); Sound.stop('critical'); return; }
+  if(agora-somAlarmeT<2400) return;
+  somAlarmeT=agora;
+  if(nivel===2){ Sound.stop('alarm'); Sound.play('critical',1,.9); } else Sound.play('alarm',1,.7);
+}
+setInterval(somTick,150);
+
+/* QR curto para parear o celular sem digitar */
+function qrSVG(url,lado){ try{
+  const q=qrcode(0,'M'); q.addData(url); q.make();
+  const n=q.getModuleCount(), c=Math.max(2,Math.floor(lado/n)), w=c*n; let d='';
+  for(let r=0;r<n;r++) for(let x=0;x<n;x++) if(q.isDark(r,x)) d+='M'+(x*c)+' '+(r*c)+'h'+c+'v'+c+'h-'+c+'z';
+  return '<svg width="'+w+'" height="'+w+'" viewBox="0 0 '+w+' '+w+'" shape-rendering="crispEdges">'
+    +'<rect width="'+w+'" height="'+w+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+}catch(e){ return ''; } }
+
 simPaint();setInterval(simPaint,250);
 window.SIMSET=(o)=>{Object.assign(SIM,o);simPaint();};
 document.addEventListener('keydown',e=>{
   if(e.key==='r')$('#vsim').classList.toggle('rev');
-  {const c=(typeof CENAS!=='undefined') && CENAS.find(x=>x[0]===e.key); if(c) SIMSET(Object.assign({},c[2]));}
+  {const c=(typeof CENAS!=='undefined') && CENAS.find(x=>x[0]===e.key); if(c){ gasSalto=true; SIMSET(Object.assign({},c[2])); }}
 });
 
 /* ---------- painel de controles na tela (tecla C esconde) ---------- */
@@ -1730,7 +1801,7 @@ function ctlDraw(){ bar.innerHTML='';
     bar.appendChild(d);});}
 function fmtC(c,v){ if(c.pct) return Math.round(v*100)+'%';
   return (c.step<1?(+v).toFixed(1).replace('.',','):Math.round(v))+(c.un?' '+c.un:''); }
-ctlDraw();document.body.classList.add('vctl');
+ctlDraw();bar.classList.add('off');   // começa oculta: tecla C mostra
 const _set=window.SIMSET; window.SIMSET=o=>{_set(o);if(o.modo||o.disp)ctlDraw();};
 document.addEventListener('keydown',e=>{ if(e.key==='c'){bar.classList.toggle('off');document.body.classList.toggle('vctl',!bar.classList.contains('off'));} if('123456789'.includes(e.key))setTimeout(ctlDraw,10); });
 
@@ -1754,26 +1825,37 @@ document.addEventListener('keydown',e=>{ if(e.key==='c'){bar.classList.toggle('o
    +'.vs-sala span{display:block;font-size:10px;letter-spacing:.16em;color:#6e7e9c}'
    +'.vs-sala b{display:block;font-size:15px;color:#e9edf6;font-weight:700}'
    +'.vs-sala i{font-style:normal;font-size:12px;color:#fb7a00;font-weight:800;letter-spacing:.08em}'
+   +'.vs-sala .vs-qr{display:flex;justify-content:flex-end;margin:0 0 7px}'
+   +'.vs-sala .vs-qr svg{display:block;border-radius:6px;padding:5px;background:#fff}'
    +'.vs-sala.off{display:none}';
   document.head.appendChild(st);
   const av=document.createElement('div'); av.className='vs-sala';
-  av.innerHTML='<span>CONTROLE NO CELULAR</span><b>'+location.host+'/remoto</b><i>sala '+sala+'</i>';
+  av.innerHTML='<span>CONTROLE NO CELULAR</span><div class="vs-qr"></div>'
+    +'<b>'+location.host+'/remoto</b><i>sala '+sala+'</i>';
   document.body.appendChild(av);
+  /* aponta a câmera e cai pareado: o QR já leva a sala */
+  try{ av.querySelector('.vs-qr').innerHTML=qrSVG(location.origin+'/remoto?s='+sala,124); }catch(e){}
   document.addEventListener('keydown',e=>{ if(e.key==='l'||e.key==='L') av.classList.toggle('off'); });
 
-  let seqVista=-1, pend=null, timer=null, ativo=0;
+  let seqVista=-1, cenaVista=null, pend=null, timer=null, ativo=0, mandouAte=0;
   const PAD=Object.assign({},SIM);   // padroes da tela, para o 'voltar ao padrao'
   const base=SIMSET;
   window.SIMSET=(o,deRemoto)=>{ base(o); if(deRemoto) return;
     pend=Object.assign(pend||{},o); ativo=Date.now();
     if(!timer) timer=setTimeout(envia,150); };
   function envia(){ timer=null; const v=pend; pend=null; if(!v) return;
+    /* enquanto o que acabamos de mexer não voltou do servidor, ignoramos o que
+       chega: senão o estado antigo volta por cima e o slider treme na projeção */
+    mandouAte=Date.now()+800;
     fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'set',v:v})}).catch(()=>{}); }
+      body:JSON.stringify({acao:'set',v:v})}).then(()=>{mandouAte=Date.now()+250;}).catch(()=>{}); }
 
   async function puxa(){
     try{ const r=await fetch(API,{cache:'no-store'}); const e=await r.json();
+      if(Date.now()<mandouAte){ setTimeout(puxa,200); return; }
       if(e.seq!==seqVista){ seqVista=e.seq; ativo=Date.now();
+        /* cenário = paciente novo: a gasometria entra de uma vez, sem caminhar */
+        if(e.cena!==cenaVista){ cenaVista=e.cena; gasSalto=true; }
         base(Object.assign({},PAD,e.set||{}));
         const el=document.getElementById('vsim'); if(el) el.classList.toggle('rev',!!e.rev);
         if(typeof ctlDraw==='function') ctlDraw(); }

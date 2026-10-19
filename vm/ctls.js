@@ -19,6 +19,9 @@ const CTLS=[
  {t:'r',k:'C',lab:'Complacência',min:8,max:80,step:1,un:'mL/cmH₂O',cls:'fis'},
  {t:'r',k:'R',lab:'Resistência',min:3,max:45,step:.5,un:'cmH₂O/L/s',cls:'fis'},
  {t:'r',k:'shunt',lab:'Shunt',min:0,max:.5,step:.01,un:'%',cls:'fis',pct:true},
+ {t:'r',k:'gasdur',lab:'Atraso da gasometria',min:0,max:60,step:5,un:'s',cls:'mon'},
+ {t:'seg',k:'som',lab:'Som do monitor',ops:[['on','Ligado'],['off','Desligado']],cls:'mon'},
+ {t:'r',k:'vol',lab:'Volume',min:0,max:1,step:.05,un:'',pct:true,cls:'mon'},
 ];
 
 /* cenários (teclas 1–9 na tela · botões no celular) */
