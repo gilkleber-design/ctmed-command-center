@@ -1304,7 +1304,7 @@ function fmtv(it,v){const d=it.d==null?0:it.d;let s=v.toFixed(d).replace('.',','
 /* ---------- som: samples reais do monitor (os mesmos da Aula 1) ---------- */
 // beep.mp3 = pulso do oxímetro · alarm.mp3 = alarme médio · critical.mp3 = alarme crítico
 // Motor 1: WebAudio (permite baixar o tom com a SpO₂). Motor 2: <audio> (funciona até em file://).
-const Sound={on:true,fx:true,vol:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},loaded:false,
+const Sound={on:true,fx:true,vol:1,volMon:.8,volVent:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},loaded:false,
   ensure(){try{if(!this.ctx){this.ctx=new (window.AudioContext||window.webkitAudioContext)();
         const comp=this.ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;comp.connect(this.ctx.destination);
         this.master=this.ctx.createGain();this.master.gain.value=this.vol;this.master.connect(comp);}
@@ -1316,7 +1316,8 @@ const Sound={on:true,fx:true,vol:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},l
   setVol(v){this.vol=clamp(+v,0,1);if(this.master)this.master.gain.value=this.vol;},
   live:{alarm:[],critical:[],beep:[],resp:[]},
   stop(n){(this.live[n]||[]).forEach(s=>{try{s.stop();}catch(e){}});this.live[n]=[];(this.pool[n]||[]).forEach(el=>{try{el.pause();el.currentTime=0;}catch(e){}});},
-  play(n,rate,vol){if(!this.on||this.vol<=0)return;rate=rate||1;vol=vol==null?1:vol;
+  play(n,rate,vol){if(!this.on||this.vol<=0)return;rate=rate||1;vol=(vol==null?1:vol)*this.volMon;
+    if(vol<=0)return;
     const buf=this.bufs[n];
     if(buf&&this.running()){try{const s=this.ctx.createBufferSource(),g=this.ctx.createGain();s.buffer=buf;s.playbackRate.value=rate;g.gain.value=vol;s.connect(g);g.connect(this.master);s.start();
       const L=this.live[n]||(this.live[n]=[]);L.push(s);s.onended=()=>{const i=L.indexOf(s);if(i>=0)L.splice(i,1);};return;}catch(e){}}
@@ -1327,7 +1328,8 @@ const Sound={on:true,fx:true,vol:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},l
      ao longo da fase. Sintetizado — não depende de nenhum arquivo. */
   respira(fase,dur,forca){
     if(!this.on||this.vol<=0||!this.running())return;
-    const c=this.ctx; dur=Math.max(.18,Math.min(6,dur||1)); forca=Math.max(.15,Math.min(1.4,forca||1));
+    const c=this.ctx; dur=Math.max(.18,Math.min(6,dur||1));
+    forca=Math.max(.15,Math.min(1.4,forca||1))*this.volVent; if(forca<=0)return;
     if(!this.ruido){const n=Math.floor(c.sampleRate*2),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
       for(let i=0;i<n;i++)d[i]=Math.random()*2-1; this.ruido=b;}
     const insp=fase==='in';
@@ -1584,9 +1586,9 @@ function applyStep(sl,s){$$('[data-s]',sl).forEach(e=>{e.hidden=!stepVisible(e.d
 const VS = {
   pac:{nome:'Seu Antônio', sexo:'M', altura:170, peso:120},
   modo:'VCV',            // VCV · PCV · O2 (suporte de oxigênio, respiração espontânea)
-  vc:400, fluxo:31.5, dp:24, ti:0.8, pausa:true,
+  vc:400, fluxo:31.5, dp:24, ti:0.8, pausa:0.5,   // s de pausa inspiratória (0 = sem pausa)
   gasdur:10,             // s até a gasometria praticamente estabilizar (0 = instantâneo)
-  som:'on', vol:.8,      // som do monitor
+  som:'on', volMon:.8, volVent:.8,   // volumes separados: monitor e ventilador
   fr:14, peep:5, fio2:0.21,
   C:55, R:8, shunt:0.05,          // os três botões da fisiologia
   vco2:180, hb:15, hco3:24,
@@ -1643,7 +1645,10 @@ function simCalc(s){
     if(s.modo==='PCV'){ ti=s.ti; vc=s.dp*C*(1-Math.exp(-ti/tau)); ppico=peep+s.dp; pplato=peep+vc/C; }
     else { vc=s.vc; const q=s.fluxo/60; ti=(vc/1000)/q; pplato=peep+vc/C; ppico=pplato+q*R; }
   }
-  const ciclo=60/fr, tePausa=(!o2&&s.pausa)?.5:0, te=Math.max(.2,ciclo-ti-tePausa);
+  const ciclo=60/fr;
+  /* pausa inspiratória em segundos; nunca pode comer o ciclo inteiro */
+  const tePausa=o2?0:Math.max(0,Math.min(+s.pausa||0, ciclo-ti-.25));
+  const te=Math.max(.2,ciclo-ti-tePausa);
   const trap=vc*Math.exp(-te/tau), autopeep=trap/C;
   const vd=2.2*pbw*(1+2.0*s.shunt), va=Math.max(.3,fr*(vc-vd)/1000);
   const vco2=s.vco2*(1+.02*Math.max(0,fr-14));   // esforço respiratório produz mais CO2
@@ -1661,13 +1666,13 @@ function simCalc(s){
   /* resposta renal AGUDA (minutos/horas): acidose resp. ↑1 por 10 · alcalose resp. ↓2 por 10 */
   const hco3=Math.max(8,s.hco3+(paco2>40?(paco2-40)*.1:(paco2-40)*.2));
   const ph=6.1+Math.log10(hco3/(.03*paco2));
-  return {pbw,broca:pesoBroca(s.pac.sexo,s.pac.altura),C,C0,recr,R,tau,ti,te,ciclo,vc,fr,peep,autopeep,
+  return {pbw,broca:pesoBroca(s.pac.sexo,s.pac.altura),C,C0,recr,R,tau,ti,te,tp:tePausa,ciclo,vc,fr,peep,autopeep,
           ppico,pplato,dp:pplato-peep,resist:ppico-pplato,vd,va,paco2,fio2,pAO2,shuntEf:f,
           pao2,sao2:sao2*100,pf:pao2/fio2,ph,hco3,caO2,estimada:(o2&&(s.disp==='cn'||s.disp==='mnr'))};
 }
 /* traçados de um ciclo: devolve f(t) para fluxo (L/min), pressão (cmH2O) e volume (mL) */
 function simOnda(s,r){
-  const tp=(!s||s.modo!=='O2')&&s&&s.pausa?.5:0, o2=s&&s.modo==='O2';
+  const o2=s&&s.modo==='O2', tp=o2?0:(+r.tp||0);
   return {ciclo:r.ciclo, tp,
     fluxo:t=>{ if(t<r.ti){ if(o2) return 30*Math.sin(Math.PI*t/r.ti);
                            return s.modo==='PCV'? (s.dp/r.R)*Math.exp(-t/r.tau)*60 : s.fluxo; }
@@ -1855,8 +1860,11 @@ requestAnimationFrame(respTick);
 
 let somPulsoT=0, somAlarmeT=0;
 function somTick(){
-  const lig=SIM.som!=='off', monitor=SIM.som==='on';   // 'vent' = só o ventilador
-  Sound.on=lig; Sound.setVol(lig?(SIM.vol==null?.8:+SIM.vol):0);
+  const lig=SIM.som!=='off';
+  Sound.on=lig; Sound.setVol(lig?1:0);
+  Sound.volMon  = lig ? (SIM.volMon ==null?.8:+SIM.volMon ) : 0;
+  Sound.volVent = lig ? (SIM.volVent==null?.8:+SIM.volVent) : 0;
+  const monitor = lig && Sound.volMon>0;
   somAviso.style.display=(lig && !Sound.running())?'block':'none';
   const g=gasAtual||gasAlvo;
   /* a pleth acompanha a saturação mesmo com o som desligado */
@@ -1959,12 +1967,17 @@ document.addEventListener('keydown',e=>{ if(e.key==='c'){bar.classList.toggle('o
        chega: senão o estado antigo volta por cima e o slider treme na projeção */
     mandouAte=Date.now()+800;
     fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({acao:'set',v:v})}).then(()=>{mandouAte=Date.now()+250;}).catch(()=>{}); }
+      body:JSON.stringify({acao:'set',v:v})})
+      .then(r=>r.json())
+      /* a resposta diz em que seq o servidor ficou: tudo que for igual ou
+         anterior a isso já está na tela e não deve ser reaplicado por cima */
+      .then(j=>{ if(j&&j.seq!=null&&j.seq>seqVista) seqVista=j.seq; mandouAte=Date.now()+120; })
+      .catch(()=>{}); }
 
   async function puxa(){
     try{ const r=await fetch(API,{cache:'no-store'}); const e=await r.json();
       if(Date.now()<mandouAte){ setTimeout(puxa,200); return; }
-      if(e.seq!==seqVista){ seqVista=e.seq; ativo=Date.now();
+      if(e.seq>seqVista){ seqVista=e.seq; ativo=Date.now();
         /* cenário = paciente novo: a gasometria entra de uma vez, sem caminhar */
         if(e.cena!==cenaVista){ cenaVista=e.cena; gasSalto=true; }
         base(Object.assign({},PAD,e.set||{}));
