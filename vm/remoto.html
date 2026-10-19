@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Controle — Simulador de ventilação</title>
+<script src="ctls.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--lar:#fb7a00;--bg:#070a12;--pan:#0e1322;--lin:#223050;--fg:#e9edf6;--mut:#8e98b0;--ok:#3cff8e}
+  html,body{background:var(--bg);color:var(--fg);font:400 16px/1.4 -apple-system,system-ui,sans-serif;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  header{position:sticky;top:0;z-index:5;background:rgba(7,10,18,.96);border-bottom:1px solid var(--lin);
+    padding:12px 14px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(8px)}
+  header b{font-size:15px;font-weight:800;letter-spacing:.02em}
+  header i{margin-left:auto;font-style:normal;font-size:12px;color:var(--mut)}
+  .dot{width:9px;height:9px;border-radius:50%;background:#ff5b6a;flex:none}
+  .dot.on{background:var(--ok);box-shadow:0 0 9px var(--ok)}
+  main{padding:12px 14px 40px;display:flex;flex-direction:column;gap:14px}
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .nm{background:var(--pan);border:1px solid var(--lin);border-radius:12px;padding:8px 6px;text-align:center}
+  .nm span{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+  .nm b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+  .nm.hot b{color:var(--lar)} .nm.good b{color:var(--ok)} .nm.bad b{color:#ff5b6a}
+  .sec{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:4px}
+  .vc{background:var(--pan);border:1px solid var(--lin);border-radius:12px;padding:10px 12px}
+  .vc label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mut);margin-bottom:4px}
+  .vc label b{color:var(--lar);font-size:16px;font-weight:800}
+  .vc input[type=range]{width:100%;height:34px;accent-color:var(--lar);background:transparent}
+  .seg{display:flex;gap:6px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:72px;font:700 14px/1 inherit;padding:13px 6px;border-radius:10px;
+    border:1px solid var(--lin);background:#0a1428;color:var(--mut)}
+  .seg button.on{border-color:var(--lar);color:var(--lar);background:rgba(251,122,0,.12)}
+  .cenas{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .cenas button{display:flex;align-items:center;gap:8px;text-align:left;font:600 14px/1.2 inherit;
+    padding:13px 10px;border-radius:12px;border:1px solid var(--lin);background:var(--pan);color:var(--fg)}
+  .cenas button i{font-style:normal;font-weight:800;color:var(--lar);min-width:16px}
+  .acoes{display:flex;gap:8px}
+  .acoes button{flex:1;font:700 15px/1 inherit;padding:15px;border-radius:12px;border:1px solid var(--lin);
+    background:var(--pan);color:var(--fg)}
+  .acoes button.rev.on{border-color:var(--lar);color:var(--lar)}
+  #pinov{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+  #pinov.on{display:flex}
+  #pinForm{background:var(--pan);border:2px solid var(--lar);border-radius:16px;padding:22px;
+    display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
+  #pinForm div{font-weight:700;text-align:center}
+  #pinIn{font:800 30px/1 inherit;text-align:center;letter-spacing:.3em;padding:14px;border-radius:10px;
+    border:1px solid var(--lin);background:#0a1428;color:#fff}
+  #pinForm button{background:var(--lar);color:#0b0f14;font:800 17px/1 inherit;padding:14px;border:0;border-radius:10px}
+</style>
+</head>
+<body>
+<header><span class="dot" id="dot"></span><b>Simulador de ventilação</b><i id="hint">sala —</i></header>
+<main>
+  <div class="nums">
+    <div class="nm"><span>P pico</span><b id="nPico">—</b></div>
+    <div class="nm"><span>P platô</span><b id="nPlato">—</b></div>
+    <div class="nm hot"><span>ΔP driving</span><b id="nDp">—</b></div>
+    <div class="nm"><span>Volume</span><b id="nVc">—</b></div>
+    <div class="nm good"><span>SpO₂</span><b id="nSpo">—</b></div>
+    <div class="nm"><span>PaO₂</span><b id="nPao">—</b></div>
+    <div class="nm"><span>P/F</span><b id="nPf">—</b></div>
+    <div class="nm"><span>Compl.</span><b id="nC">—</b></div>
+  </div>
+
+  <div class="sec">Cenários</div>
+  <div class="cenas" id="cenas"></div>
+
+  <div class="sec">Controles</div>
+  <div id="ctls" style="display:flex;flex-direction:column;gap:10px"></div>
+
+  <div class="acoes">
+    <button class="rev" id="bRev">👁 Mecânica</button>
+    <button id="bZero">↺ Voltar ao padrão</button>
+  </div>
+</main>
+
+<div id="pinov"><form id="pinForm" onsubmit="event.preventDefault();entra(document.getElementById('pinIn').value);">
+  <div>Sala que aparece na tela</div>
+  <input id="pinIn" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="0000">
+  <button type="submit">Parear</button>
+</form></div>
+
+<script>
+let SALA = (new URLSearchParams(location.search).get('s')||'').replace(/\D/g,'').slice(0,4)
+          || localStorage.getItem('salaSim') || '';
+let SET = {}, NUM = {}, seqVista = -1, online = false;
+const $ = s => document.querySelector(s);
+const api = () => '/api/sala?s=' + SALA;
+function pedePin(){ const o=$('#pinov'); o.classList.add('on'); const i=$('#pinIn'); i.value=''; i.focus(); }
+function entra(v){
+  v = String(v||'').replace(/\D/g,'').slice(0,4);
+  if(v.length!==4) return;
+  SALA = v; localStorage.setItem('salaSim', v);
+  $('#pinov').classList.remove('on'); $('#hint').textContent = 'sala '+v;
+  seqVista = -1; puxa();
+}
+
+async function cmd(body){
+  if(!SALA){ pedePin(); return false; }
+  try{
+    const r = await fetch(api(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j = await r.json(); if(j && j.seq!=null) seqVista = j.seq;
+    return true;
+  }catch(e){ return false; }
+}
+/* valor atual de um controle: o que o professor mexeu, senão o padrão da tela */
+const PADRAO = {modo:'VCV',disp:'ar',vc:400,fluxo:31.5,dp:24,ti:.8,fr:14,peep:5,fio2:.21,
+  C:55,R:8,shunt:.05,lmin:3,vtx:.31,mnr:12,ps:10,epap:5,frEsp:22};
+const val = k => (SET[k] !== undefined ? SET[k] : PADRAO[k]);
+const fmt = (c,v) => c.pct ? Math.round(v*100)+'%' : (c.step<1 ? (+v).toFixed(1).replace('.',',') : Math.round(v)) + (c.un ? ' '+c.un : '');
+
+function visivel(c){
+  const modo = val('modo'), disp = val('disp');
+  if(c.so && modo!==c.so) return false;
+  if(c.no && modo===c.no) return false;
+  if(c.mo && modo!==c.mo) return false;
+  if(c.sd && disp!==c.sd) return false;
+  if(c.k==='disp' && modo!=='O2') return false;
+  return true;
+}
+let chaveDesenho = '';
+function desenha(forcar){
+  const chave = CTLS.filter(visivel).map(c=>c.k+':'+val(c.k)).join('|');
+  if(!forcar && chave===chaveDesenho) return;
+  chaveDesenho = chave;
+  const box = $('#ctls'); box.innerHTML = '';
+  CTLS.filter(visivel).forEach(c=>{
+    const d = document.createElement('div'); d.className = 'vc';
+    if(c.t==='seg'){
+      d.innerHTML = '<label>'+c.lab+'</label><div class="seg">' +
+        c.ops.map(o=>'<button data-v="'+o[0]+'"'+(val(c.k)===o[0]?' class="on"':'')+'>'+o[1]+'</button>').join('') + '</div>';
+      d.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+        SET[c.k]=b.dataset.v; cmd({acao:'set',v:{[c.k]:b.dataset.v}}); desenha(true); });
+    } else {
+      const v = val(c.k);
+      d.innerHTML = '<label>'+c.lab+'<b data-o>'+fmt(c,v)+'</b></label>' +
+        '<input type="range" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'" value="'+v+'">';
+      const inp = d.querySelector('input'), out = d.querySelector('[data-o]');
+      let ultimo = 0, pend = 0;
+      const manda = () => { const nv = +inp.value; SET[c.k]=nv; cmd({acao:'set',v:{[c.k]:nv}}); };
+      inp.addEventListener('input', ()=>{ out.textContent = fmt(c,+inp.value);
+        const agora = Date.now(); clearTimeout(pend);
+        if(agora-ultimo > 90){ ultimo = agora; manda(); } else pend = setTimeout(manda,100); });
+      inp.addEventListener('change', manda);
+    }
+    box.appendChild(d);
+  });
+}
+function cenas(){
+  $('#cenas').innerHTML = CENAS.map(c=>'<button data-i="'+c[0]+'"><i>'+c[0]+'</i>'+c[1]+'</button>').join('');
+  $('#cenas').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    const c = CENAS.find(x=>x[0]===b.dataset.i); if(!c) return;
+    SET = Object.assign({}, c[2]); cmd({acao:'cena',v:c[2]}); desenha(true); });
+}
+function pintaNums(){
+  const n = NUM||{}, t=(id,v,u)=>{ const e=$(id); if(e) e.textContent = (v==null?'—':v)+(v!=null&&u?u:''); };
+  t('#nPico',n.pico); t('#nPlato',n.plato); t('#nDp',n.dp); t('#nVc',n.vc);
+  t('#nSpo',n.spo2,'%'); t('#nPao',n.pao2); t('#nPf',n.pf); t('#nC',n.C);
+}
+let timerPuxa = null;
+async function puxa(){
+  clearTimeout(timerPuxa);
+  if(!SALA){ pedePin(); return; }
+  try{
+    const r = await fetch(api(),{cache:'no-store'}); const st = await r.json();
+    if(!online){ online = true; $('#dot').classList.add('on'); }
+    $('#hint').textContent = 'sala ' + SALA;
+    NUM = st.num || {}; pintaNums();
+    if(st.seq !== seqVista){ seqVista = st.seq; SET = st.set || {}; desenha(true); }
+    $('#bRev').classList.toggle('on', !!st.rev);
+  }catch(e){ online = false; $('#dot').classList.remove('on'); }
+  timerPuxa = setTimeout(puxa, 700);
+}
+$('#bRev').onclick = ()=>cmd({acao:'rev'});
+$('#bZero').onclick = ()=>{ if(confirm('Voltar o simulador ao estado inicial?')){ SET={}; cmd({acao:'zerar'}); desenha(true); } };
+cenas(); desenha(true); if(!SALA) setTimeout(pedePin,300); else puxa();
+</script>
+</body>
+</html>

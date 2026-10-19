@@ -1,0 +1,49 @@
+SIMULADOR DE VENTILAÇÃO MECÂNICA — app "vm"
+===========================================
+
+Projeto Vercel próprio, com Root Directory = vm
+Domínio: vm.ctmedacademy.com.br
+
+ROTAS
+  /            projeção (o simulador, para o datashow)
+  /tela        mesma coisa, apelido
+  /remoto      controle no celular
+  /api/sala    o "quadro compartilhado" entre os dois
+
+COMO FUNCIONA O PAREAMENTO
+  A projeção sorteia uma SALA de 4 dígitos e mostra no canto
+  inferior direito. No celular, abrir /remoto e digitar esses
+  4 dígitos. Atalho: /remoto?s=1234 entra direto.
+  Duas aulas simultâneas no mesmo domínio não se misturam:
+  cada projeção tem a sua sala. A sala expira em 8 h.
+
+TECLAS NA PROJEÇÃO
+  C     mostra/esconde os controles na própria tela
+  R     revela a mecânica (platô, ΔP, auto-PEEP)
+  1-9   cenários
+  L     esconde o aviso da sala (para a foto ficar limpa)
+
+BANCO (o passo que deixa o controle estável)
+  Sem banco, o estado vive na memória da função: funciona, mas
+  pode se perder quando a Vercel troca de instância — o celular
+  "desgruda" da tela.
+  Painel da Vercel > este projeto > Storage > Marketplace >
+  Redis (plano gratuito) > conectar > Redeploy.
+  O código já aceita as variáveis que a Vercel injeta:
+    KV_REST_API_URL / KV_REST_API_TOKEN
+    UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
+  Conferir: abrir /api/sala?s=1234 e ver "kv":true
+
+ARQUIVOS
+  index.html    a projeção inteira (motor, física e desenho)
+  remoto.html   o celular
+  ctls.js       lista de controles e cenários — fonte única:
+                mexer aqui muda a tela e o celular juntos
+  api/sala.js   função serverless do estado compartilhado
+  assets/       fontes embutidas (não depende de internet
+                para o texto sair certo)
+
+VERSÃO LOCAL
+  Existe uma versão que roda no próprio computador, sem internet
+  (Python + túnel), em LABAN/SIMULADOR VENTILACAO. Serve de plano
+  B quando a sala não tem rede.
