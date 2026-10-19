@@ -36,6 +36,18 @@
   .cenas button{display:flex;align-items:center;gap:8px;text-align:left;font:600 14px/1.2 inherit;
     padding:13px 10px;border-radius:12px;border:1px solid var(--lin);background:var(--pan);color:var(--fg)}
   .cenas button i{font-style:normal;font-weight:800;color:var(--lar);min-width:16px}
+  .curvas{display:flex;flex-direction:column;gap:8px}
+  .cl2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cl2 button{font:700 14px/1.1 inherit;padding:14px 8px;border-radius:12px;border:1px solid var(--lin);background:var(--pan);color:var(--fg)}
+  .cl2 button.on{border-color:var(--lar);color:var(--lar);background:rgba(251,122,0,.12)}
+  .cur{background:var(--pan);border:1px solid var(--lin);border-radius:12px;padding:10px 12px;display:none;flex-direction:column;gap:8px}
+  .cur.on{display:flex}
+  .cl4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .cl4 button{font:700 15px/1 inherit;padding:12px 4px;border-radius:10px;border:1px solid var(--lin);background:#0a1428;color:var(--fg)}
+  .cur label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--mut)}
+  .cur label b{color:var(--lar);font-size:14px}
+  .cur input[type=range]{width:100%;height:34px;accent-color:var(--lar);background:transparent}
+  .lido{font:600 12px/1.35 ui-monospace,monospace;color:#9fb0cc;background:#0a1428;border-radius:8px;padding:8px 10px}
   .acoes{display:flex;gap:8px}
   .acoes button{flex:1;font:700 15px/1 inherit;padding:15px;border-radius:12px;border:1px solid var(--lin);
     background:var(--pan);color:var(--fg)}
@@ -69,6 +81,25 @@
 
   <div class="sec">Controles</div>
   <div id="ctls" style="display:flex;flex-direction:column;gap:10px"></div>
+
+  <div class="sec">Curvas</div>
+  <div class="curvas">
+    <div class="cl2">
+      <button id="bPausa">⏸ Pausa inspiratória</button>
+      <button id="bCong">❙❙ Congelar</button>
+    </div>
+    <div class="cur" id="curBox">
+      <div class="cl4">
+        <button data-cur="-.08">◀◀</button>
+        <button data-cur="-.015">◀</button>
+        <button data-cur=".015">▶</button>
+        <button data-cur=".08">▶▶</button>
+      </div>
+      <label>Linha do tempo<b id="recLab">agora</b></label>
+      <input type="range" id="recuo" min="0" max="168" step="1" value="0">
+      <div class="lido" id="curLido">cursor desligado</div>
+    </div>
+  </div>
 
   <div class="acoes">
     <button class="rev" id="bRev">👁 Mecânica</button>
@@ -108,7 +139,8 @@ async function cmd(body){
 /* valor atual de um controle: o que o professor mexeu, senão o padrão da tela */
 const PADRAO = {modo:'VCV',disp:'ar',vc:400,fluxo:31.5,dp:24,ti:.8,fr:14,peep:5,fio2:.21,
   C:55,R:8,shunt:.05,lmin:3,vtx:.31,mnr:12,ps:10,epap:5,frEsp:22,
-  gasdur:10,som:'on',volVent:.8,volMon:.8,pausa:.5};
+  gasdur:10,som:'on',volVent:.8,volMon:.8,
+  congelado:0,cursor:null,recuo:0,manobra:0};
 const val = k => (SET[k] !== undefined ? SET[k] : PADRAO[k]);
 const fmt = (c,v) => c.pct ? Math.round(v*100)+'%' : (c.step<1 ? (+v).toFixed(1).replace('.',',') : Math.round(v)) + (c.un ? ' '+c.un : '');
 
@@ -170,13 +202,38 @@ async function puxa(){
     $('#hint').textContent = 'sala ' + SALA;
     NUM = st.num || {}; pintaNums();
     if(st.seq !== seqVista){ seqVista = st.seq; SET = st.set || {}; desenha(true); }
+    curPinta();
     $('#bRev').classList.toggle('on', !!st.rev);
   }catch(e){ online = false; $('#dot').classList.remove('on'); }
   timerPuxa = setTimeout(puxa, 700);
 }
+/* ---- curvas: manobra, congelar, cursor e linha do tempo ---- */
+function curPinta(){
+  const cg=!!val('congelado');
+  $('#bCong').classList.toggle('on',cg);
+  $('#bCong').textContent = cg? '▶ Rodando' : '❙❙ Congelar';
+  $('#curBox').classList.toggle('on',cg);
+  const rec=+val('recuo')||0;
+  $('#recLab').textContent = rec? ('−'+rec+' s') : 'agora';
+  const r=$('#recuo'); if(document.activeElement!==r) r.value=rec;
+  $('#curLido').textContent = (NUM&&NUM.cur) || (cg?'mova o cursor com ◀ ▶':'cursor desligado');
+}
+$('#bPausa').onclick = ()=>{ const v=(+val('manobra')||0)+1; SET.manobra=v; cmd({acao:'set',v:{manobra:v}}); };
+$('#bCong').onclick = ()=>{ const cg=val('congelado')?0:1;
+  SET.congelado=cg; if(cg&&val('cursor')==null) SET.cursor=.5; if(!cg){SET.cursor=null;SET.recuo=0;}
+  cmd({acao:'set',v:{congelado:cg,cursor:cg?(val('cursor')==null?.5:val('cursor')):null,recuo:cg?(+val('recuo')||0):0}});
+  curPinta(); };
+document.querySelectorAll('[data-cur]').forEach(b=>b.onclick=()=>{
+  const d=+b.dataset.cur, c=val('cursor')==null?.5:+val('cursor');
+  const nv=Math.max(0,Math.min(1,c+d));
+  SET.cursor=nv; SET.congelado=1;
+  cmd({acao:'set',v:{cursor:nv,congelado:1}}); curPinta(); });
+$('#recuo').oninput = ()=>{ const v=+$('#recuo').value; SET.recuo=v; SET.congelado=1;
+  cmd({acao:'set',v:{recuo:v,congelado:1}}); curPinta(); };
+
 $('#bRev').onclick = ()=>cmd({acao:'rev'});
 $('#bZero').onclick = ()=>{ if(confirm('Voltar o simulador ao estado inicial?')){ SET={}; cmd({acao:'zerar'}); desenha(true); } };
-cenas(); desenha(true); if(!SALA) setTimeout(pedePin,300); else puxa();
+cenas(); desenha(true); curPinta(); if(!SALA) setTimeout(pedePin,300); else puxa();
 </script>
 </body>
 </html>

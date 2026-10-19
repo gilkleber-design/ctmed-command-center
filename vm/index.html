@@ -424,6 +424,13 @@ body:has(.slide.on .artfull:not([hidden])) #frame,body:has(.slide.on .artfull:no
 .vs-tag{display:flex;align-items:baseline;gap:.8vw}
 .vs-tag b{font-family:var(--display);font-weight:800;font-size:1.9rem;color:#4fd9ff;letter-spacing:.02em}
 .vs-tag span{font-family:var(--mono);font-size:.9rem;color:var(--muted);text-transform:uppercase;letter-spacing:.14em}
+.vs-med{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:.6vw;flex:none}
+.vs-med .md{border:1px solid #1d3157;border-radius:1vh;background:linear-gradient(180deg,#0b1729,#070f1e);padding:.5vh .7vw;min-width:0}
+.vs-med .md span{display:block;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#7f8aa6;white-space:nowrap;overflow:hidden}
+.vs-med .md b{display:block;font-family:var(--monfont);font-weight:700;font-size:1.5rem;line-height:1.1;color:#e9edf6;white-space:nowrap}
+.vs-med .md small{display:block;font-family:var(--mono);font-size:.58rem;color:#5d6780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vs-med .md.medido b{color:#ffc45b}
+.vs-med .md.cur b{color:#fff;font-size:1.15rem}
 .vs-nums{display:grid;grid-template-columns:repeat(7,1fr);gap:.7vw;flex:none}
 .vn{display:flex;flex-direction:column;gap:.1vh;border:1px solid #1d3157;border-radius:1.1vh;background:linear-gradient(180deg,#0b1729,#070f1e);padding:.8vh .6vw;min-width:0}
 .vn span{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1247,6 +1254,11 @@ body.vctl .vs-hint{bottom:20.4vh}
   <div class="vs-main">
     <div class="vs-tag"><b id="vsModo">VCV</b><span id="vsSub">volume controlado</span></div>
     <div class="vs-cv"><canvas id="vsCurves" width="1500" height="820"></canvas><div class="vs-lab"><i style="--c:#3cff8e"><b>Fluxo</b><span>L/min</span></i><i style="--c:#4fd9ff"><b>Pressão</b><span>cmH₂O</span></i><i style="--c:#f5c542"><b>Volume</b><span>mL</span></i></div></div>
+    <div class="vs-med" id="vsMed">
+      <div class="md"><span>Pausa inspiratória</span><b id="mdPlato">—</b><small>P platô medida</small></div>
+      <div class="md"><span>&nbsp;</span><b id="mdDp">—</b><small>ΔP medida</small></div>
+      <div class="md cur"><span>Cursor</span><b id="mdCur">—</b><small id="mdCurT">desligado</small></div>
+    </div>
     <div class="vs-nums">
       <div class="vn"><span>P pico</span><b id="vnPico">16,5</b><small>cmH₂O</small></div>
       <div class="vn"><span>P platô</span><b id="vnPlato">12,3</b><small>cmH₂O</small></div>
@@ -1586,7 +1598,8 @@ function applyStep(sl,s){$$('[data-s]',sl).forEach(e=>{e.hidden=!stepVisible(e.d
 const VS = {
   pac:{nome:'Seu Antônio', sexo:'M', altura:170, peso:120},
   modo:'VCV',            // VCV · PCV · O2 (suporte de oxigênio, respiração espontânea)
-  vc:400, fluxo:31.5, dp:24, ti:0.8, pausa:0.5,   // s de pausa inspiratória (0 = sem pausa)
+  vc:400, fluxo:31.5, dp:24, ti:0.8, pausa:0,
+  congelado:0, cursor:null, recuo:0, manobra:0,   // congelar · cursor · linha do tempo · pausa inspiratória
   gasdur:10,             // s até a gasometria praticamente estabilizar (0 = instantâneo)
   som:'on', volMon:.8, volVent:.8,   // volumes separados: monitor e ventilador
   fr:14, peep:5, fio2:0.21,
@@ -1691,43 +1704,132 @@ if(typeof module!=='undefined') module.exports={VS,simCalc,simOnda,pesoPredito,p
 
 /* ---------- traçado ao vivo: fluxo, pressão e volume varrendo a tela ---------- */
 class VentScope{
-  constructor(cv,getS){this.cv=cv;this.cx=cv.getContext('2d');this.getS=getS;
-    this.W=cv.width;this.H=cv.height;this.x=0;this.ph=0;this.last=0;this.prev=null;
+  /* Grava as amostras num buffer circular em vez de só desenhar: é o que
+     permite congelar, passear com o cursor e voltar na linha do tempo.
+     A cada quadro redesenhamos a janela visível a partir do buffer. */
+  constructor(cv,getS){
+    this.cv=cv; this.cx=cv.getContext('2d'); this.getS=getS;
+    this.W=cv.width; this.H=cv.height;
     this.seg=[{k:'fluxo',lab:'Fluxo',un:'L/min',cor:'#3cff8e',min:-70,max:70},
               {k:'paw',  lab:'Pressão',un:'cmH₂O',cor:'#4fd9ff',min:0,max:45},
               {k:'volume',lab:'Volume',un:'mL',cor:'#f5c542',min:0,max:800}];
-    this.vel=this.W/12;  // 12 segundos de tela (~3 ciclos)
-    this.fundo();this.run=true;requestAnimationFrame(t=>this.frame(t));}
-  fundo(){const c=this.cx,W=this.W,H=this.H;c.fillStyle='#050b16';c.fillRect(0,0,W,H);
-    this.seg.forEach((s,i)=>{const y0=i*H/3,h=H/3;
-      c.strokeStyle='#0f1c33';c.lineWidth=1;
-      for(let g=1;g<8;g++){c.beginPath();c.moveTo(g*W/8,y0);c.lineTo(g*W/8,y0+h);c.stroke();}
-      c.strokeStyle='#16294a';c.beginPath();c.moveTo(0,y0+h);c.lineTo(W,y0+h);c.stroke();
-      const yz=y0+h*(s.max/(s.max-s.min));
-      if(s.min<0){c.strokeStyle='#1d3157';c.setLineDash([4,6]);c.beginPath();c.moveTo(0,yz);c.lineTo(W,yz);c.stroke();c.setLineDash([]);}
-      });}
-  y(i,v){const h=this.H/3,s=this.seg[i];return i*h+h-(v-s.min)/(s.max-s.min)*h;}
-  frame(t){if(!this.run)return;const dt=this.last?Math.min(.05,(t-this.last)/1000):0;this.last=t;
-    const S=this.getS();if(!S||!S.on){requestAnimationFrame(t=>this.frame(t));return;}
-    const r=simCalc(S),w=simOnda(S,r);
+    this.janela=12;              // segundos visíveis
+    this.hz=120;                 // amostras por segundo
+    this.cap=this.hz*180;        // 3 minutos de história
+    this.buf=new Float32Array(this.cap*4);
+    this.n=0; this.t=0; this.ph=0; this.last=0;
+    this.hold=null;              // manobra de pausa inspiratória em curso
+    this.pedido=0;               // último SIM.manobra atendido
+    this.medida=null;            // {pplato, dp, autopeep, quando}
+    requestAnimationFrame(t=>this.frame(t));
+  }
+  grava(t,f,p,v){ const i=(this.n%this.cap)*4;
+    this.buf[i]=t; this.buf[i+1]=f; this.buf[i+2]=p; this.buf[i+3]=v; this.n++; }
+  /* valor interpolado no instante t (segundos de simulação) */
+  em(t){
+    if(!this.n) return null;
+    const prim=Math.max(0,this.n-this.cap);
+    let a=prim, b=this.n-1;
+    const tn=k=>this.buf[(k%this.cap)*4];
+    if(t<=tn(a)) return this.ler(a);
+    if(t>=tn(b)) return this.ler(b);
+    while(b-a>1){ const m=(a+b)>>1; if(tn(m)<=t) a=m; else b=m; }
+    const ta=tn(a), tb=tn(b), k=tb>ta?(t-ta)/(tb-ta):0;
+    const A=this.ler(a), B=this.ler(b);
+    return [t, A[1]+(B[1]-A[1])*k, A[2]+(B[2]-A[2])*k, A[3]+(B[3]-A[3])*k];
+  }
+  ler(k){ const i=(k%this.cap)*4; return [this.buf[i],this.buf[i+1],this.buf[i+2],this.buf[i+3]]; }
+  y(i,v){ const h=this.H/3,s=this.seg[i]; return i*h+h-(v-s.min)/(s.max-s.min)*h; }
+
+  /* ---- a manobra: fecha a válvula no fim da inspiração e segura ---- */
+  manobra(){ if(this.hold) return; this.querHold=true; }
+
+  frame(ag){
+    requestAnimationFrame(t=>this.frame(t));
+    const dt=this.last?Math.min(.05,(ag-this.last)/1000):0; this.last=ag;
+    const S=this.getS(); if(!S||!S.on) return;
+    const r=simCalc(S), w=simOnda(S,r);
     this.seg[2].max=Math.max(500,Math.ceil(r.vc/200)*200+100);
     this.seg[1].max=Math.max(30,Math.ceil((r.ppico+6)/10)*10);
-    const n=Math.max(1,Math.round(dt*this.vel/2));
-    for(let k=0;k<n;k++){
-      this.ph+=dt/n;if(this.ph>r.ciclo)this.ph-=r.ciclo;
-      const x2=this.x+this.vel*dt/n;
-      const vals=[w.fluxo(this.ph),w.paw(this.ph),w.volume(this.ph)];
-      const c=this.cx;
-      if(x2>=this.W){this.x=0;this.prev=null;this.fundo();continue;}
-      c.fillStyle='#050b16';c.fillRect(x2,0,26,this.H);
-      this.seg.forEach((s,i)=>{const y0=i*this.H/3,h=this.H/3;
-        c.strokeStyle='#0f1c33';c.lineWidth=1;
-        for(let g=1;g<8;g++){const gx=g*this.W/8;if(gx>=x2&&gx<x2+26){c.beginPath();c.moveTo(gx,y0);c.lineTo(gx,y0+h);c.stroke();}}
-        if(s.min<0){const yz=y0+h*(s.max/(s.max-s.min));c.strokeStyle='#1d3157';c.setLineDash([4,6]);c.beginPath();c.moveTo(x2,yz);c.lineTo(x2+26,yz);c.stroke();c.setLineDash([]);}});
-      if(this.prev){this.seg.forEach((s,i)=>{c.strokeStyle=s.cor;c.lineWidth=3;c.lineJoin='round';
-        c.beginPath();c.moveTo(this.x,this.y(i,this.prev[i]));c.lineTo(x2,this.y(i,vals[i]));c.stroke();});}
-      this.prev=vals;this.x=x2;}
-    requestAnimationFrame(t=>this.frame(t));}
+
+    /* pedido de manobra vindo do celular ou da tecla P */
+    if((+S.manobra||0)>this.pedido){ this.pedido=+S.manobra||0; this.manobra(); }
+
+    const congelado=!!S.congelado;
+    if(!congelado && dt>0){
+      const passos=Math.max(1,Math.round(dt*this.hz));
+      const sdt=dt/passos;
+      for(let i=0;i<passos;i++){
+        this.t+=sdt;
+        if(this.hold){
+          const el=this.t-this.hold.t0;
+          if(el>=this.hold.dur){
+            /* fim da manobra: o que o platô mostrou é o que fica medido */
+            this.medida={pplato:this.hold.pplato, dp:this.hold.pplato-r.peep,
+                         autopeep:r.autopeep, quando:Date.now()};
+            this.hold=null; this.ph=r.ti;   // solta para a expiração
+          }else{
+            /* válvula fechada: sem fluxo, volume parado, pressão equilibrando */
+            const paw=this.hold.pplato+(this.hold.ppico-this.hold.pplato)*Math.exp(-el/.045);
+            this.grava(this.t,0,paw,this.hold.vol);
+            continue;
+          }
+        }
+        this.ph+=sdt; if(this.ph>=r.ciclo) this.ph-=r.ciclo;
+        if(this.querHold && this.ph>=r.ti && S.modo!=='O2'){
+          this.querHold=false;
+          this.hold={t0:this.t,dur:1.2,pplato:r.pplato,ppico:r.ppico,vol:r.vc};
+          this.ph=r.ti;
+        }
+        this.grava(this.t, w.fluxo(this.ph), w.paw(this.ph), w.volume(this.ph));
+      }
+    }
+    this.pinta(S,r);
+  }
+
+  /* ---- desenha a janela visível a partir do buffer ---- */
+  pinta(S,r){
+    const c=this.cx,W=this.W,H=this.H;
+    const atras=Math.max(0,Math.min(+S.recuo||0, 180-this.janela));
+    const fimT=this.t-atras, iniT=fimT-this.janela;
+    c.fillStyle='#050b16'; c.fillRect(0,0,W,H);
+    this.seg.forEach((s,i)=>{const y0=i*H/3,h=H/3;
+      c.strokeStyle='#0f1c33'; c.lineWidth=1;
+      for(let g=1;g<8;g++){c.beginPath();c.moveTo(g*W/8,y0);c.lineTo(g*W/8,y0+h);c.stroke();}
+      c.strokeStyle='#16294a'; c.beginPath(); c.moveTo(0,y0+h); c.lineTo(W,y0+h); c.stroke();
+      if(s.min<0){const yz=y0+h*(s.max/(s.max-s.min));
+        c.strokeStyle='#1d3157'; c.setLineDash([4,6]); c.beginPath(); c.moveTo(0,yz); c.lineTo(W,yz); c.stroke(); c.setLineDash([]);}
+    });
+    if(this.n>1){
+      const prim=Math.max(0,this.n-this.cap);
+      this.seg.forEach((s,i)=>{
+        c.strokeStyle=s.cor; c.lineWidth=3; c.lineJoin='round'; c.beginPath();
+        let comecou=false;
+        for(let k=prim;k<this.n;k++){
+          const a=this.ler(k); if(a[0]<iniT||a[0]>fimT) continue;
+          const x=(a[0]-iniT)/this.janela*W, y=this.y(i,a[i+1]);
+          if(!comecou){c.moveTo(x,y);comecou=true;} else c.lineTo(x,y);
+        }
+        c.stroke();
+      });
+    }
+    /* cursor: linha vertical que o professor passeia pelas curvas */
+    const cf=S.cursor;
+    if(cf!=null && cf>=0){
+      const x=Math.max(0,Math.min(1,+cf))*W, tC=iniT+(x/W)*this.janela;
+      c.strokeStyle='rgba(255,255,255,.55)'; c.lineWidth=1.5; c.setLineDash([5,5]);
+      c.beginPath(); c.moveTo(x,0); c.lineTo(x,H); c.stroke(); c.setLineDash([]);
+      const v=this.em(tC);
+      if(v){ this.seg.forEach((s,i)=>{
+        const y=this.y(i,v[i+1]);
+        c.fillStyle=s.cor; c.beginPath(); c.arc(x,y,5,0,7); c.fill();
+      }); this.leitura=v; }
+    } else this.leitura=null;
+    /* marca que a tela está congelada */
+    if(S.congelado){
+      c.fillStyle='rgba(255,196,91,.14)'; c.fillRect(0,0,W,6);
+    }
+  }
 }
 if(typeof module!=='undefined') module.exports.VentScope=VentScope;
 
@@ -1757,6 +1859,7 @@ function simPaint(){
      : (d>0 ? 'mL/cmH₂O · recrutou +'+n0(d) : 'mL/cmH₂O · hiperdistendeu '+n0(d));
    e.style.color = Math.abs(d)<1 ? '' : (d>0 ? '#3cff8e' : '#ff5b6a');}
   $('#voR').textContent=n1(r.R); $('#voS').textContent=n0(r.shuntEf*100);
+  medPinta();
   const p=SIM.pac;
   $('#vsNome').textContent=p.nome;
   $('#vsPac').textContent=(p.sexo==='F'?'mulher':'homem')+' · '+(p.altura/100).toFixed(2).replace('.',',')+' m · '+p.peso+' kg · predito '+n0(r.pbw)+' kg';
@@ -1805,6 +1908,19 @@ somAviso.style.cssText='position:fixed;left:18px;bottom:18px;z-index:60;display:
  +'background:rgba(7,10,18,.9);border:1px solid #2b3a5c;border-radius:10px;padding:8px 12px;'
  +'font:700 12px/1.2 var(--body,sans-serif);color:#ffc45b;backdrop-filter:blur(6px)';
 document.body.appendChild(somAviso);
+/* ---- leitura da manobra e do cursor ---- */
+function medPinta(){
+  const m=scope && scope.medida, el=document.getElementById('mdPlato'), ed=document.getElementById('mdDp');
+  if(el) el.textContent = m? n1(m.pplato) : '—';
+  if(ed) ed.textContent = m? n1(m.dp) : '—';
+  const bl=el&&el.parentElement, bd=ed&&ed.parentElement;
+  if(bl) bl.classList.toggle('medido',!!m);
+  if(bd) bd.classList.toggle('medido',!!m);
+  const c=scope && scope.leitura, ec=document.getElementById('mdCur'), et=document.getElementById('mdCurT');
+  if(ec) ec.textContent = c? (n1(c[2])+' cmH₂O · '+n1(c[1])+' L/min · '+n0(c[3])+' mL') : '—';
+  if(et) et.textContent = c? 'pressão · fluxo · volume' : (SIM.congelado?'congelado — use ◀ ▶':'desligado');
+}
+
 /* ---- a tira de gasometria nunca pode cortar uma linha ----
    O papel tem altura própria; a coluna varia com a resolução. Em vez de
    caçar pixels no CSS, medimos e encolhemos o conjunto até caber. */
@@ -1897,13 +2013,23 @@ simPaint();setInterval(simPaint,250);
 window.SIMSET=(o)=>{Object.assign(SIM,o);simPaint();};
 document.addEventListener('keydown',e=>{
   if(e.key==='m')$('#vsim').classList.toggle('rev');   // R agora é o controle remoto
+  if(e.key==='p'||e.key==='P'){ SIMSET({manobra:(+SIM.manobra||0)+1}); }
+  if(e.code==='Space'){ e.preventDefault();
+    const cg=SIM.congelado?0:1;
+    SIMSET({congelado:cg, cursor:cg?(SIM.cursor==null?.5:SIM.cursor):null}); }
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){ e.preventDefault();
+    const dir=e.key==='ArrowRight'?1:-1;
+    if(e.shiftKey){ SIMSET({recuo:Math.max(0,Math.min(168,(+SIM.recuo||0)-dir*2))}); }
+    else{ const c=SIM.cursor==null?.5:+SIM.cursor;
+          SIMSET({congelado:1, cursor:Math.max(0,Math.min(1,c+dir*(e.altKey?.002:.02)))}); } }
+  if(e.key==='Escape'){ SIMSET({congelado:0,cursor:null,recuo:0}); }
   {const c=(typeof CENAS!=='undefined') && CENAS.find(x=>x[0]===e.key); if(c){ gasSalto=true; SIMSET(Object.assign({},c[2])); }}
 });
 
 /* ---------- painel de controles na tela (tecla C esconde) ---------- */
 /* CTLS e CENAS vêm de ctls.js (mesma lista que o celular usa) */
 const bar=document.createElement('div');bar.className='vs-ctl';document.body.appendChild(bar);
-const hint=document.createElement('div');hint.className='vs-hint';hint.textContent='R controle remoto · C controles · M mecânica · 1–9 cenários';document.body.appendChild(hint);
+const hint=document.createElement('div');hint.className='vs-hint';hint.textContent='R controle · P pausa inspiratória · espaço congela · ◀ ▶ cursor · M mecânica · C controles · 1–9 cenários';document.body.appendChild(hint);
 function ctlVis(c){ if(c.so && SIM.modo!==c.so) return false;
   if(c.no && SIM.modo===c.no) return false;
   if(c.mo && SIM.modo!==c.mo) return false;
@@ -1994,7 +2120,9 @@ document.addEventListener('keydown',e=>{ if(e.key==='c'){bar.classList.toggle('o
     const r=simCalc(SIM), o2=SIM.modo==='O2';
     const n1=v=>v.toFixed(1).replace('.',','), n0=v=>Math.round(v);
     const v={pico:o2?'—':n1(r.ppico), plato:o2?'—':n1(r.pplato), dp:o2?'—':n1(r.dp),
-      vc:n0(r.vc), spo2:n0(r.sao2), pao2:n0(r.pao2), pf:n0(r.pf), C:n0(r.C)};
+      vc:n0(r.vc), spo2:n0(r.sao2), pao2:n0(r.pao2), pf:n0(r.pf), C:n0(r.C),
+      cur:(scope&&scope.leitura)?(n1(scope.leitura[2])+' cmH₂O · '+n1(scope.leitura[1])+' L/min · '+n0(scope.leitura[3])+' mL'):null,
+      med:(scope&&scope.medida)?(n1(scope.medida.pplato)+' / '+n1(scope.medida.dp)):null};
     const j=JSON.stringify(v); if(j===ultimo) return; ultimo=j;
     fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({acao:'num',v:v})}).catch(()=>{});
