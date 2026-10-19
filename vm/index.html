@@ -436,12 +436,30 @@ body:has(.slide.on .artfull:not([hidden])) #frame,body:has(.slide.on .artfull:no
 .vs-pac b{display:block;font-family:var(--display);font-weight:800;font-size:1.35rem;color:#f4f7ff}
 .vs-pac span{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
 .vs-vit{display:grid;grid-template-columns:repeat(3,1fr);gap:.6vw;flex:none}
+.vs-fis{display:grid;grid-template-columns:auto 1fr;gap:.7vw;align-items:center;flex:none;
+  border:1px solid #1d3157;border-radius:1.1vh;background:linear-gradient(180deg,#0b1729,#070f1e);padding:.25vh .7vw}
+.vs-torax{position:relative;width:9vh;min-width:76px;height:12vh;display:grid;place-items:center;overflow:hidden}
+.vs-torax img{width:auto;height:93%;max-width:93%;object-fit:contain;display:block;
+  transform-origin:50% 58%;transition:transform .08s linear;
+  filter:drop-shadow(0 0 10px rgba(79,179,255,.22)) saturate(1.05)}
+.vs-resp{position:absolute;inset:16% 18% 12% 18%;pointer-events:none;opacity:.2;transition:opacity .08s linear;
+  background:radial-gradient(circle at 32% 46%,rgba(122,208,255,.5),transparent 42%),
+             radial-gradient(circle at 68% 46%,rgba(122,208,255,.5),transparent 42%)}
+.vs-pleth{display:flex;flex-direction:column;justify-content:center;gap:.2vh;min-width:0;color:var(--good)}
+.vs-pleth.warn{color:#ffc476} .vs-pleth.bad{color:#fb868a}
+.vs-pleth .pl-lab{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:#7f8aa6}
+.vs-pleth svg{width:100%;height:5vh;overflow:hidden;display:block}
+.vs-pleth .pl-mov{transform-box:fill-box;transform-origin:left center;
+  animation:plMov .833s linear infinite;will-change:transform}
+@keyframes plMov{from{transform:translateX(0)}to{transform:translateX(-20%)}}
+.vs-pleth small{font-family:var(--mono);font-size:.6rem;color:#7f8aa6}
 .vv{display:flex;flex-direction:column;align-items:center;border:1px solid #1d3157;border-radius:1.1vh;background:linear-gradient(180deg,#0b1729,#070f1e);padding:.8vh .4vw}
 .vv span{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted)}
 .vv b{font-family:var(--monfont);font-weight:700;font-size:2.1rem;line-height:1;color:#3cff8e;font-variant-numeric:tabular-nums}
 .vv small{font-family:var(--mono);font-size:.6rem;color:var(--dim)}
 .vv.warn b{color:#f5c542}.vv.bad b{color:#ff5b6a}
-.vs-side #vs_gas{flex:1;min-height:0}
+.vs-side #vs_gas{flex:1;min-height:0;overflow:hidden}
+#vs_gas .gas-fit{transform-origin:top center;display:flex;flex-direction:column;height:100%}
 .vs-oculto{display:grid;grid-template-columns:repeat(3,1fr);gap:.6vw;flex:none;opacity:0;transition:opacity .4s}
 .vsim.rev .vs-oculto{opacity:1}
 .vo{display:flex;flex-direction:column;align-items:center;border:1px dashed #2a3a5c;border-radius:1.1vh;padding:.7vh .4vw}
@@ -1246,6 +1264,16 @@ body.vctl .vs-hint{bottom:20.4vh}
       <div class="vv"><span>PaO₂</span><b id="vvPao">82</b><small>mmHg</small></div>
       <div class="vv"><span>P/F</span><b id="vvPf">391</b><small></small></div>
     </div>
+    <div class="vs-fis">
+      <div class="vs-torax"><img id="vsTorax" src="assets/thorax_ref.png" alt="Tórax"><i class="vs-resp" id="vsResp"></i></div>
+      <div class="vs-pleth" id="vsPleth">
+        <span class="pl-lab">Pleth · SpO₂</span>
+        <svg viewBox="0 0 180 55" preserveAspectRatio="none" aria-hidden="true"><g class="pl-mov">
+          <path d="M0 36L18 36Q26 36 30 30L36 13Q39 4 42 14L49 44Q52 47 57 36L65 36 M65 36L83 36Q91 36 95 30L101 13Q104 4 107 14L114 44Q117 47 122 36L130 36 M130 36L148 36Q156 36 160 30L166 13Q169 4 172 14L179 44Q182 47 187 36L195 36 M195 36L213 36Q221 36 225 30L231 13Q234 4 237 14L244 44Q247 47 252 36L260 36 M260 36L278 36Q286 36 290 30L296 13Q299 4 302 14L309 44Q312 47 317 36L325 36"
+            fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></g></svg>
+        <small id="vsPlethBpm">72 bpm</small>
+      </div>
+    </div>
     <div id="vs_gas"></div>
     <div class="vs-oculto" id="vsOculto">
       <div class="vo"><span>Complacência</span><b id="voC">55</b><small id="voCs">mL/cmH₂O</small></div>
@@ -1286,7 +1314,7 @@ const Sound={on:true,fx:true,vol:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},l
       if(this.ctx&&location.protocol!=='file:')fetch('assets/'+n+'.mp3').then(r=>r.arrayBuffer()).then(b=>this.ctx.decodeAudioData(b)).then(x=>{this.bufs[n]=x;}).catch(()=>{});});}},
   running(){return !!(this.ctx&&this.ctx.state==='running');},
   setVol(v){this.vol=clamp(+v,0,1);if(this.master)this.master.gain.value=this.vol;},
-  live:{alarm:[],critical:[],beep:[]},
+  live:{alarm:[],critical:[],beep:[],resp:[]},
   stop(n){(this.live[n]||[]).forEach(s=>{try{s.stop();}catch(e){}});this.live[n]=[];(this.pool[n]||[]).forEach(el=>{try{el.pause();el.currentTime=0;}catch(e){}});},
   play(n,rate,vol){if(!this.on||this.vol<=0)return;rate=rate||1;vol=vol==null?1:vol;
     const buf=this.bufs[n];
@@ -1295,6 +1323,30 @@ const Sound={on:true,fx:true,vol:.8,ctx:null,master:null,bufs:{},pool:{},pi:{},l
     const p=this.pool[n];if(!p)return;const el=p[this.pi[n]++%p.length];
     try{el.pause();el.currentTime=0;el.volume=clamp(vol*this.vol,0,1);el.preservesPitch=false;el.webkitPreservesPitch=false;el.playbackRate=clamp(rate,.5,2);const q=el.play();if(q)q.catch(()=>{});}catch(e){}},
   pulse(spo2){this.play('beep',Math.max(.55,1-Math.max(0,100-spo2)*.011),.55);},   // tom cai com a saturação
+  /* Ar entrando e saindo: ruído filtrado em banda, com a frequência varrendo
+     ao longo da fase. Sintetizado — não depende de nenhum arquivo. */
+  respira(fase,dur,forca){
+    if(!this.on||this.vol<=0||!this.running())return;
+    const c=this.ctx; dur=Math.max(.18,Math.min(6,dur||1)); forca=Math.max(.15,Math.min(1.4,forca||1));
+    if(!this.ruido){const n=Math.floor(c.sampleRate*2),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);
+      for(let i=0;i<n;i++)d[i]=Math.random()*2-1; this.ruido=b;}
+    const insp=fase==='in';
+    const src=c.createBufferSource(); src.buffer=this.ruido; src.loop=true;
+    src.playbackRate.value=.85+Math.random()*.3;
+    const f=c.createBiquadFilter(); f.type='bandpass'; f.Q.value=insp?.9:.7;
+    const g=c.createGain(); const t=c.currentTime;
+    const pico=(insp?.42:.3)*forca;
+    const sobe=dur*(insp?.33:.2);
+    g.gain.setValueAtTime(.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(.0002,pico),t+sobe);
+    g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    f.frequency.setValueAtTime(insp?430:360,t);
+    f.frequency.linearRampToValueAtTime(insp?780:170,t+dur);
+    src.connect(f); f.connect(g); g.connect(this.master);
+    try{src.start(t);src.stop(t+dur+.06);}catch(e){}
+    const L=this.live.resp||(this.live.resp=[]); L.push(src);
+    src.onended=()=>{const i=L.indexOf(src); if(i>=0)L.splice(i,1);};
+  },
   beep(){}   // legado: não usado
 };
 ['pointerdown','keydown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>Sound.ensure(),{passive:true}));
@@ -1748,15 +1800,74 @@ somAviso.style.cssText='position:fixed;left:18px;bottom:18px;z-index:60;display:
  +'background:rgba(7,10,18,.9);border:1px solid #2b3a5c;border-radius:10px;padding:8px 12px;'
  +'font:700 12px/1.2 var(--body,sans-serif);color:#ffc45b;backdrop-filter:blur(6px)';
 document.body.appendChild(somAviso);
+/* ---- a tira de gasometria nunca pode cortar uma linha ----
+   O papel tem altura própria; a coluna varia com a resolução. Em vez de
+   caçar pixels no CSS, medimos e encolhemos o conjunto até caber. */
+function ajustaGas(){
+  const cx=document.getElementById('vs_gas'); if(!cx) return;
+  /* #vs_gas é a própria tira: embrulhamos o conteúdo uma vez para ter o que escalar.
+     As referências que o painel guarda para cada linha continuam valendo. */
+  let el=cx.querySelector(':scope > .gas-fit');
+  if(!el){
+    el=document.createElement('div'); el.className='gas-fit';
+    while(cx.firstChild) el.appendChild(cx.firstChild);
+    cx.appendChild(el);
+  }
+  el.style.transform='';
+  const caixa=cx.getBoundingClientRect(); const alvo=caixa.height; if(!alvo) return;
+  let fundo=el.getBoundingClientRect().bottom;
+  el.querySelectorAll('.g').forEach(l=>{ const b=l.getBoundingClientRect().bottom; if(b>fundo) fundo=b; });
+  /* medimos contra o topo da CAIXA: o invólucro pode estar deslocado dentro dela */
+  const preciso=fundo-caixa.top;
+  if(preciso>alvo-1 && preciso>0) el.style.transform='scale('+Math.max(.55,(alvo-3)/preciso).toFixed(4)+')';
+}
+addEventListener('resize', ()=>setTimeout(ajustaGas,80));
+try{ new ResizeObserver(()=>ajustaGas()).observe(document.getElementById('vs_gas')); }catch(e){}
+setTimeout(ajustaGas,400); setTimeout(ajustaGas,1500);
+
+/* ---- tórax que expande e som da ventilação, no mesmo relógio ---- */
+const elTorax=document.getElementById('vsTorax'), elResp=document.getElementById('vsResp'),
+      elPleth=document.getElementById('vsPleth'), elBpm=document.getElementById('vsPlethBpm');
+const FC_SIM=72;                          // o modelo não tem frequência cardíaca
+let respT=performance.now(), respPh=0, respFase=null;
+function respTick(agora){
+  requestAnimationFrame(respTick);
+  try{
+    const r=simCalc(SIM), w=simOnda(SIM,r);
+    const dt=Math.min(.12,(agora-respT)/1000); respT=agora;
+    respPh+=dt; if(respPh>=r.ciclo) respPh-=r.ciclo*Math.floor(respPh/r.ciclo);
+    const prog=Math.max(0,Math.min(1.15, w.volume(respPh)/Math.max(1,r.vc)));
+    if(elTorax){ elTorax.style.transform='scale('+(1+prog*.055).toFixed(4)+')'; }
+    if(elResp){ elResp.style.opacity=(.14+prog*.5).toFixed(3); }
+
+    const tp=w.tp||0;
+    const fase = respPh<r.ti ? 'in' : (respPh<r.ti+tp ? 'pausa' : 'ex');
+    if(fase!==respFase){
+      const somLig = SIM.som!=='off';
+      const forca = Math.max(.2,Math.min(1.3, r.vc/600));
+      if(somLig && fase==='in') Sound.respira('in', r.ti, forca);
+      if(somLig && fase==='ex') Sound.respira('ex', Math.max(.35, r.ciclo-r.ti-tp), forca*.85);
+      respFase=fase;
+    }
+  }catch(e){}
+}
+requestAnimationFrame(respTick);
+
 let somPulsoT=0, somAlarmeT=0;
 function somTick(){
-  const lig=SIM.som!=='off';
+  const lig=SIM.som!=='off', monitor=SIM.som==='on';   // 'vent' = só o ventilador
   Sound.on=lig; Sound.setVol(lig?(SIM.vol==null?.8:+SIM.vol):0);
   somAviso.style.display=(lig && !Sound.running())?'block':'none';
-  if(!lig){ Sound.stop('alarm'); Sound.stop('critical'); return; }
-  const g=gasAtual||gasAlvo; if(!g) return;
+  const g=gasAtual||gasAlvo;
+  /* a pleth acompanha a saturação mesmo com o som desligado */
+  if(g && elPleth){ const spo=g['SaO₂'];
+    elPleth.classList.toggle('warn', spo<94 && spo>=90);
+    elPleth.classList.toggle('bad', spo<90);
+    if(elBpm) elBpm.textContent=FC_SIM+' bpm'; }
+  if(!lig || !monitor){ Sound.stop('alarm'); Sound.stop('critical'); if(!lig||!monitor) return; }
+  if(!g) return;
   const spo=g['SaO₂'], agora=performance.now();
-  if(agora-somPulsoT>60000/72){ somPulsoT=agora; Sound.pulse(spo); }   // 72/min: o modelo não tem FC
+  if(agora-somPulsoT>60000/FC_SIM){ somPulsoT=agora; Sound.pulse(spo); }
   const nivel=nivelParam('spo',spo);
   if(nivel===0){ somAlarmeT=0; Sound.stop('alarm'); Sound.stop('critical'); return; }
   if(agora-somAlarmeT<2400) return;
@@ -1777,14 +1888,14 @@ function qrSVG(url,lado){ try{
 simPaint();setInterval(simPaint,250);
 window.SIMSET=(o)=>{Object.assign(SIM,o);simPaint();};
 document.addEventListener('keydown',e=>{
-  if(e.key==='r')$('#vsim').classList.toggle('rev');
+  if(e.key==='m')$('#vsim').classList.toggle('rev');   // R agora é o controle remoto
   {const c=(typeof CENAS!=='undefined') && CENAS.find(x=>x[0]===e.key); if(c){ gasSalto=true; SIMSET(Object.assign({},c[2])); }}
 });
 
 /* ---------- painel de controles na tela (tecla C esconde) ---------- */
 /* CTLS e CENAS vêm de ctls.js (mesma lista que o celular usa) */
 const bar=document.createElement('div');bar.className='vs-ctl';document.body.appendChild(bar);
-const hint=document.createElement('div');hint.className='vs-hint';hint.textContent='C controles · R revela mecânica · 1–9 cenários';document.body.appendChild(hint);
+const hint=document.createElement('div');hint.className='vs-hint';hint.textContent='R controle remoto · C controles · M mecânica · 1–9 cenários';document.body.appendChild(hint);
 function ctlVis(c){ if(c.so && SIM.modo!==c.so) return false;
   if(c.no && SIM.modo===c.no) return false;
   if(c.mo && SIM.modo!==c.mo) return false;
@@ -1829,13 +1940,13 @@ document.addEventListener('keydown',e=>{ if(e.key==='c'){bar.classList.toggle('o
    +'.vs-sala .vs-qr svg{display:block;border-radius:6px;padding:5px;background:#fff}'
    +'.vs-sala.off{display:none}';
   document.head.appendChild(st);
-  const av=document.createElement('div'); av.className='vs-sala';
+  const av=document.createElement('div'); av.className='vs-sala off';   // só aparece na tecla R
   av.innerHTML='<span>CONTROLE NO CELULAR</span><div class="vs-qr"></div>'
     +'<b>'+location.host+'/remoto</b><i>sala '+sala+'</i>';
   document.body.appendChild(av);
   /* aponta a câmera e cai pareado: o QR já leva a sala */
   try{ av.querySelector('.vs-qr').innerHTML=qrSVG(location.origin+'/remoto?s='+sala,124); }catch(e){}
-  document.addEventListener('keydown',e=>{ if(e.key==='l'||e.key==='L') av.classList.toggle('off'); });
+  document.addEventListener('keydown',e=>{ if(e.key==='r'||e.key==='R') av.classList.toggle('off'); });
 
   let seqVista=-1, cenaVista=null, pend=null, timer=null, ativo=0, mandouAte=0;
   const PAD=Object.assign({},SIM);   // padroes da tela, para o 'voltar ao padrao'

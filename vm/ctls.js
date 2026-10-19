@@ -20,7 +20,7 @@ const CTLS=[
  {t:'r',k:'R',lab:'Resistência',min:3,max:45,step:.5,un:'cmH₂O/L/s',cls:'fis'},
  {t:'r',k:'shunt',lab:'Shunt',min:0,max:.5,step:.01,un:'%',cls:'fis',pct:true},
  {t:'r',k:'gasdur',lab:'Atraso da gasometria',min:0,max:60,step:5,un:'s',cls:'mon'},
- {t:'seg',k:'som',lab:'Som do monitor',ops:[['on','Ligado'],['off','Desligado']],cls:'mon'},
+ {t:'seg',k:'som',lab:'Som',ops:[['on','Tudo'],['vent','Só ventilador'],['off','Mudo']],cls:'mon'},
  {t:'r',k:'vol',lab:'Volume',min:0,max:1,step:.05,un:'',pct:true,cls:'mon'},
 ];
 
