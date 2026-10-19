@@ -1,7 +1,8 @@
 {
  "name": "Vórtice | CT-Med",
- "short_name": "Vórtice",
+ "short_name": "Vórtice|CT-Med",
  "description": "Fluxograma de resgate da via aérea · CT-Med Academy",
+ "id": "https://vortice.ctmedacademy.com.br/",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",

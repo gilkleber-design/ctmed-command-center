@@ -1,7 +1,8 @@
 {
  "name": "ISR | CT-Med",
- "short_name": "ISR",
+ "short_name": "ISR|CT-Med",
  "description": "Guia rápido de drogas e algoritmo da sequência rápida de intubação · CT-Med Academy",
+ "id": "https://israpp.ctmedacademy.com.br/",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
