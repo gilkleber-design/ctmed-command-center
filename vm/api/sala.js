@@ -7,15 +7,37 @@
 //  de ambiente existem. Sem elas, guarda na memória da função:
 //  funciona para testar, mas pode "esquecer" ao trocar de instância.
 // ============================================================
-const URL_KV   = process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL   || '';
-const TOKEN_KV = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
+// Acha as credenciais do Redis sem depender do nome exato da variavel:
+// cada integracao (e cada prefixo escolhido na hora de conectar) batiza
+// do seu jeito. Procuramos os nomes conhecidos e, se nao achar, qualquer
+// par <algo>_URL / <algo>_TOKEN que aponte para um endpoint REST.
+function credenciais() {
+  const e = process.env;
+  const conhecidos = [
+    ['KV_REST_API_URL', 'KV_REST_API_TOKEN'],
+    ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN'],
+    ['REDIS_REST_URL', 'REDIS_REST_TOKEN'],
+  ];
+  for (const [u, t] of conhecidos) {
+    if (e[u] && e[t]) return { url: e[u], token: e[t], via: u };
+  }
+  for (const k of Object.keys(e)) {
+    if (!/_REST(_API)?_URL$/.test(k)) continue;
+    const v = e[k];
+    if (!v || !/^https:\/\//.test(v)) continue;
+    const t = k.replace(/_URL$/, '_TOKEN');
+    if (e[t]) return { url: v, token: e[t], via: k };
+  }
+  return { url: '', token: '', via: null };
+}
+const KV = credenciais();
 const VALIDADE = 60 * 60 * 8;          // 8 h e a sala expira sozinha
 const MEM = (globalThis.__salas ||= new Map());
 
 async function redis(cmd) {
-  const r = await fetch(URL_KV, {
+  const r = await fetch(KV.url, {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + TOKEN_KV, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'Bearer ' + KV.token, 'Content-Type': 'application/json' },
     body: JSON.stringify(cmd),
   });
   if (!r.ok) throw new Error('kv ' + r.status);
@@ -24,12 +46,12 @@ async function redis(cmd) {
 const vazio = () => ({ set: {}, seq: 0, rev: 0, num: {} });
 
 async function le(sala) {
-  if (!URL_KV) return MEM.get(sala) || vazio();
+  if (!KV.url) return MEM.get(sala) || vazio();
   const v = await redis(['GET', 'sala:' + sala]);
   return v ? JSON.parse(v) : vazio();
 }
 async function grava(sala, e) {
-  if (!URL_KV) { MEM.set(sala, e); return; }
+  if (!KV.url) { MEM.set(sala, e); return; }
   await redis(['SET', 'sala:' + sala, JSON.stringify(e), 'EX', String(VALIDADE)]);
 }
 
@@ -39,7 +61,7 @@ export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
       const e = await le(sala);
-      return res.status(200).json({ set: e.set, seq: e.seq, rev: e.rev, num: e.num, kv: !!URL_KV });
+      return res.status(200).json({ set: e.set, seq: e.seq, rev: e.rev, num: e.num, kv: !!KV.url, via: KV.via });
     }
     if (req.method === 'POST') {
       const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
