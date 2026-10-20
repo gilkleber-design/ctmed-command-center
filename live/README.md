@@ -1,18 +1,18 @@
 # CT-MED LIVE Studio — integração com o Command Center
 
-O atalho **LIVE** do Command Center abre \`/live/\` em uma nova aba. O portal **não substitui** nem modifica a aplicação clínica: ele seleciona o endereço da central LIVE e abre os painéis de Editor, Maestro, Gil, Diego, Direção técnica, Tela pública e Aluno.
+O atalho **LIVE** do Command Center abre `/live/` em uma nova aba. O portal **não substitui** nem modifica a aplicação clínica: ele seleciona o endereço da central LIVE e abre os painéis de Editor, Maestro, Gil, Diego, Direção técnica, Tela pública e Aluno.
 
 ## Execução do LIVE Studio v1
 
-A aplicação Node.js está no pacote **CTMED-LIVE-STUDIO-v1.zip** entregue na conversa original. Extraia, instale Node.js 20+ e inicie com \`LIVE_STUDIO_SECRET\` forte, ou com \`iniciar-mac.command\` / \`iniciar-windows.bat\`.
+O código-fonte completo está na pasta [`live-studio/`](../live-studio/) deste repositório. Baixe ou clone o projeto, instale Node.js 20+, entre na pasta `live-studio` e execute `iniciar-mac.command`, `iniciar-windows.bat` ou `LIVE_STUDIO_SECRET=UMA-SENHA-COM-12-CARACTERES npm start`. O ZIP da aplicação também está disponível na conversa de criação.
 
-- Central no notebook: \`http://127.0.0.1:8000/?view=maestro\`.
-- Tablets na mesma rede: \`http://IP-DO-NOTEBOOK:8000/?view=gil\` ou \`?view=diego\`.
-- Operador de OBS: \`?view=tecnica\`.
-- Tela projetada: \`?view=publico\`.
-- Editor: \`?view=editor\`.
+- Central no notebook: `http://127.0.0.1:8000/?view=maestro`.
+- Tablets na mesma rede: `http://IP-DO-NOTEBOOK:8000/?view=gil` ou `?view=diego`.
+- Operador de OBS: `?view=tecnica`.
+- Tela projetada: `?view=publico`.
+- Editor: `?view=editor`.
 
-No portal \`/live/\`, altere o endereço do servidor em cada dispositivo conforme a rede utilizada. O ajuste fica salvo **somente naquele navegador**.
+No portal `/live/`, altere o endereço do servidor em cada dispositivo conforme a rede utilizada. O ajuste fica salvo **somente naquele navegador**.
 
 ## Limites da versão local
 
@@ -27,4 +27,4 @@ O Command Center é estático, mas o LIVE Studio precisa de **servidor Node.js a
 
 ## Publicação
 
-O projeto do Command Center na Vercel deve estar conectado ao repositório \`gilkleber-design/ctmed-command-center\`, raiz do projeto. O portal estático ficará acessível em \`/live/\` na próxima publicação que incluir este commit. Publicação depende das permissões da equipe Vercel.
+O projeto do Command Center na Vercel deve estar conectado ao repositório `gilkleber-design/ctmed-command-center`, raiz do projeto. O portal estático ficará acessível em `/live/` na próxima publicação que incluir este commit. Publicação depende das permissões da equipe Vercel.
