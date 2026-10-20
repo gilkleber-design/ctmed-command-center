@@ -1,0 +1,1 @@
+Supabase LIVE Studio schema initialized. Browser client deployment pending verification.
