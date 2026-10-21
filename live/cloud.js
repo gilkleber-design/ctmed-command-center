@@ -9,7 +9,7 @@ const warn=s=>{const el=$('#status');el.textContent=s;el.style.display='block';s
 async function load(){let s=await db.auth.getSession();auth=s.data.session;isStaff=!!auth&&(await db.rpc('live_studio_is_staff')).data===true;
 let p=await db.from('live_studio_public').select('data').eq('id',ID).single();P=p.data?.data;
 if(isStaff){let [a,b]=await Promise.all(['live_studio_lesson','live_studio_runtime'].map(t=>db.from(t).select('data').eq('id',ID).single()));L=a.data?.data;R=b.data?.data}else{L=R=edit=null}
-$('#net').textContent=isStaff?'● Equipe autenticada':'● Projeção pública';$('#signout').hidden=!auth;render()}
+$('#net').textContent=isStaff?'● Sessão do Command Center':'● Projeção pública';$('#signout').hidden=true;render()}
 const scenes=()=>L.cases.flatMap(c=>c.scenes.map(s=>({...s,caseTitle:c.title,patient:s.patient||c.patient})));
 const scene=()=>scenes()[R.index];
 function poll(){const pub=view==='publico'||view==='aluno',s=pub?P.scene:scene(),p=pub?s.poll:s.poll,ph=pub?P.pollPhase:R.pollPhase;if(!p)return '';
@@ -18,7 +18,7 @@ const vals=s=>'<div class="row">'+Object.entries(s.vitals||{}).map(([k,v])=>'<di
 const controls=()=>'<div class="card row">'+['back','advance','start_poll','close_poll','reveal_poll'].map((id,i)=>'<button data-act="'+id+'" class="'+(i===1?'primary':'')+'">'+['← Voltar','Avançar →','Abrir votação','Encerrar','Revelar'][i]+'</button>').join('')+'</div>';
 function render(){if(dirty&&view==='editor')return;
 let h='<div class="nav">'+Object.entries(views).map(([v,t])=>'<button data-view="'+v+'" class="'+(view===v?'active':'')+'">'+t+'</button>').join('')+'</div>';
-if(!isStaff&&!['publico','aluno'].includes(view)){h+='<div class="card"><h1>Login da equipe</h1><p class="muted">Acesse com e-mail autorizado. O conteúdo privado não é público.</p><form id="login"><input type="email" name="email" required placeholder="E-mail autorizado"><button class="primary">Enviar link</button></form></div>'}
+if(!isStaff&&!['publico','aluno'].includes(view)){h+='<div class="card"><h1>Sessão necessária</h1><p class="muted">Entre uma única vez no Command Center. Depois, o LIVE Studio abre automaticamente com a mesma sessão.</p><p><a href="../">← Entrar pelo Command Center</a></p></div>'}
 else if(['publico','aluno'].includes(view)){if(!P)h+='<p>Aguardando transmissão.</p>';else{const s=P.scene;h+='<h1>'+X(s.title)+'</h1><div class="card">'+vals(s)+'<p>'+X(s.patient)+'</p><p class="big">'+X(s.clinical)+'</p></div>'+(P.step>0?poll():'')}}
 else if(view==='maestro'){const s=scene();h+='<h1>'+X(s.title)+'</h1><div class="wide"><div class="card">'+scenes().map((x,i)=>'<button class="scene" data-goto="'+i+'">'+(i+1)+'. '+X(x.title)+'</button>').join('')+'</div><div><div class="card">'+vals(s)+'<p>'+X(s.clinical)+'</p></div><div class="card"><h2>Gil</h2><p>'+X(s.gil)+'</p><h2>Diego</h2><p>'+X(s.diego)+'</p><h2>FAZER</h2><p>'+X(s.action)+'</p><h2>PRÓXIMO</h2><p>'+X(s.next)+'</p></div>'+controls()+poll()+'</div></div>'}
 else if(view==='gil'||view==='diego'){let s=scene(),gil=view==='gil';h+='<h1>'+X(s.title)+'</h1><div class="card"><h2>SUA FALA</h2><p class="big">'+X(gil?s.gil:s.diego)+'</p><h2>OUTRO PROFESSOR</h2><p>'+X(gil?s.cueDiego:s.cueGil)+'</p><h2>PRÓXIMO</h2>'+X(s.next)+'</div>'+controls()}
@@ -34,11 +34,11 @@ else if(b.dataset.select!==undefined){capture();dirty=false;sel=+b.dataset.selec
 else if(b.id==='save'){capture();act('save_lesson',{lesson:edit})}
 else if(b.id==='export'){capture();let blob=new Blob([JSON.stringify(edit,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ctmed-live.json';a.click()}
 else if(b.id==='sendNotice')act('notice',{notice:$('#notice').value});
-else if(b.id==='signout')db.auth.signOut().then(()=>location.reload())});
-document.addEventListener('submit',async e=>{if(e.target.id!=='login')return;e.preventDefault();let email=new FormData(e.target).get('email');localStorage.setItem('ctmed-live-last-view',view);const redirectTo=location.origin+location.pathname;let r=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:false}});warn(r.error?r.error.message:'Novo link enviado. Abra apenas a mensagem mais recente e clique uma vez.')});
+else if(b.id==='signout')location.assign('../')});
+
 document.addEventListener('change',async e=>{if(e.target.name!=='vote')return;let id=localStorage.getItem('live-voter')||crypto.randomUUID().replaceAll('-','');localStorage.setItem('live-voter',id);let r=await db.rpc('live_studio_cast_vote',{p_lesson_id:ID,p_voter_id:id,p_selected:+e.target.value});warn(r.error?r.error.message:'Voto registrado')});
 document.addEventListener('input',e=>{if(e.target.matches('[data-edit]'))dirty=true});
 document.addEventListener('keydown',e=>{if(!isStaff||!['maestro','gil','diego'].includes(view)||e.target.closest('input,textarea,select'))return;if(e.code==='Space'||e.code==='ArrowRight'){e.preventDefault();act('advance')}else if(e.code==='ArrowLeft'){e.preventDefault();act('back')}});
-$('#signout').addEventListener('click',()=>db.auth.signOut().then(()=>location.reload()));
+
 await load();db.channel('live-updates').on('postgres_changes',{event:'*',schema:'public',table:'live_studio_public',filter:'id=eq.'+ID},()=>{if(!dirty)load()}).subscribe();setInterval(()=>{if(!dirty)load()},10000);
 })().catch(e=>{document.querySelector('#app').textContent='Falha ao iniciar LIVE: '+e.message;});
