@@ -259,15 +259,17 @@ async function authenticatedEnter(){
   const name=e==='gilkleber@gmail.com'||e==='gil.cruz@afya.com.br'?'Gil':e.startsWith('diego')?'Diego':e.split('@')[0];
   window.ctmedVerifiedName=name;
   user=name;localStorage.setItem('ctmed_user',name);
-  document.body.classList.remove('ctmed-auth-pending');
-  document.body.classList.add('ctmed-authenticated');
-  if(!commandStarted){commandStarted=true;init()}
   if(u.user.user_metadata?.must_change_password){
     const modal=document.getElementById('ctmedPasswordModal');
     document.getElementById('ctmedPassCancel').hidden=true;
-    modal.showModal();
-    authMessage('Defina uma senha pessoal antes de continuar.');
+    if(!modal.open)modal.showModal();
+    authMessage('Defina uma senha pessoal para concluir o primeiro acesso.');
+    return true;
   }
+  document.getElementById('ctmedPassCancel').hidden=false;
+  document.body.classList.remove('ctmed-auth-pending');
+  document.body.classList.add('ctmed-authenticated');
+  if(!commandStarted){commandStarted=true;init()}
   return true;
  }catch(e){authMessage('Falha ao verificar sessão. Tente novamente.');return false}
 }
@@ -320,6 +322,7 @@ async function startCommandAuth(){
    const {error}=await client.auth.updateUser({password:pass,data:{must_change_password:false}});
    if(error){msg.textContent='Não foi possível salvar: '+error.message;return}
    msg.textContent='Senha salva com sucesso.';
+   await authenticatedEnter();
    document.getElementById('ctmedNewPassword').value='';
    document.getElementById('ctmedRepeatPassword').value='';
    setTimeout(()=>document.getElementById('ctmedPasswordModal').close(),700);
