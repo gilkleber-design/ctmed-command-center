@@ -34,3 +34,18 @@ O Maestro anterior `/live/?view=maestro` está bloqueado até a primeira publica
 - O painel cobre decisões e texto; uma visualização gráfica completa do monitor/cenários para revisão ainda pode ser adicionada.
 - Não substitui revisão científica dos casos e condutas antes da transmissão.
 - O acesso de Diego depende da definição do endereço de e-mail dele no convite.
+
+
+## IA — terceira participante (sob demanda)
+
+A interface \`/live/revisao.html\` inclui um painel "IA · terceira participante", que responde no histórico do tópico como \`author_role=ia\` e propõe, quando justificado, até duas alterações de pauta. Sugestões aparecem na **coluna esquerda**, claramente marcadas como pendentes. Um professor precisa clicar **Aplicar como proposta** para efetivamente criar ou revisar um item; nenhuma sugestão da IA conta como aprovação.
+
+- Modelo padrão: \`gpt-4.1-mini\`.
+- Chamada exclusivamente manual pelo botão **Analisar com IA** ou **Revisar lacunas**.
+- Entra: tópico atual reduzido, nomes/estado da pauta e até 5 comentários recentes. Não envia documentos completos ou todas as cenas.
+- Sai: resposta sem preâmbulo ou concordância automática, até ~110 palavras; no máximo 2 sugestões estruturadas.
+- Limite técnico: até 560 tokens de geração, até 900 caracteres por pergunta, no máximo 40 requisições por pessoa/dia e 80 requisições no projeto/dia.
+- Observação: limite de requisições não equivale a teto monetário de API. Configure orçamento/alertas na OpenAI separadamente.
+- Backend: Supabase Edge Function \`live-editorial-ai\` protegida por JWT da sessão e verificação de papel da equipe. Não exponha chaves no HTML, GitHub ou chat.
+- Para ativar: Supabase → Edge Functions → Secrets → definir **\`OPENAI_API_KEY\`** usando chave própria da plataforma OpenAI. Até essa variável existir, a interface indica "Não configurada" e não tenta gerar respostas.
+- Uma revisão médica feita pela IA é uma proposta; verificar diretrizes e recomendações antes de aplicar em material de ensino.
