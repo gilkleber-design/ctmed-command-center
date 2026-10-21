@@ -8,7 +8,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const api=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!api||!key||!window.supabase)throw Error('Configuração Supabase indisponível');
 const db=supabase.createClient(api,key);
-let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null};
+let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null,aiSuggestions:[],aiReady:false,aiBusy:false,aiTokens:null,aiError:null};
 function flash(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';clearTimeout(flash._timer);flash._timer=setTimeout(()=>t.style.display='none',4800)}
 const selected=()=>S.units.find(u=>u.id===S.selected)||S.units[0];
 const locked=u=>u&&u.final_revision===u.revision;
@@ -108,7 +108,10 @@ function renderSidebar(){
   let [state,cls]=label(u);
   h+='<button class="unit '+(S.selected===u.id?'selected':'')+'" data-unit="'+esc(u.id)+'" title="'+esc(state)+'"><div><div class="name">'+esc(u.title)+'</div><div class="meta">v'+u.revision+' · '+state+'</div></div><span class="dot '+cls+'"></span></button>';
  }
- $('#unitList').innerHTML=h||'<p class="sub" style="padding:8px">Nenhum tópico neste filtro.</p>';
+ const candidate=(S.aiSuggestions||[]).filter(p=>p.state==='pending'&&(!q||(p.title+' '+p.reason).toLocaleLowerCase('pt-BR').includes(q)));
+ const proposalHtml=candidate.length?'<div class="sec-label">✦ Propostas da IA ('+candidate.length+')</div>'+
+   candidate.map(p=>'<button class="unit ai-unit" data-suggestion="'+p.id+'"><div><div class="name">✦ '+esc(p.title)+'</div><div class="meta">Proposta · '+(p.kind==='add_topic'?'incluir':'revisar')+' · aguarda decisão</div></div><span class="dot revision"></span></button>').join(''):'';
+ $('#unitList').innerHTML=proposalHtml+(h||'<p class="sub" style="padding:8px">Nenhum tópico neste filtro.</p>');
  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===S.filter));
  $('#addUnit').disabled=!isAuthor();
 }
@@ -160,6 +163,14 @@ function renderDiscussion(){
  '<label class="field"><span class="label">Trecho ou parâmetro (opcional)</span><input id="commentAnchor" maxlength="120" placeholder="Ex.: SpO₂ inicial, fala de Gil ou uma frase selecionada"></label>'+
  '<div id="replyHint" class="sub"></div><button class="primary" type="submit">Enviar comentário</button></form></div>';
  if(S.role==='gil'&&!roster.diego)content+='<div class="card"><h2>Convidar Diego</h2><p class="sub">Cadastre o segundo professor, que terá sua própria conta e aprovação independente.</p><form id="inviteForm"><label class="field"><span class="label">E-mail profissional de Diego</span><input id="inviteEmail" type="email" required autocomplete="off" placeholder="E-mail de Diego"></label><button class="primary" type="submit">Criar acesso para Diego</button></form><p class="sub">A senha provisória será exibida uma única vez para você compartilhar em canal privado.</p></div>';
+ const proposals=(S.aiSuggestions||[]).filter(p=>p.unit_id===u.id&&p.state==='pending');
+ content+='<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':'Não configurada')+'</span></div>'+
+ '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+
+ (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">A integração está instalada, mas precisa da chave OPENAI_API_KEY nas configurações seguras do Supabase.</div>')+
+ (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
+ '</div>';
+ if(proposals.length)content+='<div class="card"><h2>Atualizações sugeridas para a pauta</h2>'+
+ proposals.map(p=>'<div class="ai-proposal"><div class="eyebrow">✦ PROPOSTA · '+(p.kind==='add_topic'?'NOVO TÓPICO':'REVISAR TÓPICO')+'</div><strong>'+esc(p.title)+'</strong><p>'+esc(p.body)+'</p><p class="sub">'+esc(p.reason)+'</p><div class="row"><button data-ai-apply="'+p.id+'" class="primary" '+(!isAuthor()?'disabled':'')+'>Aplicar como proposta</button><button data-ai-dismiss="'+p.id+'" '+(!isAuthor()?'disabled':'')+'>Descartar</button></div></div>').join('')+'</div>';
  content+='<div class="card"><h2>Publicação para o Maestro</h2><div class="metrics"><div class="metric"><b>'+done()+'/'+total+'</b><span>Dupla aprovação</span></div><div class="metric"><b>'+esc(S.release?.version||0)+'</b><span>Versões publicadas</span></div></div>'+
  '<div class="progress"><div style="width:'+(total?100*done()/total:0)+'%"></div></div>'+
  (S.release?.published_at?'<p class="sub">Última publicação: '+date(S.release.published_at)+'</p>':'<p class="sub">Nenhuma versão editorial publicada ainda. O Maestro anterior é um rascunho legado.</p>')+
@@ -169,14 +180,15 @@ function renderDiscussion(){
 }
 function render(){renderSidebar();renderWork();renderDiscussion()}
 async function fetchAll(){
- const [ur,cr,er,rr]=await Promise.all([
+ const [ur,cr,er,rr,ar]=await Promise.all([
  db.from('live_editorial_units').select('*').eq('lesson_id',ID).order('order_index'),
  db.from('live_editorial_comments').select('*').order('created_at'),
  db.from('live_editorial_events').select('*').order('id',{ascending:false}).limit(750),
- db.from('live_editorial_release').select('*').eq('id',ID).maybeSingle()
+ db.from('live_editorial_release').select('*').eq('id',ID).maybeSingle(),
+ db.from('live_editorial_ai_suggestions').select('*').order('id',{ascending:false}).limit(100)
  ]);
- for(const x of [ur,cr,er,rr])if(x.error)throw Error(x.error.message);
- S.units=ur.data||[];S.comments=cr.data||[];S.events=er.data||[];S.release=rr.data;
+ for(const x of [ur,cr,er,rr,ar])if(x.error)throw Error(x.error.message);
+ S.units=ur.data||[];S.comments=cr.data||[];S.events=er.data||[];S.release=rr.data;S.aiSuggestions=ar.data||[];
  if(!S.units.some(u=>u.id===S.selected))S.selected=S.units[0]?.id||null;
 }
 async function refresh(){
@@ -215,6 +227,25 @@ function newUnitDraft(k,title,parent){
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.filter){S.filter=b.dataset.filter;renderSidebar();return}
+ if(b.dataset.suggestion){
+  const p=S.aiSuggestions.find(x=>String(x.id)===b.dataset.suggestion);
+  if(!p)return;
+  if(S.dirty&&!confirm('Descartar alterações locais e abrir proposta da IA?'))return;
+  S.selected=p.unit_id;S.dirty=false;S.draft=null;S.tab='conteudo';render();return;
+ }
+ if(b.dataset.aiApply||b.dataset.aiDismiss){
+  if(S.dirty)return flash('Salve a edição local antes de aplicar uma sugestão');
+  const suggestionId=Number(b.dataset.aiApply||b.dataset.aiDismiss);
+  if(b.dataset.aiApply&&!confirm('Adicionar esta sugestão à pauta como proposta ainda sujeita à dupla aprovação?'))return;
+  const task=b.dataset.aiApply?'apply':'dismiss';
+  const {data,error}=await db.rpc('live_editorial_ai_decide',{p_suggestion:suggestionId,p_action:task});
+  if(error)return flash(error.message);
+  S.draft=null;S.dirty=false;await refresh();
+  if(task==='apply'&&data?.unit){S.selected=data.unit;S.draft=null;render()}
+  flash(task==='apply'?'Proposta adicionada para revisão de Gil e Diego.':'Sugestão descartada.');
+  return;
+ }
+ if(b.dataset.aiAudit){const field=$('#aiPrompt');if(field){field.value='Identifique a lacuna clínica ou pedagógica mais relevante neste tópico; proponha a correção necessária. Não repita o que já está adequado.';field.focus()}return}
  if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;render();return}
  if(b.dataset.tab){if(S.dirty)syncInputs();S.tab=b.dataset.tab;renderWork();return}
  if(b.dataset.reply){const m=S.comments.find(c=>String(c.id)===b.dataset.reply);if(!m)return;window._replyTo=m.id;$('#replyHint').textContent='Respondendo ao comentário #'+m.id+' de '+m.author_role.toUpperCase();$('#commentBody').focus();return}
@@ -251,11 +282,37 @@ document.addEventListener('mouseup',e=>{
  if(phrase.length>1&&phrase.length<=120){const anchor=$('#commentAnchor');if(anchor)anchor.value=phrase}
 });
 document.addEventListener('input',e=>{
+ if(e.target.id==='aiPrompt'){S.composing=true;return}
  if(e.target.id==='search'){S.query=e.target.value;renderSidebar();return}if(e.target.id==='commentBody'||e.target.id==='commentAnchor'){S.composing=true;return}
  if(e.target.matches('[data-field],[data-title],[data-check],[data-answer]')){S.dirty=true}
 });
 document.addEventListener('change',e=>{if(e.target.matches('[data-check],[data-answer]'))S.dirty=true});
 document.addEventListener('submit',async e=>{
+ if(e.target.id==='aiForm'){
+   e.preventDefault();
+   if(!S.aiReady||S.aiBusy)return;
+   if(S.dirty)return flash('Salve as alterações locais antes da análise da IA');
+   const unit=selected(),prompt=$('#aiPrompt')?.value.trim();
+   if(!unit||!prompt||prompt.length<3)return;
+   S.aiBusy=true;S.composing=true;
+   const send=$('#aiSend');if(send){send.disabled=true;send.textContent='Analisando...'}
+   try{
+     const {data:{session}}=await db.auth.getSession();
+     if(!session)throw Error('Sessão expirada. Entre novamente pelo Command Center');
+     const response=await fetch(api+'/functions/v1/live-editorial-ai',{
+       method:'POST',headers:{'authorization':'Bearer '+session.access_token,'apikey':key,'content-type':'application/json'},
+       body:JSON.stringify({action:'ask',unit_id:unit.id,message:prompt})
+     });
+     const data=await response.json();
+     if(!response.ok)throw Error(data.error||'Erro na análise da IA');
+     S.aiTokens=data.tokens||null;
+     S.composing=false;
+     await refresh();
+     flash(data.proposals_saved?'IA respondeu e sugeriu '+data.proposals_saved+' atualização(ões) de pauta.':'IA respondeu na discussão.');
+   }catch(err){flash(err.message);S.composing=true;const b=$('#aiSend');if(b){b.disabled=false;b.textContent='✦ Analisar com IA'}}
+   finally{S.aiBusy=false}
+   return;
+ }
  if(e.target.id==='inviteForm'){
   e.preventDefault();
   const email=$('#inviteEmail').value.trim().toLowerCase();
@@ -298,9 +355,16 @@ async function start(){
  if(!S.role){$('#work').innerHTML='<div class="card login"><h1>Sem permissão de equipe</h1><p>Esta conta não está cadastrada para trabalhar na LIVE.</p><a href="../">← Command Center</a></div>';$('#conn').textContent='● Sem permissão';$('#discussion').innerHTML='';return}
  const roster=await db.rpc('live_editorial_roster');
  S.roster=roster.data||{};
+ try{
+   const check=await fetch(api+'/functions/v1/live-editorial-ai',{method:'POST',
+    headers:{'authorization':'Bearer '+s.data.session.access_token,'apikey':key,'content-type':'application/json'},
+    body:JSON.stringify({action:'status'})});
+   const availability=await check.json();S.aiReady=check.ok&&availability.configured===true;
+ }catch{S.aiReady=false}
  await refresh();
  db.channel('editorial-live').on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_units'},()=>refresh())
-  .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh()).subscribe();
+  .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh())
+  .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_ai_suggestions'},()=>refresh()).subscribe();
  setInterval(()=>{if(!S.dirty&&!S.composing)refresh()},16000);
 }
 await start();
