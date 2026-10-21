@@ -8,7 +8,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const api=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!api||!key||!window.supabase)throw Error('Configuração Supabase indisponível');
 const db=supabase.createClient(api,key);
-let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null,aiSuggestions:[],aiReady:false,aiBusy:false,aiTokens:null,aiError:null};
+let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null,aiSuggestions:[],aiReady:false,aiReferenceOk:false,aiBusy:false,aiTokens:null,aiError:null};
 function flash(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';clearTimeout(flash._timer);flash._timer=setTimeout(()=>t.style.display='none',4800)}
 const selected=()=>S.units.find(u=>u.id===S.selected)||S.units[0];
 const locked=u=>u&&u.final_revision===u.revision;
@@ -166,9 +166,10 @@ function renderDiscussion(){
  '<div id="replyHint" class="sub"></div><button class="primary" type="submit">Enviar comentário</button></form></div>';
  if(S.role==='gil'&&!roster.diego)content+='<div class="card"><h2>Convidar Diego</h2><p class="sub">Cadastre o segundo professor, que terá sua própria conta e aprovação independente.</p><form id="inviteForm"><label class="field"><span class="label">E-mail profissional de Diego</span><input id="inviteEmail" type="email" required autocomplete="off" placeholder="E-mail de Diego"></label><button class="primary" type="submit">Criar acesso para Diego</button></form><p class="sub">A senha provisória será exibida uma única vez para você compartilhar em canal privado.</p></div>';
  const proposals=(S.aiSuggestions||[]).filter(p=>p.unit_id===u.id&&p.state==='pending');
- content+='<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':'Não configurada')+'</span></div>'+
- '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+
- (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">A integração está instalada, mas precisa da chave OPENAI_API_KEY nas configurações seguras do Supabase.</div>')+
+ content+='<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':S.aiReferenceOk?'Chave pendente':'Verificando memória')+'</span></div>'+
+ '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+ 
+ '<p class="sub">Contexto: <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">Memória da aula (MD) ↗</a> · resumo compacto + pauta e tópico atualizados.</p>'+
+ (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
  (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
  '</div>';
  if(proposals.length)content+='<div class="card"><h2>Atualizações sugeridas para a pauta</h2>'+
@@ -361,8 +362,8 @@ async function start(){
    const check=await fetch(api+'/functions/v1/live-editorial-ai',{method:'POST',
     headers:{'authorization':'Bearer '+s.data.session.access_token,'apikey':key,'content-type':'application/json'},
     body:JSON.stringify({action:'status'})});
-   const availability=await check.json();S.aiReady=check.ok&&availability.configured===true;
- }catch{S.aiReady=false}
+   const availability=await check.json();S.aiReferenceOk=check.ok&&availability.reference_ok===true;S.aiReady=check.ok&&availability.configured===true&&S.aiReferenceOk;
+ }catch{S.aiReady=false;S.aiReferenceOk=false}
  await refresh();
  db.channel('editorial-live').on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_units'},()=>refresh())
   .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh())
