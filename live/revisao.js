@@ -120,8 +120,8 @@ function renderSidebar(){
 function renderAI(){
  return '<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':S.aiReferenceOk?'Chave pendente':'Verificando memória')+'</span></div>'+
  '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+ 
- '<p class="sub">Contexto: <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">Memória da aula (MD) ↗</a> · resumo compacto + pauta e tópico atualizados.</p>'+
- (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
+ '<p class="sub">Analisa somente este tópico, as últimas intervenções registradas nele e <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">o resumo MD ↗</a>.</p>'+
+ (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Orientação adicional (opcional)</span><textarea id="aiPrompt" rows="2" maxlength="600" placeholder="Opcional. A IA já lê o conteúdo e a conversa deste tópico."></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar tópico e discussão')+'</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
  (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
  '</div>';
 }
@@ -251,7 +251,7 @@ document.addEventListener('click',async e=>{
   flash(task==='apply'?'Proposta adicionada para revisão de Gil e Diego.':'Sugestão descartada.');
   return;
  }
- if(b.dataset.aiAudit){const field=$('#aiPrompt');if(field){field.value='Identifique a lacuna clínica ou pedagógica mais relevante neste tópico; proponha a correção necessária. Não repita o que já está adequado.';field.focus()}return}
+ 
  if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;S.composing=false;render();return}
  if(b.dataset.tab){if(S.dirty)syncInputs();S.tab=b.dataset.tab;renderWork();return}
  if(b.dataset.reply){const m=S.comments.find(c=>String(c.id)===b.dataset.reply);if(!m)return;window._replyTo=m.id;$('#replyHint').textContent='Respondendo ao comentário #'+m.id+' de '+m.author_role.toUpperCase();$('#commentBody').focus();return}
@@ -298,8 +298,8 @@ document.addEventListener('submit',async e=>{
    e.preventDefault();
    if(!S.aiReady||S.aiBusy)return;
    if(S.dirty)return flash('Salve as alterações locais antes da análise da IA');
-   const unit=selected(),prompt=$('#aiPrompt')?.value.trim();
-   if(!unit||!prompt||prompt.length<3)return;
+   const unit=selected(),prompt=$('#aiPrompt')?.value.trim()||'';
+   if(!unit)return;
    S.aiBusy=true;S.composing=true;
    const send=$('#aiSend');if(send){send.disabled=true;send.textContent='Analisando...'}
    try{
@@ -307,7 +307,7 @@ document.addEventListener('submit',async e=>{
      if(!session)throw Error('Sessão expirada. Entre novamente pelo Command Center');
      const response=await fetch(api+'/functions/v1/live-editorial-ai',{
        method:'POST',headers:{'authorization':'Bearer '+session.access_token,'apikey':key,'content-type':'application/json'},
-       body:JSON.stringify({action:'ask',unit_id:unit.id,message:prompt})
+       body:JSON.stringify({action:'analyze',unit_id:unit.id,message:prompt})
      });
      const data=await response.json();
      if(!response.ok)throw Error(data.error||'Erro na análise da IA');
@@ -315,7 +315,7 @@ document.addEventListener('submit',async e=>{
      S.composing=false;
      await refresh();
      flash(data.proposals_saved?'IA respondeu e sugeriu '+data.proposals_saved+' atualização(ões) de pauta.':'IA respondeu na discussão.');
-   }catch(err){flash(err.message);S.composing=true;const b=$('#aiSend');if(b){b.disabled=false;b.textContent='✦ Analisar com IA'}}
+   }catch(err){flash(err.message);S.composing=true;const b=$('#aiSend');if(b){b.disabled=false;b.textContent='✦ Analisar tópico e discussão'}}
    finally{S.aiBusy=false}
    return;
  }
