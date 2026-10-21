@@ -2,6 +2,9 @@
 Versão: 1.0 · 2026-10-21
 Uso: referência editorial estável. O estado do banco, os textos revisados e as aprovações mais recentes prevalecem sobre este documento.
 
+## Resumo compacto para a IA (única seção enviada por padrão)
+Aula SPRINT ISR da CT-MED, 05/11/2026, para internos e médicos nos primeiros plantões: decidir indicação, urgência, preparo e pós-IOT em paciente crítico. Método: casos com decisões e consequências, não apenas drogas. Em cada cena: indicação vs alternativa, momento da IOT, oxigenação e hemodinâmica, plano A/B/resgate, confirmação e pós-IOT. Priorizar segurança e consistência dos sinais vitais; não inventar dados ou referências. Gil e Diego aprovam cada revisão; IA apenas debate e propõe, nunca aprova. Texto atual, pauta e estado de aprovação do Supabase prevalecem. Atenção: pauta atual cita TCE grave e DPOC, mas há cenas legadas de cetoacidose e asma; não presumir substituição concluída. Duração 105 vs 120 min ainda em discussão. Respostas objetivas, fundamentadas, sem elogios ou concordância automática.
+
 ## Identidade e entrega
 - CT-MED Academy — “Do conhecimento à conduta”.
 - LIVE paga: **SPRINT ISR — Sua primeira intubação sozinho na UPA. E agora?**
