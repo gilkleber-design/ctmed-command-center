@@ -154,6 +154,7 @@ function renderDiscussion(){
  '<form id="commentForm"><label class="field"><span class="label">Comentar ou solicitar revisão</span><textarea id="commentBody" rows="3" required minlength="2" maxlength="4000" placeholder="O que precisa mudar? Por quê?"></textarea></label>'+
  '<label class="field"><span class="label">Referência opcional</span><select id="commentAnchor"><option value="">Tópico inteiro</option><option value="Roteiro de Gil">Fala de Gil</option><option value="Roteiro de Diego">Fala de Diego</option><option value="Sinais vitais">Sinais vitais</option><option value="Decisão clínica">Decisão clínica</option><option value="Pergunta / gabarito">Pergunta / gabarito</option></select></label>'+
  '<div id="replyHint" class="sub"></div><button class="primary" type="submit">Enviar comentário</button></form></div>';
+ if(S.role==='gil'&&!roster.diego)content+='<div class="card"><h2>Convidar Diego</h2><p class="sub">Cadastre o segundo professor, que terá sua própria conta e aprovação independente.</p><form id="inviteForm"><label class="field"><span class="label">E-mail profissional de Diego</span><input id="inviteEmail" type="email" required autocomplete="off" placeholder="E-mail de Diego"></label><button class="primary" type="submit">Criar acesso para Diego</button></form><p class="sub">A senha provisória será exibida uma única vez para você compartilhar em canal privado.</p></div>';
  content+='<div class="card"><h2>Publicação para o Maestro</h2><div class="metrics"><div class="metric"><b>'+done()+'/'+total+'</b><span>Dupla aprovação</span></div><div class="metric"><b>'+esc(S.release?.version||0)+'</b><span>Versões publicadas</span></div></div>'+
  '<div class="progress"><div style="width:'+(total?100*done()/total:0)+'%"></div></div>'+
  (S.release?.published_at?'<p class="sub">Última publicação: '+date(S.release.published_at)+'</p>':'<p class="sub">Nenhuma versão editorial publicada ainda. O Maestro anterior é um rascunho legado.</p>')+
@@ -229,6 +230,8 @@ document.addEventListener('click',async e=>{
   $('#newUnitDialog').showModal();return;
  }
  if(b.id==='cancelNewUnit'){$('#newUnitDialog').close();return}
+ if(b.id==='copyInvite'){try{await navigator.clipboard.writeText($('#inviteResultPassword').textContent);flash('Senha provisória copiada')}catch{flash('Selecione a senha exibida e copie manualmente')}return}
+ if(b.id==='closeInvite'){$('#inviteResultPassword').textContent='';$('#inviteResultDialog').close();return}
  if(b.id==='publish'){
   if(!confirm('Publicar todos os tópicos aprovados no Maestro? A versão anterior permanece registrada no histórico do projeto.'))return;
   let r=await db.rpc('live_editorial_publish');
@@ -242,10 +245,29 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{if(e.target.matches('[data-check],[data-answer]'))S.dirty=true});
 document.addEventListener('submit',async e=>{
+ if(e.target.id==='inviteForm'){
+  e.preventDefault();
+  const email=$('#inviteEmail').value.trim().toLowerCase();
+  if(!confirm('Criar conta individual de Diego para '+email+'?'))return;
+  try{
+   const {data:{session}}=await db.auth.getSession();
+   const response=await fetch(api+'/functions/v1/live-studio-invite',{
+    method:'POST',headers:{'authorization':'Bearer '+session.access_token,'apikey':key,'content-type':'application/json'},
+    body:JSON.stringify({email})});
+   const data=await response.json();
+   if(!response.ok)throw Error(data.error||'Não foi possível cadastrar Diego');
+   S.roster={...S.roster,diego:true};
+   $('#inviteResultEmail').textContent=data.email;
+   $('#inviteResultPassword').textContent=data.temporary_password;
+   $('#inviteResultDialog').showModal();
+   renderDiscussion();
+  }catch(err){flash(err.message)}
+  return;
+ }
  if(e.target.id==='commentForm'){
   e.preventDefault();let body=$('#commentBody').value.trim();if(!body)return;
   const reply_to=window._replyTo||null;
-  window._replyTo=null;await action('comment',{body,anchor:$('#commentAnchor').value,reply_to});return;
+  window._replyTo=null;if(S.dirty){flash('Salve ou descarte as edições locais antes de comentar');return}const payload={body,anchor:$('#commentAnchor').value};if(reply_to)payload.reply_to=reply_to;await action('comment',payload);return;
  }
  if(e.target.id==='newUnitForm'){
   e.preventDefault();
