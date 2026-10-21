@@ -39,4 +39,11 @@
 <label>Caso relacionado (para nova cena)</label><select name="parent" id="newUnitParent"></select>
 <div class="row"><button type="submit" class="primary">Criar proposta</button><button type="button" id="cancelNewUnit">Cancelar</button></div>
 </form></dialog>
+<dialog id="inviteResultDialog">
+<h2>Conta de Diego criada</h2>
+<p class="sub">Compartilhe a senha provisória diretamente com Diego em canal privado. Ela não ficará salva nesta tela depois de fechada.</p>
+<p><strong>E-mail:</strong> <span id="inviteResultEmail"></span></p>
+<div class="field"><div class="label">Senha provisória (uso único para acesso inicial)</div><code id="inviteResultPassword" style="display:block;overflow-wrap:anywhere;padding:14px;border:1px solid #405a78;border-radius:8px;font-size:13px"></code></div>
+<div class="row"><button type="button" id="copyInvite" class="primary">Copiar senha</button><button type="button" id="closeInvite">Fechar e ocultar senha</button></div>
+</dialog>
 </body></html>
