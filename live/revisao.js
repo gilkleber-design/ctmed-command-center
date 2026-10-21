@@ -40,7 +40,8 @@ function sectionEditor(u){
  }else if(u.kind==='case'){
   s+=field('Título do caso','title',{full:true})+field('Paciente / situação clínica','patient',{textarea:true,full:true,rows:2})+
   field('Motivo para incluir ou retirar este caso','approach',{textarea:true,full:true,rows:4})+
-  field('Decisão editorial (manter, excluir ou mudar abordagem)','decision',{textarea:true,full:true,rows:2});
+  field('Decisão editorial (manter, excluir ou mudar abordagem)','decision',{textarea:true,full:true,rows:2})+
+  field('Notas e propostas para revisão','notes',{textarea:true,full:true,rows:3});
  }else{
   s+=field('Título da cena','scene.title',{full:true})+
   field('Duração (min)','scene.minutes')+
@@ -61,7 +62,8 @@ function sectionEditor(u){
   field('Objetivo pedagógico','scene.objective',{textarea:true,full:true,rows:3})+
   field('O que fazer / ação','scene.action',{textarea:true,rows:3})+
   field('O que vem depois','scene.next',{textarea:true,rows:3})+
-  field('Orientação ao operador OBS','scene.technical',{textarea:true,full:true,rows:3});
+  field('Orientação ao operador OBS','scene.technical',{textarea:true,full:true,rows:3})+
+  field('Notas e propostas da IA para revisão','notes',{textarea:true,full:true,rows:3});
   if(u.kind==='scene'){
    s+=heading('Pergunta e votação');
    if(S.draft.scene.poll){
@@ -246,7 +248,7 @@ document.addEventListener('click',async e=>{
   return;
  }
  if(b.dataset.aiAudit){const field=$('#aiPrompt');if(field){field.value='Identifique a lacuna clínica ou pedagógica mais relevante neste tópico; proponha a correção necessária. Não repita o que já está adequado.';field.focus()}return}
- if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;render();return}
+ if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;S.composing=false;render();return}
  if(b.dataset.tab){if(S.dirty)syncInputs();S.tab=b.dataset.tab;renderWork();return}
  if(b.dataset.reply){const m=S.comments.find(c=>String(c.id)===b.dataset.reply);if(!m)return;window._replyTo=m.id;$('#replyHint').textContent='Respondendo ao comentário #'+m.id+' de '+m.author_role.toUpperCase();$('#commentBody').focus();return}
  if(b.dataset.resolve){await action('resolve_comment',{comment_id:Number(b.dataset.resolve)});return}
