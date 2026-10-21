@@ -77,9 +77,11 @@ function sectionEditor(u){
  return s;
 }
 function diff(u){
- if(!u.final)return '<div class="help">Ainda não há versão definitiva. Esta é a primeira proposta.</div>';
+ const historyBase=S.events.filter(e=>e.unit_id===u.id&&e.kind==='edit'&&e.before?.draft).sort((a,b)=>b.id-a.id)[0]?.before?.draft;
+ const prior=u.final||historyBase;
+ if(!prior)return '<div class="help">Primeira proposta: nenhuma versão anterior para comparar.</div>';
  const flat=(o,prefix='',ret={})=>{for(const [key,v] of Object.entries(o||{})){let path=prefix?prefix+'.'+key:key;if(v&&typeof v==='object'&&!Array.isArray(v))flat(v,path,ret);else ret[path]=Array.isArray(v)?v.join(' | '):String(v??'')}return ret};
- const before=flat(u.final),after=flat(u.draft);
+ const before=flat(prior),after=flat(u.draft);
  const changed=[...new Set([...Object.keys(before),...Object.keys(after)])].filter(k=>before[k]!==after[k]);
  if(!changed.length)return '<div class="help">Proposta reaberta sem mudanças no texto. Ainda requer nova aprovação dos dois.</div>';
  return '<div class="compare"><div class="line"><div class="key">Campo</div><div class="key">Definitivo anterior</div><div class="key">Nova proposta</div></div>'+
@@ -155,7 +157,7 @@ function renderDiscussion(){
  (!m.resolved&&isAuthor()?'<button data-resolve="'+m.id+'" class="ghost">Resolver</button>':'')+
  '<button class="ghost" data-reply="'+m.id+'">Responder</button></div></div>').join(''):'<p class="sub">Ainda não há comentários. Discussões e sugestões ficam registradas aqui.</p>')+
  '<form id="commentForm"><label class="field"><span class="label">Comentar ou solicitar revisão</span><textarea id="commentBody" rows="3" required minlength="2" maxlength="4000" placeholder="O que precisa mudar? Por quê?"></textarea></label>'+
- '<label class="field"><span class="label">Referência opcional</span><select id="commentAnchor"><option value="">Tópico inteiro</option><option value="Roteiro de Gil">Fala de Gil</option><option value="Roteiro de Diego">Fala de Diego</option><option value="Sinais vitais">Sinais vitais</option><option value="Decisão clínica">Decisão clínica</option><option value="Pergunta / gabarito">Pergunta / gabarito</option></select></label>'+
+ '<label class="field"><span class="label">Trecho ou parâmetro (opcional)</span><input id="commentAnchor" maxlength="120" placeholder="Ex.: SpO₂ inicial, fala de Gil ou uma frase selecionada"></label>'+
  '<div id="replyHint" class="sub"></div><button class="primary" type="submit">Enviar comentário</button></form></div>';
  if(S.role==='gil'&&!roster.diego)content+='<div class="card"><h2>Convidar Diego</h2><p class="sub">Cadastre o segundo professor, que terá sua própria conta e aprovação independente.</p><form id="inviteForm"><label class="field"><span class="label">E-mail profissional de Diego</span><input id="inviteEmail" type="email" required autocomplete="off" placeholder="E-mail de Diego"></label><button class="primary" type="submit">Criar acesso para Diego</button></form><p class="sub">A senha provisória será exibida uma única vez para você compartilhar em canal privado.</p></div>';
  content+='<div class="card"><h2>Publicação para o Maestro</h2><div class="metrics"><div class="metric"><b>'+done()+'/'+total+'</b><span>Dupla aprovação</span></div><div class="metric"><b>'+esc(S.release?.version||0)+'</b><span>Versões publicadas</span></div></div>'+
@@ -241,6 +243,11 @@ document.addEventListener('click',async e=>{
   if(r.error){flash(r.error.message);return}
   await refresh();flash('Versão aprovada publicada para o Maestro.');
  }
+});
+document.addEventListener('mouseup',e=>{
+ if(!e.target.matches('[data-field]'))return;
+ const input=e.target;const phrase=input.value.slice(input.selectionStart||0,input.selectionEnd||0).trim();
+ if(phrase.length>1&&phrase.length<=120){const anchor=$('#commentAnchor');if(anchor)anchor.value=phrase}
 });
 document.addEventListener('input',e=>{
  if(e.target.id==='search'){S.query=e.target.value;renderSidebar();return}
