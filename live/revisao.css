@@ -22,3 +22,8 @@ dialog{border:1px solid #4a6987;border-radius:15px;padding:25px;background:#0e1d
 .ai-proposal{border:1px solid #3a5e7d;background:#0b2033;border-radius:10px;margin:10px 0;padding:13px}
 .ai-proposal>p{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0}
 .comment:has(.author){word-break:break-word}
+
+/* IA fica imediatamente abaixo dos botões de salvar/aprovar, na coluna central. */
+.center .toolbar{position:static;margin-bottom:16px}
+.center .ai-panel{width:100%;margin-top:0}
+.center .ai-panel .field textarea{min-height:95px}
