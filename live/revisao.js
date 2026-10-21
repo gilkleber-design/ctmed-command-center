@@ -14,10 +14,12 @@ const selected=()=>S.units.find(u=>u.id===S.selected)||S.units[0];
 const locked=u=>u&&u.final_revision===u.revision;
 const isAuthor=()=>['gil','diego'].includes(S.role);
 const approvedBy=(u,role)=>u[role+'_approved_revision']===u.revision;
-const awaitingMe=u=>!locked(u)&&isAuthor()&&!approvedBy(u,S.role);
+const exempt=u=>u.kind==='scene'&&S.units.some(parent=>parent.kind==='case'&&locked(parent)&&parent.final?.include===false&&parent.final?.case_id===u.draft?.case_id);
+const required=()=>S.units.filter(u=>!exempt(u));
+const awaitingMe=u=>!exempt(u)&&!locked(u)&&isAuthor()&&!approvedBy(u,S.role);
 const openIssues=u=>S.comments.filter(c=>c.unit_id===u.id&&c.revision===u.revision&&!c.resolved).length;
-const done=()=>S.units.filter(locked).length;
-const label=u=>{if(locked(u))return ['Consolidado','approved'];if(u.final_revision)return ['Revisão aberta','revision'];if(approvedBy(u,'gil')||approvedBy(u,'diego'))return ['Uma aprovação','one'];return ['Em discussão','pending']};
+const done=()=>required().filter(locked).length;
+const label=u=>{if(exempt(u))return ['Dispensada pelo caso','pending'];if(locked(u))return ['Consolidado','approved'];if(u.final_revision)return ['Revisão aberta','revision'];if(approvedBy(u,'gil')||approvedBy(u,'diego'))return ['Uma aprovação','one'];return ['Em discussão','pending']};
 const date=v=>v?new Date(v).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 function get(obj,path){return path.split('.').reduce((v,k)=>v?.[k],obj)}
 function set(obj,path,val){const keys=path.split('.');let at=obj;for(let i=0;i<keys.length-1;i++){if(at[keys[i]]==null)at[keys[i]]={};at=at[keys[i]]}at[keys.at(-1)]=val}
@@ -93,11 +95,11 @@ function history(u){
 }
 function renderSidebar(){
  $('#who').textContent=S.role?'Logado como '+S.role.toUpperCase()+' · '+S.email:'Autenticação necessária';
- const n=S.units.length,complete=done();
+ const n=required().length,complete=done();
  $('#progressTop').innerHTML='<div class="progress"><div style="width:'+(n?Math.round(100*complete/n):0)+'%"></div></div><div class="sub">'+complete+' de '+n+' unidades aprovadas por ambos</div>';
  const q=S.query.toLocaleLowerCase('pt-BR');
  let list=S.units.filter(u=>(!q||(u.title+' '+u.section).toLocaleLowerCase('pt-BR').includes(q))&&(
- S.filter==='todos'||S.filter==='aprovados'&&locked(u)||S.filter==='meus'&&awaitingMe(u)));
+ S.filter==='todos'||S.filter==='aprovados'&&(locked(u)||exempt(u))||S.filter==='meus'&&awaitingMe(u)));
  let prev='',h='';
  for(const u of list){
   if(u.section!==prev){prev=u.section;h+='<div class="sec-label">'+esc(prev)+'</div>'}
@@ -125,7 +127,8 @@ function renderWork(){
  else main='<div class="card"><h2>Histórico auditável</h2>'+history(u)+'</div>';
  let buttons='';
  if(isAuthor()){
-  if(isFinal)buttons='<button class="primary" data-action="reopen">Abrir proposta de revisão</button>';
+  if(exempt(u))buttons='<span class="sub">Cena dispensada porque o caso foi excluído por dupla aprovação.</span>';
+  else if(isFinal)buttons='<button class="primary" data-action="reopen">Abrir proposta de revisão</button>';
   else buttons='<button data-action="save" '+(S.dirty?'class="primary"':'')+'>Salvar nova versão</button>'+
     '<button class="good" data-action="approve" '+(mine||issues?'disabled':'')+'>✓ '+(mine?'Você já aprovou':'Aprovar versão '+u.revision)+'</button>'+
     (mine?'<button class="ghost" data-action="withdraw">Retirar minha aprovação</button>':'');
@@ -141,7 +144,7 @@ function renderDiscussion(){
  const approval=(role)=>'<div class="approval"><div class="who"><b>'+role.toUpperCase()+'</b>'+
  '<span class="pill '+(approvedBy(u,role)?'approved':'pending')+'">'+(approvedBy(u,role)?'✓ Aprovado':'Aguardando')+'</span></div>'+
  '<div class="stamp">'+(approvedBy(u,role)?'Aprovou a versão '+u.revision+' · '+date(u[role+'_approved_at']):!roster[role]?'Conta ainda não habilitada':'Pendente nesta versão')+'</div></div>';
- const total=S.units.length,canPub=total>0&&done()===total;
+ const total=required().length,canPub=total>0&&done()===total;
  let content='<div class="card"><h2>Dupla aprovação</h2><p class="sub">Aprovações são independentes e pertencem à versão atual. Editar reinicia ambas.</p>'+
  approval('gil')+approval('diego')+
  '<div class="sub">Comentários abertos: '+openIssues(u)+'</div></div>';
