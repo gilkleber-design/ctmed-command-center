@@ -8,7 +8,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const api=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!api||!key||!window.supabase)throw Error('Configuração Supabase indisponível');
 const db=supabase.createClient(api,key);
-let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,working:false,pendingRefresh:false,roster:null};
+let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null};
 function flash(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';clearTimeout(flash._timer);flash._timer=setTimeout(()=>t.style.display='none',4800)}
 const selected=()=>S.units.find(u=>u.id===S.selected)||S.units[0];
 const locked=u=>u&&u.final_revision===u.revision;
@@ -181,7 +181,7 @@ async function fetchAll(){
 }
 async function refresh(){
  if(S.working)return;
- if(S.dirty){S.pendingRefresh=true;$('#conn').textContent='● Outra atualização disponível';return}
+ if(S.dirty||S.composing){S.pendingRefresh=true;$('#conn').textContent='● Outra atualização disponível';return}
  await fetchAll();const now=selected();
  if(now&&(S._draftFor!==S.selected||S.baseRev!==now.revision)){S.draft=null;S._draftFor=null}
  render();$('#conn').textContent='● Sincronizado';
@@ -250,7 +250,7 @@ document.addEventListener('mouseup',e=>{
  if(phrase.length>1&&phrase.length<=120){const anchor=$('#commentAnchor');if(anchor)anchor.value=phrase}
 });
 document.addEventListener('input',e=>{
- if(e.target.id==='search'){S.query=e.target.value;renderSidebar();return}
+ if(e.target.id==='search'){S.query=e.target.value;renderSidebar();return}if(e.target.id==='commentBody'||e.target.id==='commentAnchor'){S.composing=true;return}
  if(e.target.matches('[data-field],[data-title],[data-check],[data-answer]')){S.dirty=true}
 });
 document.addEventListener('change',e=>{if(e.target.matches('[data-check],[data-answer]'))S.dirty=true});
@@ -277,7 +277,7 @@ document.addEventListener('submit',async e=>{
  if(e.target.id==='commentForm'){
   e.preventDefault();let body=$('#commentBody').value.trim();if(!body)return;
   const reply_to=window._replyTo||null;
-  window._replyTo=null;if(S.dirty){flash('Salve ou descarte as edições locais antes de comentar');return}const payload={body,anchor:$('#commentAnchor').value};if(reply_to)payload.reply_to=reply_to;await action('comment',payload);return;
+  window._replyTo=null;if(S.dirty){flash('Salve ou descarte as edições locais antes de comentar');return}S.composing=false;const payload={body,anchor:$('#commentAnchor').value};if(reply_to)payload.reply_to=reply_to;await action('comment',payload);return;
  }
  if(e.target.id==='newUnitForm'){
   e.preventDefault();
@@ -300,7 +300,7 @@ async function start(){
  await refresh();
  db.channel('editorial-live').on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_units'},()=>refresh())
   .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh()).subscribe();
- setInterval(()=>{if(!S.dirty)refresh()},16000);
+ setInterval(()=>{if(!S.dirty&&!S.composing)refresh()},16000);
 }
 await start();
 })().catch(err=>{
