@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#07111e"/>
+<title>CT-MED LIVE · Editor anterior (preservado)</title>
+<link rel="stylesheet" href="./revisao.css"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" defer></script>
+<script src="./revisao.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+<div class="brand">CT-MED <span> / LIVE · Construção</span></div>
+<div class="topactions">
+<small id="conn">Conectando...</small>
+<a href="../" title="Retornar ao Command Center">Command Center ↗</a>
+<a href="./?view=maestro" title="Apresentação, disponível após publicação">Maestro ↗</a>
+</div>
+</header>
+<div class="shell">
+<aside class="side">
+<div class="heading"><div class="eyebrow">SPRINT ISR · 05/11</div><h2>Construção da aula</h2><div class="sub" id="who">Gil + Diego · coautoria</div>
+<div id="progressTop"></div><input id="search" placeholder="Buscar parte da aula..." aria-label="Buscar tópicos"/><div class="row"><button data-filter="todos" class="active">Todos</button><button data-filter="meus">Minha fila</button><button data-filter="aprovados">Fechados</button></div></div>
+<div id="unitList" role="navigation" aria-label="Tópicos da aula"></div>
+<div style="padding:12px 9px"><button id="addUnit">+ Novo tópico ou caso</button></div>
+</aside>
+<main class="center" id="work"><div class="card">Carregando ambiente colaborativo...</div></main>
+<aside class="right" id="discussion"><div class="card">Aguardando acesso ao conteúdo.</div></aside>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<dialog id="newUnitDialog"><form id="newUnitForm">
+<h2>Novo tópico para discussão</h2>
+<p class="sub">A inclusão também exige aprovação dos dois professores.</p>
+<label>Título</label><input name="title" required minlength="3" maxlength="160"/>
+<label>Tipo</label><select name="kind" id="newUnitKind">
+<option value="topic">Assunto / decisão editorial</option><option value="case">Novo caso clínico</option><option value="scene">Cena clínica</option><option value="intro">Abertura</option><option value="closing">Encerramento</option>
+</select>
+<label>Caso relacionado (para nova cena)</label><select name="parent" id="newUnitParent"></select>
+<div class="row"><button type="submit" class="primary">Criar proposta</button><button type="button" id="cancelNewUnit">Cancelar</button></div>
+</form></dialog>
+<dialog id="inviteResultDialog">
+<h2>Conta de Diego criada</h2>
+<p class="sub">Compartilhe a senha provisória diretamente com Diego em canal privado. Ela não ficará salva nesta tela depois de fechada.</p>
+<p><strong>E-mail:</strong> <span id="inviteResultEmail"></span></p>
+<div class="field"><div class="label">Senha provisória (uso único para acesso inicial)</div><code id="inviteResultPassword" style="display:block;overflow-wrap:anywhere;padding:14px;border:1px solid #405a78;border-radius:8px;font-size:13px"></code></div>
+<div class="row"><button type="button" id="copyInvite" class="primary">Copiar senha</button><button type="button" id="closeInvite">Fechar e ocultar senha</button></div>
+</dialog>
+</body></html>
