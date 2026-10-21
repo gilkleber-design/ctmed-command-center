@@ -117,6 +117,14 @@ function renderSidebar(){
  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===S.filter));
  $('#addUnit').disabled=!isAuthor();
 }
+function renderAI(){
+ return '<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':S.aiReferenceOk?'Chave pendente':'Verificando memória')+'</span></div>'+
+ '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+ 
+ '<p class="sub">Contexto: <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">Memória da aula (MD) ↗</a> · resumo compacto + pauta e tópico atualizados.</p>'+
+ (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
+ (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
+ '</div>';
+}
 function renderWork(){
  const u=selected();
  if(!u){$('#work').innerHTML='<div class="card">Não há tópicos disponíveis.</div>';return}
@@ -142,7 +150,7 @@ function renderWork(){
  }
  const warn=issues?'<p class="sub alertbox">Há '+issues+' comentário(s) sem resolução nesta versão. Resolva-os antes de aprovar.</p>':'';
  const bottom='<div class="toolbar"><div class="actions">'+buttons+'</div><div class="sub">'+(isFinal?'Versão consolidada, alterações somente por revisão':S.dirty?'Alterações locais não salvas':'Gil e Diego devem aprovar a mesma versão')+'</div></div>';
- $('#work').innerHTML=header+'<div class="tabs">'+tabBtn('conteudo','Conteúdo')+tabBtn('comparar','Comparar versões')+tabBtn('historico','Histórico')+'</div>'+main+warn+bottom;
+ $('#work').innerHTML=header+'<div class="tabs">'+tabBtn('conteudo','Conteúdo')+tabBtn('comparar','Comparar versões')+tabBtn('historico','Histórico')+'</div>'+main+warn+bottom+renderAI();
 }
 function renderDiscussion(){
  const u=selected();if(!u){$('#discussion').innerHTML='';return}
@@ -166,12 +174,7 @@ function renderDiscussion(){
  '<div id="replyHint" class="sub"></div><button class="primary" type="submit">Enviar comentário</button></form></div>';
  if(S.role==='gil'&&!roster.diego)content+='<div class="card"><h2>Convidar Diego</h2><p class="sub">Cadastre o segundo professor, que terá sua própria conta e aprovação independente.</p><form id="inviteForm"><label class="field"><span class="label">E-mail profissional de Diego</span><input id="inviteEmail" type="email" required autocomplete="off" placeholder="E-mail de Diego"></label><button class="primary" type="submit">Criar acesso para Diego</button></form><p class="sub">A senha provisória será exibida uma única vez para você compartilhar em canal privado.</p></div>';
  const proposals=(S.aiSuggestions||[]).filter(p=>p.unit_id===u.id&&p.state==='pending');
- content+='<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':S.aiReferenceOk?'Chave pendente':'Verificando memória')+'</span></div>'+
- '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+ 
- '<p class="sub">Contexto: <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">Memória da aula (MD) ↗</a> · resumo compacto + pauta e tópico atualizados.</p>'+
- (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Perguntar à IA neste tópico</span><textarea id="aiPrompt" rows="3" minlength="3" maxlength="900" required placeholder="Ex.: As indicações de IOT estão bem justificadas? O que falta na otimização?"></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar com IA')+'</button><button type="button" data-ai-audit="true" '+(S.aiBusy?'disabled':'')+'>Revisar lacunas</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
- (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
- '</div>';
+
  if(proposals.length)content+='<div class="card"><h2>Atualizações sugeridas para a pauta</h2>'+
  proposals.map(p=>'<div class="ai-proposal"><div class="eyebrow">✦ PROPOSTA · '+(p.kind==='add_topic'?'NOVO TÓPICO':'REVISAR TÓPICO')+'</div><strong>'+esc(p.title)+'</strong><p>'+esc(p.body)+'</p><p class="sub">'+esc(p.reason)+'</p><div class="row"><button data-ai-apply="'+p.id+'" class="primary" '+(!isAuthor()?'disabled':'')+'>Aplicar como proposta</button><button data-ai-dismiss="'+p.id+'" '+(!isAuthor()?'disabled':'')+'>Descartar</button></div></div>').join('')+'</div>';
  content+='<div class="card"><h2>Publicação para o Maestro</h2><div class="metrics"><div class="metric"><b>'+done()+'/'+total+'</b><span>Dupla aprovação</span></div><div class="metric"><b>'+esc(S.release?.version||0)+'</b><span>Versões publicadas</span></div></div>'+
