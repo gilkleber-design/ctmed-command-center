@@ -129,8 +129,8 @@ function renderWork(){
  else main='<div class="card"><h2>Histórico auditável</h2>'+history(u)+'</div>';
  let buttons='';
  if(isAuthor()){
-  if(exempt(u))buttons='<span class="sub">Cena dispensada porque o caso foi excluído por dupla aprovação.</span>';
-  else if(isFinal)buttons='<button class="primary" data-action="reopen">Abrir proposta de revisão</button>';
+  if(exempt(u))buttons='<button class="primary" data-action="next">Próximo item pendente →</button>';
+  else if(isFinal)buttons='<button data-action="next" class="primary">Próximo item pendente →</button><button data-action="reopen">Reabrir para revisão</button>';
   else buttons='<button data-action="save" '+(S.dirty?'class="primary"':'')+'>Salvar nova versão</button>'+
     '<button class="good" data-action="approve" '+(mine||issues?'disabled':'')+'>✓ '+(mine?'Você já aprovou':'Aprovar versão '+u.revision)+'</button>'+
     (mine?'<button class="ghost" data-action="withdraw">Retirar minha aprovação</button>':'');
@@ -221,6 +221,7 @@ document.addEventListener('click',async e=>{
  if(b.dataset.resolve){await action('resolve_comment',{comment_id:Number(b.dataset.resolve)});return}
  if(b.dataset.action){
   const type=b.dataset.action,u=selected();
+  if(type==='next'){const open=S.units.find(x=>!locked(x)&&!exempt(x));if(!open)return flash('Todas as partes já foram aprovadas');S.selected=open.id;S.draft=null;S.tab='conteudo';S.dirty=false;render();return}
   if(type==='save'){syncInputs();if(!S.dirty){flash('Nenhuma alteração pendente');return}await action('edit',{title:S.editTitle,draft:S.draft});return}
   if(type==='approve'){if(S.dirty){flash('Salve as alterações antes de aprovar');return}await action('approve');return}
   if(type==='withdraw'){await action('withdraw');return}
