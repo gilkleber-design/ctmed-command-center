@@ -2,13 +2,13 @@
 const $=s=>document.querySelector(s),X=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])),ID='sprint-isr';
 let conf=await fetch('../index.html').then(r=>r.text()),url=conf.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=conf.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key)throw Error('Configure a chave publicável do Supabase para o LIVE');
-const db=supabase.createClient(url,key),views={editor:'Editor',maestro:'Maestro',gil:'Roteiro Gil',diego:'Roteiro Diego',tecnica:'Direção técnica',publico:'Tela pública',aluno:'Votação'};
-let view=new URLSearchParams(location.search).get('view')||localStorage.getItem('ctmed-live-last-view')||'editor',isStaff=false,auth=null,L=null,R=null,P=null,edit=null,sel=0,dirty=false;
+const db=supabase.createClient(url,key),views={maestro:'Maestro',gil:'Roteiro Gil',diego:'Roteiro Diego',tecnica:'Direção técnica',publico:'Tela pública',aluno:'Votação'};
+let REL=null;let view=new URLSearchParams(location.search).get('view')||localStorage.getItem('ctmed-live-last-view')||'maestro',isStaff=false,auth=null,L=null,R=null,P=null,edit=null,sel=0,dirty=false;
 if(!views[view])view='maestro';
 const warn=s=>{const el=$('#status');el.textContent=s;el.style.display='block';setTimeout(()=>el.style.display='none',4000)};
 async function load(){let s=await db.auth.getSession();auth=s.data.session;isStaff=!!auth&&(await db.rpc('live_studio_is_staff')).data===true;
 let p=await db.from('live_studio_public').select('data').eq('id',ID).single();P=p.data?.data;
-if(isStaff){let [a,b]=await Promise.all(['live_studio_lesson','live_studio_runtime'].map(t=>db.from(t).select('data').eq('id',ID).single()));L=a.data?.data;R=b.data?.data}else{L=R=edit=null}
+if(isStaff){let [a,b,x]=await Promise.all(['live_studio_lesson','live_studio_runtime'].map(t=>db.from(t).select('data').eq('id',ID).single()).concat([db.from('live_editorial_release').select('version,published_at').eq('id',ID).maybeSingle()]));L=a.data?.data;R=b.data?.data;REL=x.data}else{L=R=REL=edit=null}
 $('#net').textContent=isStaff?'● Sessão do Command Center':'● Projeção pública';$('#signout').hidden=true;render()}
 const scenes=()=>L.cases.flatMap(c=>c.scenes.map(s=>({...s,caseTitle:c.title,patient:s.patient||c.patient})));
 const scene=()=>scenes()[R.index];
@@ -17,7 +17,8 @@ return '<div class="card"><h2>'+X(p.question)+'</h2>'+p.options.map((o,i)=>'<lab
 const vals=s=>'<div class="row">'+Object.entries(s.vitals||{}).map(([k,v])=>'<div class="stat"><small>'+X(k)+'</small><b>'+X(v)+'</b></div>').join('')+'</div>';
 const controls=()=>'<div class="card row">'+['back','advance','start_poll','close_poll','reveal_poll'].map((id,i)=>'<button data-act="'+id+'" class="'+(i===1?'primary':'')+'">'+['← Voltar','Avançar →','Abrir votação','Encerrar','Revelar'][i]+'</button>').join('')+'</div>';
 function render(){if(dirty&&view==='editor')return;
-let h='<div class="nav">'+Object.entries(views).map(([v,t])=>'<button data-view="'+v+'" class="'+(view===v?'active':'')+'">'+t+'</button>').join('')+'</div>';
+let h='<div class="nav"><a href="./revisao.html" style="display:inline-block;padding:10px 13px;background:#235e70;color:white;border-radius:8px;margin-right:8px">✎ Construção colaborativa ↗</a>'+Object.entries(views).map(([v,t])=>'<button data-view="'+v+'" class="'+(view===v?'active':'')+'">'+t+'</button>').join('')+'</div>';
+if(isStaff&&!REL?.version&&!['publico','aluno'].includes(view)){$('#app').innerHTML=h+'<div class="card"><h1>Aula em construção</h1><p>O Maestro só recebe uma nova versão depois que Gil e Diego aprovarem todos os itens. Nenhuma versão editorial foi publicada ainda.</p><a href="./revisao.html">Abrir sala de construção e aprovação →</a></div>';return}
 if(!isStaff&&!['publico','aluno'].includes(view)){h+='<div class="card"><h1>Sessão necessária</h1><p class="muted">Entre uma única vez no Command Center. Depois, o LIVE Studio abre automaticamente com a mesma sessão.</p><p><a href="../">← Entrar pelo Command Center</a></p></div>'}
 else if(['publico','aluno'].includes(view)){if(!P)h+='<p>Aguardando transmissão.</p>';else{const s=P.scene;h+='<h1>'+X(s.title)+'</h1><div class="card">'+vals(s)+'<p>'+X(s.patient)+'</p><p class="big">'+X(s.clinical)+'</p></div>'+(P.step>0?poll():'')}}
 else if(view==='maestro'){const s=scene();h+='<h1>'+X(s.title)+'</h1><div class="wide"><div class="card">'+scenes().map((x,i)=>'<button class="scene" data-goto="'+i+'">'+(i+1)+'. '+X(x.title)+'</button>').join('')+'</div><div><div class="card">'+vals(s)+'<p>'+X(s.clinical)+'</p></div><div class="card"><h2>Gil</h2><p>'+X(s.gil)+'</p><h2>Diego</h2><p>'+X(s.diego)+'</p><h2>FAZER</h2><p>'+X(s.action)+'</p><h2>PRÓXIMO</h2><p>'+X(s.next)+'</p></div>'+controls()+poll()+'</div></div>'}
