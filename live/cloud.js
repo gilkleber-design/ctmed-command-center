@@ -3,7 +3,7 @@ const $=s=>document.querySelector(s),X=s=>String(s??'').replace(/[&<>"']/g,c=>({
 let conf=await fetch('../index.html').then(r=>r.text()),url=conf.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=conf.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key)throw Error('Configure a chave publicável do Supabase para o LIVE');
 const db=supabase.createClient(url,key),views={editor:'Editor',maestro:'Maestro',gil:'Roteiro Gil',diego:'Roteiro Diego',tecnica:'Direção técnica',publico:'Tela pública',aluno:'Votação'};
-let view=new URLSearchParams(location.search).get('view')||'maestro',isStaff=false,auth=null,L=null,R=null,P=null,edit=null,sel=0,dirty=false;
+let view=new URLSearchParams(location.search).get('view')||localStorage.getItem('ctmed-live-last-view')||'editor',isStaff=false,auth=null,L=null,R=null,P=null,edit=null,sel=0,dirty=false;
 if(!views[view])view='maestro';
 const warn=s=>{const el=$('#status');el.textContent=s;el.style.display='block';setTimeout(()=>el.style.display='none',4000)};
 async function load(){let s=await db.auth.getSession();auth=s.data.session;isStaff=!!auth&&(await db.rpc('live_studio_is_staff')).data===true;
@@ -28,14 +28,14 @@ $('#app').innerHTML=h}
 async function act(type,payload={}){let r=await db.rpc('live_studio_control',{p_type:type,p_payload:payload});if(r.error)warn(r.error.message);else{if(type==='save_lesson'){dirty=false;edit=null}await load()}}
 function capture(){if(!edit)return;let s=edit.cases.flatMap(c=>c.scenes)[sel];document.querySelectorAll('[data-edit]').forEach(el=>s[el.dataset.edit]=el.value)}
 document.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;
-if(b.dataset.view){if(dirty&&!confirm('Descartar edição não salva?'))return;dirty=false;edit=null;view=b.dataset.view;history.replaceState({},'',location.pathname+'?view='+view);render()}
+if(b.dataset.view){if(dirty&&!confirm('Descartar edição não salva?'))return;dirty=false;edit=null;view=b.dataset.view;localStorage.setItem('ctmed-live-last-view',view);history.replaceState({},'',location.pathname+'?view='+view);render()}
 else if(b.dataset.act)act(b.dataset.act);else if(b.dataset.goto!==undefined)act('goto',{index:+b.dataset.goto});
 else if(b.dataset.select!==undefined){capture();dirty=false;sel=+b.dataset.select;render()}
 else if(b.id==='save'){capture();act('save_lesson',{lesson:edit})}
 else if(b.id==='export'){capture();let blob=new Blob([JSON.stringify(edit,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ctmed-live.json';a.click()}
 else if(b.id==='sendNotice')act('notice',{notice:$('#notice').value});
 else if(b.id==='signout')db.auth.signOut().then(()=>location.reload())});
-document.addEventListener('submit',async e=>{if(e.target.id!=='login')return;e.preventDefault();let email=new FormData(e.target).get('email');let r=await db.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname+'?view='+view}});warn(r.error?r.error.message:'Verifique o link enviado por e-mail.')});
+document.addEventListener('submit',async e=>{if(e.target.id!=='login')return;e.preventDefault();let email=new FormData(e.target).get('email');localStorage.setItem('ctmed-live-last-view',view);const redirectTo=location.origin+location.pathname;let r=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:false}});warn(r.error?r.error.message:'Novo link enviado. Abra apenas a mensagem mais recente e clique uma vez.')});
 document.addEventListener('change',async e=>{if(e.target.name!=='vote')return;let id=localStorage.getItem('live-voter')||crypto.randomUUID().replaceAll('-','');localStorage.setItem('live-voter',id);let r=await db.rpc('live_studio_cast_vote',{p_lesson_id:ID,p_voter_id:id,p_selected:+e.target.value});warn(r.error?r.error.message:'Voto registrado')});
 document.addEventListener('input',e=>{if(e.target.matches('[data-edit]'))dirty=true});
 document.addEventListener('keydown',e=>{if(!isStaff||!['maestro','gil','diego'].includes(view)||e.target.closest('input,textarea,select'))return;if(e.code==='Space'||e.code==='ArrowRight'){e.preventDefault();act('advance')}else if(e.code==='ArrowLeft'){e.preventDefault();act('back')}});
