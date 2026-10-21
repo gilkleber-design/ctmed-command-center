@@ -8,7 +8,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const api=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!api||!key||!window.supabase)throw Error('Configuração Supabase indisponível');
 const db=supabase.createClient(api,key);
-let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null,aiSuggestions:[],aiReady:false,aiReferenceOk:false,aiBusy:false,aiTokens:null,aiError:null};
+let S={role:null,email:'',units:[],comments:[],events:[],release:null,selected:'agenda',filter:'todos',query:'',tab:'conteudo',draft:null,editTitle:'',baseRev:0,dirty:false,composing:false,working:false,pendingRefresh:false,roster:null,aiSuggestions:[],aiReady:false,aiReferenceOk:false,aiBusy:false,aiTokens:null,aiError:null,aiErrorUnit:null,aiPromptDraft:''};
 function flash(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';clearTimeout(flash._timer);flash._timer=setTimeout(()=>t.style.display='none',4800)}
 const selected=()=>S.units.find(u=>u.id===S.selected)||S.units[0];
 const locked=u=>u&&u.final_revision===u.revision;
@@ -118,11 +118,22 @@ function renderSidebar(){
  $('#addUnit').disabled=!isAuthor();
 }
 function renderAI(){
- return '<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+(S.aiReady?'Disponível':S.aiReferenceOk?'Chave pendente':'Verificando memória')+'</span></div>'+
+ const u=selected();
+ const reply=[...S.comments].filter(c=>c.unit_id===u?.id&&c.author_role==='ia').sort((a,b)=>b.id-a.id)[0];
+ const error=S.aiErrorUnit===u?.id?S.aiError:null;
+ const statusLabel=reply?'Resposta registrada':S.aiReady?'Chave configurada':'Não configurada';
+ const answerBox='<div class="ai-result" id="aiResult" role="status" aria-live="polite">'+
+  '<div class="eyebrow">RESPOSTA DA IA · ESTE TÓPICO</div>'+
+  (error?'<p class="ai-failure">Não foi possível obter uma resposta: '+esc(error)+'</p>':
+   reply?'<p class="ai-answer">'+esc(reply.body)+'</p><p class="sub">Registrada na discussão à direita · versão '+esc(reply.revision)+'</p>':
+   '<p class="sub">A resposta aparecerá aqui, logo abaixo do botão, e na discussão à direita.</p>')+
+  '</div>';
+ return '<div class="card ai-panel"><div class="row spread"><h2><span class="ai-icon">✦</span> IA · terceira participante</h2><span class="pill '+(S.aiReady?'approved':'pending')+'">'+statusLabel+'</span></div>'+
  '<p class="sub">Crítica objetiva, sem concordância automática. Só responde quando solicitada. Sugere alterações, mas não aprova.</p>'+ 
  '<p class="sub">Analisa somente este tópico, as últimas intervenções registradas nele e <a href="https://github.com/gilkleber-design/ctmed-command-center/blob/main/live/CONTEXTO-IA.md" target="_blank" rel="noopener noreferrer">o resumo MD ↗</a>.</p>'+
- (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Orientação adicional (opcional)</span><textarea id="aiPrompt" rows="2" maxlength="600" placeholder="Opcional. A IA já lê o conteúdo e a conversa deste tópico."></textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar tópico e discussão')+'</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
+ (S.aiReady?'<form id="aiForm"><label class="field"><span class="label">Orientação adicional (opcional)</span><textarea id="aiPrompt" rows="2" maxlength="600" placeholder="Opcional. A IA já lê o conteúdo e a conversa deste tópico.">'+esc(S.aiPromptDraft)+'</textarea></label><div class="row"><button class="primary" id="aiSend" type="submit" '+(S.aiBusy?'disabled':'')+'>'+(S.aiBusy?'Analisando...':'✦ Analisar tópico e discussão')+'</button></div></form>':'<div class="help">'+(S.aiReferenceOk?'A integração da memória funciona. Falta configurar a chave OPENAI_API_KEY no Supabase.':'A memória de referência não está acessível. Verifique o arquivo CONTEXTO-IA.md e recarregue.')+'</div>')+
  (S.aiTokens?'<p class="sub">Última análise: '+S.aiTokens.input+' tokens de entrada · '+S.aiTokens.output+' de saída.</p>':'')+
+ answerBox+
  '</div>';
 }
 function renderWork(){
@@ -252,7 +263,7 @@ document.addEventListener('click',async e=>{
   return;
  }
  
- if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;S.composing=false;render();return}
+ if(b.dataset.unit){if(S.dirty&&!confirm('Há alterações locais não salvas. Descartar e mudar de tópico?'))return;S.selected=b.dataset.unit;S.draft=null;S.tab='conteudo';S.dirty=false;S.composing=false;S.aiPromptDraft='';S.aiError=null;render();return}
  if(b.dataset.tab){if(S.dirty)syncInputs();S.tab=b.dataset.tab;renderWork();return}
  if(b.dataset.reply){const m=S.comments.find(c=>String(c.id)===b.dataset.reply);if(!m)return;window._replyTo=m.id;$('#replyHint').textContent='Respondendo ao comentário #'+m.id+' de '+m.author_role.toUpperCase();$('#commentBody').focus();return}
  if(b.dataset.resolve){await action('resolve_comment',{comment_id:Number(b.dataset.resolve)});return}
@@ -288,7 +299,7 @@ document.addEventListener('mouseup',e=>{
  if(phrase.length>1&&phrase.length<=120){const anchor=$('#commentAnchor');if(anchor)anchor.value=phrase}
 });
 document.addEventListener('input',e=>{
- if(e.target.id==='aiPrompt'){S.composing=true;return}
+ if(e.target.id==='aiPrompt'){S.composing=true;S.aiPromptDraft=e.target.value;return}
  if(e.target.id==='search'){S.query=e.target.value;renderSidebar();return}if(e.target.id==='commentBody'||e.target.id==='commentAnchor'){S.composing=true;return}
  if(e.target.matches('[data-field],[data-title],[data-check],[data-answer]')){S.dirty=true}
 });
@@ -300,6 +311,7 @@ document.addEventListener('submit',async e=>{
    if(S.dirty)return flash('Salve as alterações locais antes da análise da IA');
    const unit=selected(),prompt=$('#aiPrompt')?.value.trim()||'';
    if(!unit)return;
+   S.aiError=null;S.aiErrorUnit=unit.id;S.aiPromptDraft=prompt;
    S.aiBusy=true;S.composing=true;
    const send=$('#aiSend');if(send){send.disabled=true;send.textContent='Analisando...'}
    try{
@@ -311,11 +323,18 @@ document.addEventListener('submit',async e=>{
      });
      const data=await response.json();
      if(!response.ok)throw Error(data.error||'Erro na análise da IA');
-     S.aiTokens=data.tokens||null;
-     S.composing=false;
+     S.aiTokens=data.tokens||null;S.aiError=null;S.aiPromptDraft='';
+     S.aiBusy=false;S.composing=false;
      await refresh();
-     flash(data.proposals_saved?'IA respondeu e sugeriu '+data.proposals_saved+' atualização(ões) de pauta.':'IA respondeu na discussão.');
-   }catch(err){flash(err.message);S.composing=true;const b=$('#aiSend');if(b){b.disabled=false;b.textContent='✦ Analisar tópico e discussão'}}
+     $('#aiResult')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+     flash(data.proposals_saved?'IA respondeu e sugeriu '+data.proposals_saved+' atualização(ões) de pauta.':'Resposta da IA exibida logo abaixo.');
+   }catch(err){
+     S.aiError=err instanceof Error?err.message:String(err);
+     S.aiBusy=false;S.composing=false;
+     renderWork();
+     $('#aiResult')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+     flash('A análise falhou. Veja o erro no card da IA.');
+   }
    finally{S.aiBusy=false}
    return;
  }
