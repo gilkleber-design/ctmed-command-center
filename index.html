@@ -54,6 +54,12 @@ body.ctmed-authenticated .ctmed-auth-wall{display:none}
       <button class="btn primary" type="submit">Entrar no Command Center</button>
     </form>
     <button id="ctmedAuthRecover" class="ctmed-auth-link" type="button">Primeiro acesso ou esqueci minha senha</button>
+    <div id="ctmedRecoverPanel" hidden>
+      <p>Enviaremos um link único ao e-mail informado. <strong>Não clique no link:</strong> copie o endereço do botão recebido e cole abaixo para configurar sua senha neste dispositivo, sem redirecionamento.</p>
+      <label for="ctmedRecoverLink">Endereço do link recebido</label>
+      <input id="ctmedRecoverLink" type="text" autocomplete="off" spellcheck="false" placeholder="Cole aqui o link de recuperação do Supabase"/>
+      <button type="button" id="ctmedRecoverConfirm" class="btn">Confirmar e definir senha</button>
+    </div>
     <p id="ctmedAuthStatus" class="ctmed-auth-status" aria-live="polite"></p>
     <small>Primeiro acesso: pode ser necessário definir uma senha uma única vez. Nenhum link é exigido nos próximos logins.</small>
   </div>
@@ -280,8 +286,23 @@ async function startCommandAuth(){
   document.getElementById('ctmedAuthRecover').onclick=async()=>{
    const email=document.getElementById('ctmedAuthEmail').value.trim().toLowerCase();
    if(!email||!document.getElementById('ctmedAuthEmail').checkValidity()){authMessage('Informe seu e-mail autorizado primeiro.');return}
-   const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/'});
-   authMessage(error?'Não foi possível enviar o link. Aguarde e tente novamente.':'Se o e-mail estiver autorizado, enviaremos um link único para definir a senha.');
+   document.getElementById('ctmedRecoverPanel').hidden=false;
+   const {error}=await client.auth.resetPasswordForEmail(email);
+   authMessage(error?'Não foi possível enviar o link agora. Aguarde um minuto e tente novamente.':'Verifique o e-mail. Copie o endereço do link recebido sem clicar e cole no campo acima.');
+  };
+  document.getElementById('ctmedRecoverConfirm').onclick=async()=>{
+   const input=document.getElementById('ctmedRecoverLink');
+   let link;
+   try{link=new URL(input.value.trim())}catch{authMessage('Cole um link válido de recuperação.');return}
+   const expected=new URL(CTMED_CONFIG.SUPABASE_URL);
+   const hash=link.searchParams.get('token')||link.searchParams.get('token_hash');
+   if(link.hostname!==expected.hostname||link.pathname!=='/auth/v1/verify'||link.searchParams.get('type')!=='recovery'||!hash){
+    authMessage('Esse link não é uma recuperação de senha válida deste projeto.');return
+   }
+   const {error}=await client.auth.verifyOtp({token_hash:hash,type:'recovery'});
+   input.value='';
+   if(error){authMessage('O link expirou ou já foi usado. Solicite um novo.');return}
+   if(await authenticatedEnter())document.getElementById('ctmedPasswordModal').showModal();
   };
   document.getElementById('ctmedPassCancel').onclick=()=>document.getElementById('ctmedPasswordModal').close();
   document.getElementById('ctmedPasswordForm').addEventListener('submit',async ev=>{
