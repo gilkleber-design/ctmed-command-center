@@ -29,7 +29,7 @@ function flash(txt,isError=false){
 function sideUnit(u){
  const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec);
  return '<button class="nav-item '+(S.view===u.id?'selected':'')+'" data-open="'+esc(u.id)+'">'+
- '<span class="nav-name">'+esc(u.title)+'</span>'+
+ '<span class="nav-name">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+'</span>'+
  '<span class="nav-state '+badge(sec)+'">'+(fixed(sec)?'✓ ': '')+esc(st)+'</span></button>';
 }
 function renderSidebar(){
