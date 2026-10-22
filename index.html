@@ -18,6 +18,22 @@
 .topic-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px}
 .topic-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 @media(max-width:540px){.topic-fields{grid-template-columns:1fr}.topic-actions .btn{flex:1}}
+
+/* LIVE Studio: acesso permanente no cabeçalho, inclusive no celular */
+.topbar .live-header-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;background:#1b463b;border:1px solid #3daa84;color:#c2f7e4;text-decoration:none;white-space:nowrap;font-weight:900;letter-spacing:.015em}
+.topbar .live-header-link:hover,.topbar .live-header-link:focus-visible{background:#24654e;border-color:#72e5bb}
+@media(max-width:820px){
+ .topbar .topin{flex-wrap:wrap;gap:8px;padding:10px 12px}
+ .topbar .brand{flex:1 1 100%;min-width:0}
+ .topbar .actions{width:100%;justify-content:flex-start;gap:6px}
+ .topbar .live-header-link{order:-2;min-height:39px;padding:9px 14px}
+ .topbar .actions>.pill:first-of-type{order:-1}
+}
+@media(max-width:390px){
+ .topbar .actions>.pill:first-of-type{max-width:122px;overflow:hidden}
+ .topbar .actions>.pill:first-of-type .syncstack{min-width:0}
+ .topbar .actions>.pill:first-of-type #mode,.topbar .actions>.pill:first-of-type #lastSync{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:95px}
+}
 </style>
 <style id="ctmedAuthCSS">
 body.ctmed-auth-pending{overflow:hidden}
@@ -76,7 +92,7 @@ body.ctmed-authenticated .ctmed-auth-wall{display:none}
     <div class="row"><button type="submit" class="btn primary">Salvar senha</button><button type="button" class="btn" id="ctmedPassCancel">Cancelar</button></div>
   </form>
 </dialog>
-<header class="topbar"><div class="topin"><div class="brand"><div class="logo"><img src="ctmed-header.png" alt="CT-MED" onerror="this.style.display='none';this.parentElement.textContent='CT'"/></div><div><h1>CT‑MED COMMAND CENTER</h1><small>Sprint ISR · out/2026 → jan/2027</small></div></div><div class="actions"><div class="pill"><span class="dot" id="dot"></span><span class="syncstack"><span id="mode">Conectando…</span><small id="lastSync">aguardando sincronização</small></span></div><div class="pill hide-sm" id="presencePill"><span class="presence-dot"></span><span id="presenceText">Online: —</span></div><button class="btn hide-sm" id="export">Exportar</button><button class="btn hide-sm" id="import">Importar</button><button class="btn" id="user" title="Definir ou alterar senha">Usuário: <span id="userTop">—</span></button><button class="btn" id="ctmedSignOut" title="Encerrar sessão">Sair</button><button class="btn mobilechat" id="openChat">Chat</button></div></div></header>
+<header class="topbar"><div class="topin"><div class="brand"><div class="logo"><img src="ctmed-header.png" alt="CT-MED" onerror="this.style.display='none';this.parentElement.textContent='CT'"/></div><div><h1>CT‑MED COMMAND CENTER</h1><small>Sprint ISR · out/2026 → jan/2027</small></div></div><div class="actions"><a class="btn live-header-link" href="./live/revisao.html" aria-label="Abrir LIVE Studio, sala de construção da aula" title="LIVE Studio — construir a aula">● LIVE</a><div class="pill"><span class="dot" id="dot"></span><span class="syncstack"><span id="mode">Conectando…</span><small id="lastSync">aguardando sincronização</small></span></div><div class="pill hide-sm" id="presencePill"><span class="presence-dot"></span><span id="presenceText">Online: —</span></div><button class="btn hide-sm" id="export">Exportar</button><button class="btn hide-sm" id="import">Importar</button><button class="btn" id="user" title="Definir ou alterar senha">Usuário: <span id="userTop">—</span></button><button class="btn" id="ctmedSignOut" title="Encerrar sessão">Sair</button><button class="btn mobilechat" id="openChat">Chat</button></div></div></header>
 <div class="shell">
 <aside class="sidebar card"><div class="side-title">Navegação</div><button class="nav" data-to="overview"><span class="num">00</span>Visão geral</button><button class="nav" data-to="strategy"><span class="num">01</span>Estratégia</button><button class="nav" data-to="opsmemory"><span class="num">02</span>Decisões & histórico</button><button class="nav" data-to="roadmap"><span class="num">03</span>Cronograma</button><button class="nav" data-to="parking"><span class="num">04</span>Parking lot</button><button class="nav" data-to="documentation"><span class="num">05</span>Documentação</button><div class="rule"></div><div class="side-title">Pulso</div><div class="mini"><b id="doneMini">0/0</b><span>tarefas concluídas</span></div><div class="mini"><b id="blockedMini">0</b><span>bloqueios ativos</span></div><div class="mini"><b>05/11</b><span>live paga — alvo</span></div><div class="rule"></div><div class="side-title">Ferramentas</div><a class="nav" href="./live/revisao.html" target="_blank" rel="noopener noreferrer" title="Abrir sala colaborativa de construção da LIVE em nova aba"><span class="num" style="color:#f5a524">●</span>LIVE Studio ↗</a><a class="nav" href="https://vm.ctmedacademy.com.br" target="_blank" rel="noopener"><span class="num">VM</span>Simulador de ventilação</a><div class="rule"></div><div style="padding:0 8px;color:#b8c6d8;font-size:11px;line-height:1.5"><b>Regra:</b> se não ajuda a vender ou entregar ISR, vai para o Parking Lot.</div></aside>
 <main class="main">
