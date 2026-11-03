@@ -3,6 +3,41 @@
 'use strict';
 const $=q=>document.querySelector(q);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mdInline=x=>esc(x)
+ .replace(/\\*\\*(.+?)\\*\\*/g,'<strong>$1</strong>')
+ .replace(/\\`([^\\`]+)\\`/g,'<code>$1</code>')
+ .replace(/\\*([^*]+)\\*/g,'<em>$1</em>');
+function richText(raw){
+ const lines=String(raw??'').replace(/\\r/g,'').split('\\n');
+ const out=[];let inList=false;
+ const closeList=()=>{if(inList){out.push('</ul>');inList=false}};
+ const cells=row=>row.trim().replace(/^\\|/,'').replace(/\\|$/,'').split('|').map(x=>x.trim());
+ const isSep=row=>{const a=cells(row);return a.length>0&&a.every(x=>/^:?-{3,}:?$/.test(x))};
+ for(let i=0;i<lines.length;i++){
+  const t=lines[i].trim();
+  if(!t){closeList();out.push('<div class="rich-gap"></div>');continue}
+  if(/^\\|.*\\|$/.test(t)&&i+1<lines.length&&isSep(lines[i+1])){
+   closeList();const head=cells(t);const rows=[];i+=2;
+   while(i<lines.length&&/^\\|.*\\|$/.test(lines[i].trim())){rows.push(cells(lines[i]));i++}
+   i--;
+   out.push('<div class="rich-table-wrap"><table class="rich-table"><thead><tr>'+head.map(x=>'<th>'+mdInline(x)+'</th>').join('')+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+r.map(x=>'<td>'+mdInline(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');
+   continue;
+  }
+  if(/^---+$/.test(t)){closeList();out.push('<hr>');continue}
+  const h=t.match(/^(#{1,4})\\s+(.+)$/);
+  if(h){closeList();const level=Math.min(4,h[1].length+1);out.push('<h'+level+'>'+mdInline(h[2])+'</h'+level+'>');continue}
+  if(/^>\\s?/.test(t)){closeList();out.push('<blockquote>'+mdInline(t.replace(/^>\\s?/,''))+'</blockquote>');continue}
+  const bullet=t.match(/^[-*•]\\s+(.+)$/);
+  if(bullet){if(!inList){out.push('<ul>');inList=true}out.push('<li>'+mdInline(bullet[1])+'</li>');continue}
+  const step=t.match(/^→\\s*(.+)$/);
+  if(step){closeList();out.push('<div class="rich-step">→ <span>'+mdInline(step[1])+'</span></div>');continue}
+  const choice=t.match(/^(○|◯|☐|☑|✅|🔴|🟠|🟢|⚪|🔒)\\s*(.+)$/);
+  if(choice){closeList();out.push('<div class="rich-choice"><span>'+choice[1]+'</span><span>'+mdInline(choice[2])+'</span></div>');continue}
+  closeList();out.push('<p>'+mdInline(t)+'</p>');
+ }
+ closeList();return out.join('');
+}
 const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Configuração do Supabase indisponível');
@@ -81,7 +116,7 @@ function proposalCard(role){
   '<div class="form-actions"><button id="saveProposal" class="primary" '+(S.busy?'disabled':'')+'>Salvar minha proposta</button>'+
   '<button id="toggleShare" class="secondary" '+(S.busy||S.proposalDirty?'disabled':'')+'>'+(rec.shared?'Tornar privada':'Compartilhar com '+roleName(role==='gil'?'diego':'gil'))+'</button></div>'+
   (S.proposalDirty?'<p class="notice">Salve antes de modificar a visibilidade.</p>':''):
-  '<div class="proposal-text">'+esc(rec.content||'Ainda sem conteúdo')+'</div>')+
+  '<div class="proposal-text rich-text">'+richText(rec.content||'Ainda sem conteúdo')+'</div>')+
  '</div>';
 }
 function renderPedagogy(){
@@ -114,9 +149,10 @@ function consensusCard(u,s){
  const text=S.consensusDirty&&S.editVersion===s.version?S._consensusTemp:s.consensus_text;
  return '<section class="consensus card '+(isFixed?'fixed-card':'')+'"><div class="split"><h2>Texto de consenso</h2><span class="chip '+(isFixed?'fixed':one?'review':'private')+'">'+status(s)+'</span></div>'+
  '<p class="small">'+(isFixed?'Card fixo. Alterações exigem nova revisão e dupla aprovação.':'Escrevam aqui apenas o texto que querem consolidar. As propostas individuais e o chat permanecem intactos.')+'</p>'+
- (editing?'<textarea id="consensusInput" rows="13" placeholder="Após a discussão, formulem aqui o texto que ambos poderão aprovar.">'+esc(text||'')+'</textarea>':
-  '<div class="consensus-read">'+esc(isFixed?lockedText:s.consensus_text||'Ainda não há uma formulação consensual.')+'</div>')+
- (s.fixed_version&&!isFixed?'<div class="previous"><strong>Último consenso fixo · v'+s.fixed_version+'</strong><p>'+esc(s.fixed_text)+'</p></div>':'')+
+ (editing?'<textarea id="consensusInput" rows="13" placeholder="Após a discussão, formulem aqui o texto que ambos poderão aprovar.">'+esc(text||'')+'</textarea>'+
+  '<div class="consensus-preview"><div class="preview-label">VISUALIZAÇÃO PARA APROVAÇÃO</div><div id="consensusPreview" class="rich-text">'+richText(text||'Comece a escrever para ver a versão formatada aqui.')+'</div></div>':
+  '<div class="consensus-read rich-text">'+richText(isFixed?lockedText:s.consensus_text||'Ainda não há uma formulação consensual.')+'</div>')+
+ (s.fixed_version&&!isFixed?'<div class="previous"><strong>Último consenso fixo · v'+s.fixed_version+'</strong><div class="rich-text compact">'+richText(s.fixed_text)+'</div></div>':'')+
  msg+
  (canEdit()?'<div class="form-actions wrap">'+(isFixed?'<button data-consensus="reopen" class="secondary">Abrir revisão</button>':
   '<button data-consensus="save" class="secondary" '+(S.busy?'disabled':'')+'>Salvar texto</button>'+
@@ -292,7 +328,7 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{
  if(e.target.id==='chatText'){S.chatDraft=e.target.value;S.typing=!!S.chatDraft;return}
  if(e.target.id==='myProposal'){S.proposalDirty=true;S.proposalDraft=e.target.value;return}
- if(e.target.id==='consensusInput'){S.consensusDirty=true;S._consensusTemp=e.target.value;S.editVersion=current()?.version;return}
+ if(e.target.id==='consensusInput'){S.consensusDirty=true;S._consensusTemp=e.target.value;S.editVersion=current()?.version;const p=$('#consensusPreview');if(p)p.innerHTML=richText(e.target.value||'Comece a escrever para ver a versão formatada aqui.');return}
 });
 document.addEventListener('submit',async e=>{
  if(e.target.id==='chatForm'){e.preventDefault();await sendChat();return}
