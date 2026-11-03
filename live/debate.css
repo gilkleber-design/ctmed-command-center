@@ -116,3 +116,60 @@ dialog::backdrop{background:#03101cc9}dialog label{font-size:12px;color:#d3e4f2}
  .rich-text h2{font-size:16px}
  .rich-table{min-width:360px}
 }
+
+
+/* Workspace de debate em uma tela no desktop */
+@media(min-width:1121px){
+  .editor-grid{
+    align-items:stretch;
+    height:calc(100vh - 235px);
+    min-height:560px;
+    max-height:760px;
+    overflow:hidden;
+  }
+
+  .discussion,
+  .consensus{
+    height:100%;
+    min-height:0;
+  }
+
+  .discussion{
+    overflow:hidden;
+  }
+
+  .discussion .thread{
+    flex:1 1 auto;
+    min-height:0;
+    max-height:none;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+  }
+
+  .discussion #chatForm{
+    flex:0 0 auto;
+    background:var(--panel);
+  }
+
+  .consensus{
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-gutter:stable;
+    scroll-behavior:smooth;
+  }
+
+  .consensus>.split:first-child{
+    position:sticky;
+    top:-21px;
+    z-index:3;
+    margin:-21px -21px 12px;
+    padding:18px 21px 12px;
+    background:linear-gradient(180deg,var(--panel) 82%,rgba(14,29,48,.96));
+    border-bottom:1px solid var(--stroke);
+  }
+
+  .consensus-preview{
+    margin-bottom:4px;
+  }
+}
