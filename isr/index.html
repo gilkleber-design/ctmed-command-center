@@ -271,6 +271,75 @@ nav .dot.on{display:block}
 .copts button{min-height:40px;padding:0 12px;border-radius:9px;border:1.5px solid var(--line2);font-family:var(--num);font-weight:700;font-size:17px;background:rgba(8,19,36,.85)}
 .copts button.on{background:var(--orgrad);color:#170f06;border-color:transparent}
 
+/* ---------- Modo Estudo guiado ---------- */
+.calcLbl{display:none;font-family:var(--num);font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--tx3);text-transform:uppercase;margin:18px 0 6px}
+body.study .calcLbl{display:block}
+.stq{background:var(--panel);border:1px solid rgba(255,122,15,.5);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 18px 40px -28px rgba(255,116,5,.7)}
+.stq h2{font-size:17px;margin:6px 0 4px}
+.stq p{margin:0 0 10px;font-size:13px;color:var(--tx2)}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;width:100%;text-align:left;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:6px;background:var(--panel);min-height:48px}
+.opt i{width:24px;height:24px;border-radius:7px;border:2px solid var(--tx3);display:grid;place-items:center;font-style:normal}
+.opt.on{border-color:rgba(255,122,15,.7);background:rgba(255,122,15,.09)}
+.opt.on i{background:var(--or);border-color:var(--or)}
+.opt.on i:after{content:"";width:6px;height:11px;border:solid #140800;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.opt b{display:block;font-size:14px}
+.opt span{display:block;font-size:12px;color:var(--tx2)}
+.opt.none{border-style:dashed}
+.indbar{position:sticky;top:calc(60px + env(safe-area-inset-top));z-index:14;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(10,23,42,.97),rgba(6,15,29,.97));border:1px solid var(--line2);border-radius:12px;padding:9px 12px;margin-bottom:12px;font-size:12.5px;color:var(--tx2)}
+.indbar div{flex:1;min-width:0}
+.indbar b{color:var(--tx)}
+.indbar button{flex:none;font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--or2);border:1px solid rgba(255,122,15,.5);border-radius:8px;padding:7px 9px;min-height:36px}
+.rule{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11.5px;color:var(--tx2);margin:0 0 12px}
+.rule span{border:1px solid var(--line2);border-radius:99px;padding:4px 9px;font-weight:600}
+.rule i{font-style:normal;color:var(--tx3)}
+.sc2{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 0;border-top:1px solid var(--line)}
+.dl .sc2:first-child{border-top:0}
+.sc2 .nm{flex:1;min-width:0}
+.sc2 .nm b{display:block;font-size:15.5px}
+.sc2 .nm span{display:block;font-size:12px;color:var(--tx2)}
+.sc2 .act2{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.lk{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;border:1px solid var(--line2);color:var(--tx3)}
+.lk svg{width:16px;height:16px}
+.mini2{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:8px;padding:8px 10px;min-height:38px;border:1.5px solid var(--line2);background:rgba(8,19,36,.85)}
+.mini2.or{background:var(--orgrad);color:#170f06;border-color:transparent;box-shadow:var(--orglow)}
+.btn:disabled,.mini2:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}
+.sc2 .nm .stt{display:inline-flex;width:auto}
+.sc2 .nm .stt{font-size:10.5px}.sc2 .nm .stt.ev{color:#170f06}.sc2 .nm .stt.fa{color:#03140c}.sc2 .nm .stt.de{color:var(--or2)}.sc2 .nm .stt.va{color:#fff}.sc2 .nm .stt.na{color:var(--tx3)}
+.stt{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:3px 9px;margin-top:4px;border:1px solid}
+.stt.na{color:var(--tx3);border-color:var(--line2)}
+.stt.ev{background:var(--orgrad);color:#170f06;border-color:transparent}
+.stt.de{color:var(--or2);border-color:rgba(255,122,15,.7);background:rgba(255,122,15,.08)}
+.stt.fa{background:var(--gr);color:#03140c;border-color:var(--gr)}
+.stt.va{color:#fff;border-color:rgba(255,255,255,.6)}
+.sc2.s-ev .nm b{text-decoration:line-through;text-decoration-color:var(--or)}
+.why2{display:block;font-size:12px;color:var(--tx2);margin-top:3px}
+.tree{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0 10px}
+.tree span{font-size:11.5px;font-weight:700;border-radius:99px;padding:5px 10px;border:1px solid var(--line2);color:var(--tx3)}
+.tree span.cur{border-color:var(--or);color:var(--tx);background:rgba(255,122,15,.1)}
+.tree span.done{color:var(--tx);border-color:rgba(255,255,255,.4)}
+.tree i{font-style:normal;color:var(--tx3);font-size:12px}
+.qh{font-size:16px;font-weight:800;margin:4px 0 10px;line-height:1.25}
+.res{border-radius:14px;padding:14px;margin:4px 0 12px;border:1px solid}
+.res .t{font-family:var(--num);font-weight:700;font-size:26px;letter-spacing:.04em;line-height:1}
+.res p{margin:6px 0 0;font-size:13.5px}
+.res ul{margin:8px 0 0;padding-left:18px;font-size:13px}
+.res li{margin:3px 0}
+.res li small{display:block;color:inherit;opacity:.8}
+.res.ev{background:var(--orgrad);color:#170f06;border-color:transparent;box-shadow:var(--orglow)}
+.res.de{background:rgba(255,122,15,.09);border-color:rgba(255,122,15,.7);color:var(--tx)}
+.res.de .t{color:var(--or2)}
+.res.fa{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.6);color:var(--tx)}
+.res.fa .t{color:var(--gr)}
+.res.va{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.5);color:var(--tx)}
+.prev{font-size:12.5px;color:var(--tx2);border-left:3px solid var(--line2);padding:2px 0 2px 10px;margin:0 0 12px}
+.prev b{color:var(--tx)}
+.suag{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.suag h3{margin:0 0 6px;font-family:var(--num);font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--or2);text-transform:uppercase}
+.suag p{margin:0;font-size:14px}
+.suag .sc2{padding:9px 0}
+.stEmpty{font-size:13px;color:var(--tx3);text-align:center;padding:6px 0}
+.extra{font-size:12px;color:var(--tx3);margin:14px 0 6px}
+
 footer{color:var(--tx3);font-size:11.5px;line-height:1.5;padding:18px 0 8px;border-top:1px solid var(--line);margin-top:20px}
 footer b{color:var(--tx2)}
 .tag{font-weight:800;color:var(--tx);font-size:13px;margin-bottom:6px}
@@ -310,6 +379,9 @@ footer b{color:var(--tx2)}
     <button class="x" id="installX" aria-label="Fechar aviso">×</button>
   </div>
 
+  <div id="stTop"></div>
+  <div id="calcPanel">
+  <div class="calcLbl" id="calcLbl">Peso do paciente · usado no cálculo das drogas liberadas</div>
   <div class="wt">
     <div><div class="lbl">Peso real · adulto</div>
       <label class="wv"><input id="wIn" type="number" inputmode="decimal" min="30" max="250" step="1" value="70" aria-label="Peso em kg"><small>kg</small></label></div>
@@ -329,8 +401,10 @@ footer b{color:var(--tx2)}
   </div>
 
   <button class="amp" id="ampBtn"><i class="dev dev-ampola"></i><div><b>Confira suas ampolas</b>Concentrações usadas no cálculo · toque para trocar</div><span class="e">Editar</span></button>
+  </div>
 
   <div id="doseList"></div>
+  <div id="stList" hidden></div>
 
   <div class="why">
     <h4>Por que funciona assim</h4>
@@ -439,6 +513,19 @@ footer b{color:var(--tx2)}
   </div>
 </section>
 
+<!-- ===================== SUA ISR (Modo Estudo) ===================== -->
+<section class="screen" id="s-sua">
+  <div class="eyebrow">Modo Estudo · resumo</div>
+  <h1>Sua ISR. <em>Decisão por decisão.</em></h1>
+  <p class="lead">Só aparecem as drogas que você avaliou. Toque numa droga para rever o raciocínio.</p>
+  <div id="suaBody"></div>
+  <div class="subrow" style="margin-top:12px">
+    <button class="btn" id="suaReview">Revisar decisões</button>
+    <button class="btn or" id="suaNew">Nova simulação</button>
+  </div>
+  <p class="note">Material educacional CT-MED. As listas de contraindicações e indicações resumem o raciocínio da live; não substituem bula, protocolos institucionais nem julgamento clínico.</p>
+</section>
+
 <!-- ===================== REGISTRO ===================== -->
 <section class="screen" id="s-reg">
   <div class="eyebrow">Registro</div>
@@ -483,6 +570,14 @@ footer b{color:var(--tx2)}
     <button class="btn ghost block" id="dsClose" style="margin-top:8px">Fechar</button>
   </div>
 </div>
+<div class="sheet" id="evSheet" role="dialog" aria-modal="true" aria-labelledby="evTitle">
+  <div class="in">
+    <div class="grab"></div>
+    <div class="sh-head"><span class="shic"><i class="dev dev-seringa"></i></span><div style="flex:1;min-width:0"><div class="eyebrow" id="evEye">Indução</div><h2 id="evTitle" style="margin-top:6px">Cetamina</h2></div></div>
+    <div class="tree" id="evTree"></div>
+    <div id="evBody"></div>
+  </div>
+</div>
 <div class="sheet" id="ampSheet" role="dialog" aria-modal="true" aria-labelledby="amTitle">
   <div class="in">
     <div class="grab"></div>
@@ -525,7 +620,7 @@ var INF=[
 ];
 
 var S,KEY="ctmed_isr_v1";
-function fresh(keepConc){return {w:70,unst:false,obese:false,h:170,sex:"m",conc:keepConc||{},log:[],start:null,step:0,bnm:"roc",scen:"choque"};}
+function fresh(keepConc){return {w:70,unst:false,obese:false,h:170,sex:"m",conc:keepConc||{},log:[],start:null,step:0,bnm:"roc",scen:"choque",st:{ind:[],ev:{}}};}
 function load(){try{var j=localStorage.getItem(KEY);S=j?JSON.parse(j):fresh();}catch(e){S=fresh();}var f=fresh();for(var k in f)if(!(k in S))S[k]=f[k];}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 load();
@@ -636,7 +731,7 @@ function openDose(id){
   $("dsFacts").innerHTML=f;
   $("scrim").className="scrim on";$("doseSheet").className="sheet on";buzz();
 }
-function closeSheets(){$("scrim").className="scrim";$("doseSheet").className="sheet";$("ampSheet").className="sheet";}
+function closeSheets(){$("scrim").className="scrim";$("doseSheet").className="sheet";$("ampSheet").className="sheet";$("evSheet").className="sheet";}
 $("scrim").addEventListener("click",closeSheets);$("dsClose").addEventListener("click",closeSheets);
 $("dsReg").addEventListener("click",function(){
   var d=curD,r=dose(d);if(!d||r.avoid)return;
@@ -809,11 +904,257 @@ function go(id){
 qa("[data-go]").forEach(function(b){b.addEventListener("click",function(){go(b.getAttribute("data-go"));});});
 
 /* ---------- estudo ---------- */
-function setStudy(on){document.body.classList.toggle("study",on);$("studyBtn").setAttribute("aria-pressed",on?"true":"false");try{localStorage.setItem("ctmed_isr_study",on?"1":"0");}catch(e){}}
+function setStudy(on){document.body.classList.toggle("study",on);$("studyBtn").setAttribute("aria-pressed",on?"true":"false");try{localStorage.setItem("ctmed_isr_study",on?"1":"0");}catch(e){}if(typeof renderStudy==="function"&&$("stList"))renderStudy();}
 $("studyBtn").addEventListener("click",function(){setStudy(!document.body.classList.contains("study"));});
 try{setStudy(localStorage.getItem("ctmed_isr_study")==="1");}catch(e){}
 
-function renderAll(){renderDoses();renderAlgo();renderCen();renderPos();renderLog();}
+/* ===================== MODO ESTUDO GUIADO =====================
+   Camada de decisão ANTES do cálculo. Não altera DRUGS nem dose():
+   só decide quando o botão "Calcular dose" chama openDose(id).
+   Conteúdo clínico centralizado em STUDY (validar com o Gil). */
+var STUDY={
+ ind:[
+  {k:"resp",t:"Insuficiência respiratória",d:"Falha de oxigenação ou de ventilação apesar de O₂, VNI ou cateter de alto fluxo"},
+  {k:"prot",t:"Incapacidade de proteger a via aérea",d:"Rebaixamento de consciência, sangue, vômito ou secreção que o paciente não maneja"},
+  {k:"ant",t:"Antecipação de piora clínica",d:"Curso previsto: queimadura de via aérea, edema progressivo, transporte, procedimento"}
+ ],
+ stages:[
+  {k:"pre",t:"Pré-medicação",drugs:["fen"]},
+  {k:"ind",t:"Indução",drugs:["cet","eto","pro","mid"]},
+  {k:"bnm",t:"Bloqueio neuromuscular",drugs:["roc","sux"]}
+ ],
+ /* ci = contraindicação ou motivo forte para evitar (vai para EVITAR)
+    df = fator desfavorável, não absoluto (vai para DESFAVORECIDA)
+    fa = indicação ou característica que favorece (vai para FAVORECIDA) */
+ drugs:{
+  fen:{ci:[
+     {k:"choque",t:"Choque ou hipotensão",w:"PAS < 90 ou índice de choque ≥ 0,9: o fentanil tira o tônus simpático que segura a pressão"},
+     {k:"crash",t:"Parada iminente ou apneia",w:"Não há tempo para os 3 minutos do pré-tratamento; vá direto para indução e bloqueio"}],
+   df:[
+     {k:"fragil",t:"Idoso frágil ou baixa reserva cardiovascular",w:"Maior queda de pressão com opioide; se usar, dose menor"},
+     {k:"drive",t:"Respiração compensando acidose metabólica grave",w:"O opioide pode reduzir o drive antes do tubo e piorar a acidose"}],
+   fa:[
+     {k:"hic",t:"TCE ou hipertensão intracraniana",w:"Atenua o pico de pressão intracraniana da laringoscopia"},
+     {k:"aorta",t:"Dissecção de aorta ou emergência hipertensiva",w:"Evita o pico hipertensivo e o cisalhamento da laringoscopia"},
+     {k:"sca",t:"Síndrome coronariana aguda",w:"Reduz taquicardia e hipertensão que aumentam o consumo de O₂ do miocárdio"},
+     {k:"hsa",t:"Hemorragia subaracnoide ou aneurisma",w:"Pico hipertensivo aumenta o risco de ressangramento"}]},
+  cet:{ci:[
+     {k:"alergia",t:"Alergia conhecida à cetamina",w:"Única contraindicação absoluta na emergência"}],
+   df:[
+     {k:"has",t:"Hipertensão grave ou emergência hipertensiva",w:"O efeito simpaticomimético sobe ainda mais a pressão"},
+     {k:"sca",t:"Síndrome coronariana aguda",w:"Taquicardia e hipertensão aumentam o consumo de O₂ do miocárdio"},
+     {k:"aorta",t:"Dissecção de aorta",w:"O aumento de pressão e de força de contração piora o cisalhamento"},
+     {k:"exaust",t:"Choque prolongado com catecolaminas esgotadas",w:"Sem reserva simpática, sobra o efeito depressor direto: pode hipotensionar; reduza a dose"}],
+   fa:[
+     {k:"choque",t:"Choque ou instabilidade hemodinâmica",w:"Preserva a pressão pelo estímulo simpático; dose de 0,5 a 1 mg/kg"},
+     {k:"bronco",t:"Broncoespasmo ou asma grave",w:"Broncodilatadora"},
+     {k:"dor",t:"Dor importante ou necessidade de analgesia",w:"Analgésica além de hipnótica"}]},
+  eto:{ci:[
+     {k:"alergia",t:"Alergia conhecida ao etomidato",w:"Única contraindicação absoluta"}],
+   df:[
+     {k:"sepse",t:"Choque séptico",w:"Supressão adrenal transitória após dose única; impacto clínico controverso, mas pese a escolha"},
+     {k:"conv",t:"Estado de mal epiléptico",w:"Não tem efeito anticonvulsivante e pode causar mioclonias que confundem a avaliação"}],
+   fa:[
+     {k:"instavel",t:"Instabilidade hemodinâmica",w:"O indutor mais neutro para a pressão; reduza a dose no choque"},
+     {k:"cardio",t:"Cardiopatia grave ou síndrome coronariana",w:"Mínimo efeito sobre contratilidade e frequência"},
+     {k:"hic",t:"TCE ou hipertensão intracraniana com pressão normal",w:"Reduz a pressão intracraniana preservando a pressão de perfusão"}]},
+  pro:{ci:[
+     {k:"choque",t:"Choque ou hipotensão",w:"Vasodilatação e depressão miocárdica: queda de pressão previsível no paciente que já não tem reserva"},
+     {k:"alergia",t:"Alergia conhecida ao propofol",w:"Contraindicação absoluta"}],
+   df:[
+     {k:"fragil",t:"Idoso frágil ou baixa reserva cardiovascular",w:"Mesmo normotenso, cai mais; se usar, dose bem menor"},
+     {k:"hipovol",t:"Hipovolemia não corrigida",w:"A vasodilatação revela a falta de volume"},
+     {k:"vd",t:"Disfunção de VD ou insuficiência cardíaca grave",w:"Depressão miocárdica e queda da pressão de perfusão coronariana"}],
+   fa:[
+     {k:"conv",t:"Convulsão ou estado de mal epiléptico",w:"Anticonvulsivante; útil se a pressão estiver preservada"},
+     {k:"bronco",t:"Broncoespasmo com pressão preservada",w:"Atenua o reflexo de broncoconstrição"},
+     {k:"has",t:"Hipertensão ou emergência hipertensiva",w:"Ajuda a controlar o pico pressórico da laringoscopia"}]},
+  mid:{ci:[
+     {k:"choque",t:"Choque ou hipotensão",w:"Dose de indução derruba a pressão e o início é lento"}],
+   df:[
+     {k:"rapido",t:"Necessidade de início rápido (ISR clássica)",w:"Leva 2 a 5 minutos para efeito pleno: o paciente pode estar paralisado e ainda acordado"},
+     {k:"idoso",t:"Idoso",w:"Efeito prolongado e maior queda de pressão"}],
+   fa:[
+     {k:"conv",t:"Convulsão ou estado de mal epiléptico",w:"Anticonvulsivante; já faz parte do tratamento da crise"},
+     {k:"falta",t:"Indisponibilidade dos outros indutores",w:"Alternativa possível, respeitando o início lento"}]},
+  roc:{ci:[
+     {k:"alergia",t:"Anafilaxia prévia ao rocurônio",w:"Contraindicação absoluta"}],
+   df:[
+     {k:"semsug",t:"Via aérea difícil prevista sem sugamadex disponível",w:"O bloqueio dura 45 a 60 min e não há como revertê-lo rápido se não intubar nem oxigenar"}],
+   fa:[
+     {k:"k",t:"Hipercalemia conhecida ou provável",w:"Não libera potássio, ao contrário da succinilcolina"},
+     {k:"queim",t:"Queimado, imobilizado ou esmagamento há mais de 48–72 h",w:"Receptores proliferados: a succinilcolina pode causar hipercalemia grave"},
+     {k:"neuro",t:"Lesão medular, AVC antigo ou doença neuromuscular",w:"Mesma razão: evita o risco da succinilcolina"},
+     {k:"hm",t:"História de hipertermia maligna",w:"Não desencadeia hipertermia maligna"}]},
+  sux:{ci:[
+     {k:"k",t:"Hipercalemia conhecida ou provável",w:"Sobe o K⁺ em cerca de 0,5 mEq/L, e muito mais em alguns pacientes"},
+     {k:"queim",t:"Queimado, imobilizado ou esmagamento há mais de 48–72 h",w:"Receptores proliferados: risco de hipercalemia grave e parada"},
+     {k:"neuro",t:"Lesão medular, AVC com déficit ou doença neuromuscular",w:"Mesmo mecanismo de hipercalemia"},
+     {k:"hm",t:"História pessoal ou familiar de hipertermia maligna",w:"Desencadeante clássico"}],
+   df:[
+     {k:"bradi",t:"Bradicardia",w:"Pode causar bradicardia, sobretudo em doses repetidas"},
+     {k:"pseudo",t:"Deficiência conhecida de pseudocolinesterase",w:"Bloqueio prolongado por horas"}],
+   fa:[
+     {k:"curto",t:"Via aérea difícil prevista sem sugamadex disponível",w:"Bloqueio curto: o paciente volta a respirar em poucos minutos"},
+     {k:"neuroav",t:"Avaliação neurológica precoce necessária",w:"Efeito termina em cerca de 10 minutos"}]}
+ }
+};
+var STATE={na:{t:"Não avaliada",c:"na"},ev:{t:"Evitar",c:"ev"},de:{t:"Desfavorecida",c:"de"},fa:{t:"Favorecida",c:"fa"},va:{t:"Opção válida",c:"va"}};
+var LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function drugById(id){return DRUGS.filter(function(x){return x.id===id;})[0];}
+function stageOf(id){return STUDY.stages.filter(function(g){return g.drugs.indexOf(id)>=0;})[0];}
+function st(){if(!S.st)S.st={ind:[],ev:{}};return S.st;}
+function evOf(id){return st().ev[id];}
+function pick(list,keys){return list.filter(function(i){return keys.indexOf(i.k)>=0;});}
+function classify(id){
+  var e=evOf(id),D=STUDY.drugs[id];if(!e||!e.done)return "na";
+  if(pick(D.ci,e.c).length)return "ev";
+  if(pick(D.df,e.c).length)return "de";
+  if(e.f.length)return "fa";
+  return "va";
+}
+function reasons(id){
+  var e=evOf(id),D=STUDY.drugs[id],c=classify(id);
+  if(c==="ev")return pick(D.ci,e.c);
+  if(c==="de")return pick(D.df,e.c).concat(pick(D.fa,e.f));
+  if(c==="fa")return pick(D.fa,e.f);
+  return [];
+}
+function released(id){var c=classify(id);return c==="fa"||c==="va"||c==="de";}
+function indText(){var s=st();return STUDY.ind.filter(function(i){return s.ind.indexOf(i.k)>=0;}).map(function(i){return i.t;}).join(" · ");}
+
+/* ---------- tela Doses em modo estudo ---------- */
+var indEditing=false;
+function renderStudy(){
+  var on=document.body.classList.contains("study"),cp=$("calcPanel");
+  $("doseList").hidden=on;$("stList").hidden=!on;
+  if(!on){$("stTop").innerHTML="";$("doseList").parentNode.insertBefore(cp,$("doseList"));return;}
+  $("stList").parentNode.insertBefore(cp,$("stList").nextSibling);
+  var s=st(),h="";
+  if(!s.indOk||!s.ind.length||indEditing){
+    h+='<div class="stq"><div class="eyebrow">Modo Estudo · etapa 1</div><h2>Qual é a indicação da intubação?</h2><p>Marque uma ou mais. As drogas só abrem depois disso.</p>';
+    h+=STUDY.ind.map(function(i){return '<button class="opt'+(s.ind.indexOf(i.k)>=0?" on":"")+'" data-ind="'+i.k+'"><i></i><div><b>'+i.t+'</b><span>'+i.d+'</span></div></button>';}).join("");
+    h+='<button class="btn or block" id="indOk" style="margin-top:6px"'+(s.ind.length?"":" disabled")+'>'+(s.ind.length?"Confirmar indicação":"Marque ao menos uma indicação")+'</button></div>';
+  }else{
+    h+='<div class="indbar"><div><b>Indicação da IOT:</b> '+indText()+'</div><button id="indEdit">Editar</button></div>';
+  }
+  h+='<div class="rule"><span>Tem contraindicação?</span><i>sim → evitar · não ↓</i><span>Tem indicação?</span><i>sim → priorizar · não →</i><span>Opção válida</span></div>';
+  $("stTop").innerHTML=h;
+  qa("#stTop [data-ind]").forEach(function(b){b.addEventListener("click",function(){var k=b.getAttribute("data-ind"),i=s.ind.indexOf(k);if(i>=0)s.ind.splice(i,1);else s.ind.push(k);save();buzz(8);renderStudy();});});
+  if($("indOk"))$("indOk").addEventListener("click",function(){if(!s.ind.length)return;indEditing=false;s.indOk=true;addLog("info","Estudo · indicação: "+indText());save();renderLog();renderStudy();});
+  if($("indEdit"))$("indEdit").addEventListener("click",function(){indEditing=true;renderStudy();});
+  var locked=!s.indOk||!s.ind.length||indEditing,l="",n=0;
+  STUDY.stages.forEach(function(g){
+    l+='<div class="grp"><span>'+g.t.toUpperCase()+'</span><em>'+(g.k==="pre"?"opcional":"")+'</em></div><div class="card dl">';
+    g.drugs.forEach(function(id){l+=cardHtml(id,locked);if(classify(id)!=="na")n++;});
+    l+='</div>';
+  });
+  l+='<button class="btn block '+(n?"or":"")+'" id="toSua" style="margin-top:6px"'+(n?"":" disabled")+'>'+(n?"Ver sua ISR ("+n+" avaliada"+(n>1?"s":"")+")":"Avalie ao menos uma droga para ver sua ISR")+'</button>';
+  l+='<p class="extra">Push dose e sugamadex ficam fora da avaliação: use o app com o Modo Estudo desligado.</p>';
+  $("stList").innerHTML=l;
+  qa("#stList [data-ev]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();if(locked)return;openEval(b.getAttribute("data-ev"));});});
+  qa("#stList [data-calc]").forEach(function(b){b.addEventListener("click",function(e){e.stopPropagation();openDose(b.getAttribute("data-calc"));});});
+  if($("toSua"))$("toSua").addEventListener("click",function(){renderSua();go("sua");});
+}
+function cardHtml(id,locked){
+  var d=drugById(id),c=classify(id),S2=STATE[c],rs=reasons(id),btn;
+  if(c==="na")btn='<button class="mini2 '+(locked?"":"or")+'" data-ev="'+id+'"'+(locked?' disabled':'')+'>Avaliar</button>';
+  else if(released(id))btn='<button class="mini2 or" data-calc="'+id+'">Calcular dose</button><button class="mini2" data-ev="'+id+'">Rever</button>';
+  else btn='<button class="mini2" data-ev="'+id+'">Rever</button>';
+  var why=c==="va"?"Sem fator específico a favor ou contra":rs.map(function(r){return r.t;}).join(" · ");
+  return '<div class="sc2 s-'+S2.c+'">'+(c==="na"?'<span class="lk">'+LOCK+'</span>':'')+'<div class="nm"><b>'+d.n+'</b><span class="stt '+S2.c+'">'+S2.t+'</span>'+(why?'<span class="why2">'+why+'</span>':'')+'</div><div class="act2">'+btn+'</div></div>';
+}
+
+/* ---------- avaliação (bottom sheet) ---------- */
+var evId=null,evStep=1;
+function openEval(id){
+  evId=id;var e=st().ev[id];
+  if(!e){e=st().ev[id]={c:[],none1:false,f:[],none2:false,done:false};}
+  evStep=e.done?3:1;
+  $("evEye").textContent=stageOf(id).t;$("evTitle").textContent=drugById(id).n;
+  renderEval();$("scrim").className="scrim on";$("evSheet").className="sheet on";buzz();
+}
+function treeHtml(){
+  var e=evOf(evId),D=STUDY.drugs[evId],c=classify(evId);
+  var a1=e.done||evStep>1?(pick(D.ci,e.c).length?"Sim":(pick(D.df,e.c).length?"Relativa":"Não")):"";
+  var a2=(e.done&&!pick(D.ci,e.c).length)||evStep>2?(e.f.length?"Sim":"Não"):"";
+  var t1='<span class="'+(evStep===1?"cur":(a1?"done":""))+'">Contraindicação?'+(a1?" "+a1:"")+'</span>';
+  var t2=pick(D.ci,e.c).length&&e.done?"":'<i>→</i><span class="'+(evStep===2?"cur":(a2?"done":""))+'">Indicação?'+(a2?" "+a2:"")+'</span>';
+  var t3='<i>→</i><span class="'+(evStep===3?"cur":"")+'">'+(e.done?STATE[c].t:"Classificação")+'</span>';
+  return t1+t2+t3;
+}
+function optList(items,sel,noneOn,noneTxt,attr){
+  return items.map(function(i){return '<button class="opt'+(sel.indexOf(i.k)>=0?" on":"")+'" data-'+attr+'="'+i.k+'"><i></i><div><b>'+i.t+'</b></div></button>';}).join("")+
+    '<button class="opt none'+(noneOn?" on":"")+'" data-'+attr+'="__none"><i></i><div><b>'+noneTxt+'</b></div></button>';
+}
+function renderEval(){
+  var e=evOf(evId),D=STUDY.drugs[evId],b="";
+  $("evTree").innerHTML=treeHtml();
+  if(evStep===1){
+    b+='<div class="qh">Tem contraindicação ou motivo importante para evitar esta droga?</div>';
+    b+=optList(D.ci.concat(D.df),e.c,e.none1,"Nenhuma das anteriores","c");
+    b+='<button class="btn or block" id="evNext" style="margin-top:8px"'+(e.c.length||e.none1?"":" disabled")+'>Continuar</button>';
+  }else if(evStep===2){
+    var cs=pick(D.df,e.c);
+    if(cs.length)b+='<div class="prev"><b>Você marcou:</b> '+cs.map(function(i){return i.t;}).join(" · ")+'. Não é contraindicação absoluta; a droga segue na avaliação.</div>';
+    else b+='<div class="prev"><b>Contraindicação:</b> nenhuma.</div>';
+    b+='<div class="qh">Existe alguma indicação ou característica do paciente que favoreça esta droga?</div>';
+    b+=optList(D.fa,e.f,e.none2,"Nenhuma indicação específica","f");
+    b+='<div class="subrow" style="margin-top:8px"><button class="btn" id="evBack">Voltar</button><button class="btn or" id="evDone"'+(e.f.length||e.none2?"":" disabled")+'>Concluir</button></div>';
+  }else{
+    var c=classify(evId),rs=reasons(evId),txt={ev:"Dose bloqueada neste fluxo de estudo.",de:"Não é contraindicação absoluta. Se for usar, pese o motivo abaixo.",fa:"Priorize esta droga para este paciente.",va:"Sem contraindicação e sem indicação específica. Pode ser utilizada conforme julgamento clínico."}[c];
+    b+='<div class="res '+c+'"><div class="t">'+STATE[c].t.toUpperCase()+'</div><p>'+txt+'</p>';
+    if(rs.length)b+='<ul>'+rs.map(function(r){return '<li><b>'+r.t+'</b><small>'+r.w+'</small></li>';}).join("")+'</ul>';
+    b+='</div>';
+    if(released(evId))b+='<button class="btn or block huge" id="evCalc">Calcular dose</button>';
+    b+='<div class="subrow" style="margin-top:8px"><button class="btn" id="evBack">'+(c==="ev"?"Rever resposta":"Rever respostas")+'</button><button class="btn" id="evClose">Fechar</button></div>';
+  }
+  $("evBody").innerHTML=b;
+  qa("#evBody [data-c]").forEach(function(x){x.addEventListener("click",function(){toggleSel(e,"c","none1",x.getAttribute("data-c"));});});
+  qa("#evBody [data-f]").forEach(function(x){x.addEventListener("click",function(){toggleSel(e,"f","none2",x.getAttribute("data-f"));});});
+  if($("evNext"))$("evNext").addEventListener("click",function(){
+    if(pick(D.ci,e.c).length){finish();return;}
+    evStep=2;renderEval();});
+  if($("evDone"))$("evDone").addEventListener("click",finish);
+  if($("evBack"))$("evBack").addEventListener("click",function(){
+    if(evStep===3){e.done=false;evStep=pick(D.ci,e.c).length?1:2;}else evStep=1;save();renderEval();renderStudy();});
+  if($("evClose"))$("evClose").addEventListener("click",closeSheets);
+  if($("evCalc"))$("evCalc").addEventListener("click",function(){var id=evId;closeSheets();setTimeout(function(){openDose(id);},180);});
+}
+function toggleSel(e,arr,noneKey,k){
+  if(k==="__none"){e[noneKey]=!e[noneKey];if(e[noneKey])e[arr]=[];}
+  else{var i=e[arr].indexOf(k);if(i>=0)e[arr].splice(i,1);else{e[arr].push(k);e[noneKey]=false;}}
+  e.done=false;save();buzz(8);renderEval();
+}
+function finish(){
+  var e=evOf(evId),D=STUDY.drugs[evId];
+  if(pick(D.ci,e.c).length){e.f=[];e.none2=false;}
+  e.done=true;evStep=3;var c=classify(evId);
+  addLog("info","Estudo · "+drugById(evId).n+": "+STATE[c].t+(reasons(evId).length?" ("+reasons(evId).map(function(r){return r.t.toLowerCase();}).join("; ")+")":""));
+  save();renderLog();buzz([20,30,20]);renderEval();renderStudy();
+}
+
+/* ---------- Sua ISR ---------- */
+function renderSua(){
+  var s=st(),h='<div class="suag"><h3>Indicação da intubação</h3><p>'+(s.ind.length?indText():"Não definida")+'</p></div>';
+  STUDY.stages.forEach(function(g){
+    var ids=g.drugs.filter(function(id){return classify(id)!=="na";});
+    h+='<div class="suag"><h3>'+g.t+'</h3>'+(ids.length?'<div class="dl" style="padding:0">'+ids.map(function(id){return cardHtml(id,false);}).join("")+'</div>':'<div class="stEmpty">Nenhuma droga avaliada nesta etapa.</div>')+'</div>';
+  });
+  $("suaBody").innerHTML=h;
+  qa("#suaBody [data-ev]").forEach(function(b){b.addEventListener("click",function(){openEval(b.getAttribute("data-ev"));});});
+  qa("#suaBody [data-calc]").forEach(function(b){b.addEventListener("click",function(){openDose(b.getAttribute("data-calc"));});});
+}
+$("suaReview").addEventListener("click",function(){go("doses");});
+var suaArm=0;
+$("suaNew").addEventListener("click",function(){
+  var b=this;
+  if(suaArm&&now()-suaArm<3000){suaArm=0;S.st={ind:[],ev:{}};indEditing=false;addLog("info","Estudo · nova simulação");save();renderLog();b.textContent="Nova simulação";b.classList.remove("armed");renderStudy();go("doses");return;}
+  suaArm=now();b.textContent="Toque de novo para apagar";b.classList.add("armed");buzz(15);
+  setTimeout(function(){if(now()-suaArm>=2900){suaArm=0;b.textContent="Nova simulação";b.classList.remove("armed");}},3050);
+});
+
+function renderAll(){renderDoses();renderAlgo();renderCen();renderPos();renderLog();renderStudy();}
 renderAll();
 if(S.start&&S.step<STEPS.length)reqWake();
 
