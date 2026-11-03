@@ -7,9 +7,9 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Configuração do Supabase indisponível');
 const db=window.supabase.createClient(url,key);
-const S={role:null,units:[],sections:[],proposals:[],comments:[],view:'agenda',roster:{},busy:false,
+const S={role:null,userId:null,units:[],sections:[],proposals:[],comments:[],events:[],reads:{},view:'agenda',roster:{},busy:false,
  chatDraft:'',consensusDirty:false,proposalDirty:false,proposalDraft:'',proposalOwner:'',
- editVersion:null,typing:false,updated:false,replyTo:null,loading:false};
+ editVersion:null,typing:false,updated:false,replyTo:null,loading:false,rendered:false};
 const authors=['gil','diego'];
 const selected=()=>S.units.find(u=>u.id===S.view);
 const current=()=>S.sections.find(x=>x.unit_id===S.view);
@@ -22,14 +22,33 @@ const badge=s=>fixed(s)?'fixed':approved(s,'gil')||approved(s,'diego')?'review':
 const initials=a=>a==='diego'?'D':a==='gil'?'G':'✦';
 const date=t=>t?new Date(t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 const canEdit=()=>authors.includes(S.role);
+const notifyKinds=new Set(['create','edit','comment','approve','withdraw','reopen','resolve_comment','debate_consensus_edit','debate_approve','debate_reopen']);
+const relevantEvent=e=>e&&notifyKinds.has(e.kind)&&e.author_role!==S.role;
+const unitUnread=id=>{
+ const seen=Number(S.reads[id]||0);
+ return S.events.filter(e=>e.unit_id===id&&Number(e.id)>seen&&relevantEvent(e)).length;
+};
+const totalUnread=()=>S.units.reduce((n,u)=>n+unitUnread(u.id),0);
+const eventVerb=k=>({
+ create:'criou uma nova seção',
+ edit:'editou o material',
+ comment:'comentou',
+ approve:'aprovou uma versão',
+ withdraw:'retirou uma aprovação',
+ reopen:'reabriu uma revisão',
+ resolve_comment:'resolveu um comentário',
+ debate_consensus_edit:'atualizou o texto de consenso',
+ debate_approve:'aprovou o consenso',
+ debate_reopen:'reabriu o consenso'
+}[k]||'atualizou o material');
 function flash(txt,isError=false){
  const target=$('#toast');target.textContent=txt;target.className=isError?'toast error':'toast';
  target.hidden=false;clearTimeout(flash.timer);flash.timer=setTimeout(()=>{target.hidden=true},6400);
 }
 function sideUnit(u){
- const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec);
+ const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec),unread=unitUnread(u.id);
  return '<button class="nav-item '+(S.view===u.id?'selected':'')+'" data-open="'+esc(u.id)+'">'+
- '<span class="nav-name">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+'</span>'+
+ '<span class="nav-name">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+(unread?'<span class="unread-badge">'+unread+'</span>':'')+'</span>'+
  '<span class="nav-state '+badge(sec)+'">'+(fixed(sec)?'✓ ': '')+esc(st)+'</span></button>';
 }
 function renderSidebar(){
@@ -38,7 +57,10 @@ function renderSidebar(){
  const active=S.units.filter(u=>!fixed(S.sections.find(s=>s.unit_id===u.id))&&(u.id==='agenda'||created.some(x=>x.id===u.id)));
  const old=S.units.filter(u=>!created.some(x=>x.id===u.id)&&u.id!=='agenda'&&!fixed(S.sections.find(s=>s.unit_id===u.id)));
  const ps=S.proposals.filter(x=>x.shared).length;
+ const unread=totalUnread();
+ document.title=(unread?'('+unread+') ':'')+'CT-MED LIVE · Sala de construção';
  $('#nav').innerHTML=
+  (unread?'<div class="nav-section update-box"><div class="nav-heading">ATUALIZAÇÕES</div><button id="openUnread" class="nav-item unread-summary"><span class="nav-name">● '+unread+' não lida'+(unread===1?'':'s')+'</span><span class="nav-state">Abrir próxima</span></button></div>':'')+
   '<div class="nav-section"><div class="nav-heading">PONTO DE PARTIDA</div>'+
   '<button data-open="pedagogy" class="nav-item '+(S.view==='pedagogy'?'selected':'')+'"><span class="nav-name">Proposta Pedagógica Prévia</span><span class="nav-state">'+ps+'/2 compartilhadas</span></button></div>'+
   '<div class="nav-section"><div class="nav-heading">CARDS FIXOS · '+fixedOnes.length+'</div>'+
@@ -135,22 +157,58 @@ function renderReplyIndicator(){
 function render(){
  $('#identity').textContent=S.role?'Conectado como '+roleName(S.role):'Conta não identificada';
  renderSidebar();if(S.view==='pedagogy')renderPedagogy();else renderSection();
+ S.rendered=true;
+}
+function signature(){
+ return JSON.stringify({units:S.units,sections:S.sections,proposals:S.proposals,comments:S.comments,events:S.events,reads:S.reads,roster:S.roster});
+}
+function readingPosition(){
+ return {x:window.scrollX,y:window.scrollY,nav:$('#nav')?.scrollTop||0};
+}
+function restoreReadingPosition(pos){
+ requestAnimationFrame(()=>{
+  const root=document.documentElement,prev=root.style.scrollBehavior;
+  root.style.scrollBehavior='auto';
+  const maxY=Math.max(0,root.scrollHeight-window.innerHeight);
+  window.scrollTo(pos.x,Math.min(pos.y,maxY));
+  if($('#nav'))$('#nav').scrollTop=pos.nav;
+  requestAnimationFrame(()=>{root.style.scrollBehavior=prev});
+ });
 }
 async function load(){
- const [u,s,p,c,r]=await Promise.all([
+ const [u,s,p,c,e,reads,r]=await Promise.all([
   db.from('live_editorial_units').select('*').eq('lesson_id','sprint-isr').order('order_index'),
   db.from('live_debate_sections').select('*'),
   db.from('live_pedagogy_proposals').select('*'),
   db.from('live_editorial_comments').select('*').order('created_at'),
+  db.from('live_editorial_events').select('*').order('id',{ascending:false}).limit(750),
+  db.from('live_editorial_notification_reads').select('unit_id,last_seen_event_id'),
   db.rpc('live_editorial_roster')
  ]);
- for(const v of [u,s,p,c])if(v.error)throw Error(v.error.message);
- S.units=u.data||[];S.sections=s.data||[];S.proposals=p.data||[];S.comments=c.data||[];S.roster=r.data||{};
+ for(const v of [u,s,p,c,e,reads])if(v.error)throw Error(v.error.message);
+ S.units=u.data||[];S.sections=s.data||[];S.proposals=p.data||[];S.comments=c.data||[];S.events=e.data||[];
+ S.reads=Object.fromEntries((reads.data||[]).map(x=>[x.unit_id,Number(x.last_seen_event_id||0)]));
+ S.roster=r.data||{};
  if(!S.units.some(u=>u.id===S.view)&&S.view!=='pedagogy')S.view='agenda';
+}
+async function markRead(unitId){
+ if(!S.userId||!unitId||unitId==='pedagogy')return;
+ const latest=Math.max(0,...S.events.filter(e=>e.unit_id===unitId).map(e=>Number(e.id)||0));
+ if(latest<=Number(S.reads[unitId]||0))return;
+ const {error}=await db.from('live_editorial_notification_reads').upsert({
+  user_id:S.userId,unit_id:unitId,last_seen_event_id:latest,updated_at:new Date().toISOString()
+ },{onConflict:'user_id,unit_id'});
+ if(!error){S.reads[unitId]=latest;renderSidebar()}
 }
 async function refresh(silent=false){
  if(S.busy||S.consensusDirty||S.proposalDirty||S.typing){S.updated=true;return}
- try{await load();render();if(!silent)$('#conn').textContent='● Sincronizado';}
+ const before=signature(),pos=readingPosition();
+ try{
+  await load();
+  const changed=!S.rendered||before!==signature();
+  if(changed){render();restoreReadingPosition(pos)}
+  if(!silent)$('#conn').textContent='● Sincronizado';
+ }
  catch(e){$('#conn').textContent='● Falha de sincronização';if(!silent)flash(e.message,true)}
 }
 async function debate(action,text=''){
@@ -203,7 +261,14 @@ document.addEventListener('click',async e=>{
  if(b.dataset.open){
   if(S.consensusDirty||S.proposalDirty||S.chatDraft.trim())if(!confirm('Há texto não salvo. Descartar e mudar de seção?'))return;
   S.view=b.dataset.open;S.chatDraft='';S.replyTo=null;S.typing=false;S.consensusDirty=false;S.proposalDirty=false;
+  if(S.view!=='pedagogy')await markRead(S.view);
   render();return;
+ }
+ if(b.id==='openUnread'){
+  const next=S.units.find(u=>unitUnread(u.id)>0);
+  if(!next)return;
+  S.view=next.id;S.chatDraft='';S.replyTo=null;S.typing=false;S.consensusDirty=false;S.proposalDirty=false;
+  await markRead(S.view);render();return;
  }
  if(b.id==='addSection'){$('#sectionDialog').showModal();return}
  if(b.id==='cancelSection'){$('#sectionDialog').close();return}
@@ -245,14 +310,24 @@ document.addEventListener('submit',async e=>{
 async function start(){
  const {data:{session}}=await db.auth.getSession();
  if(!session){$('#page').innerHTML='<div class="card"><h1>Acesso da equipe</h1><p>Entre no Command Center com sua conta individual.</p><a href="../">Abrir login →</a></div>';return}
+ S.userId=session.user.id;
  const {data:role,error}=await db.rpc('live_editorial_role');
  if(error||!role){$('#page').innerHTML='<div class="card">Sua conta não está habilitada para a construção da LIVE.</div>';return}
  S.role=role;await refresh();
- db.channel('debate-live').on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh(true))
+ db.channel('debate-live')
+  .on('postgres_changes',{event:'INSERT',schema:'public',table:'live_editorial_events'},async payload=>{
+    const ev=payload.new;
+    if(relevantEvent(ev)){
+      const u=S.units.find(x=>x.id===ev.unit_id);
+      flash(roleName(ev.author_role)+' '+eventVerb(ev.kind)+(u?' · '+(u.id==='agenda'?'Esqueleto central da LIVE':u.title):''));
+    }
+    await refresh(true);
+  })
+  .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_comments'},()=>refresh(true))
   .on('postgres_changes',{event:'*',schema:'public',table:'live_debate_sections'},()=>refresh(true))
   .on('postgres_changes',{event:'*',schema:'public',table:'live_pedagogy_proposals'},()=>refresh(true))
   .on('postgres_changes',{event:'*',schema:'public',table:'live_editorial_units'},()=>refresh(true)).subscribe();
- setInterval(()=>{if(!S.busy&&!S.typing&&!S.consensusDirty&&!S.proposalDirty)refresh(true)},20000);
+ setInterval(()=>{if(!S.busy&&!S.typing&&!S.consensusDirty&&!S.proposalDirty)refresh(true)},60000);
 }
 start().catch(e=>{$('#page').innerHTML='<div class="card"><h2>Erro ao carregar debate</h2><p>'+esc(e.message)+'</p><a href="./revisao-legado.html">Abrir editor preservado</a></div>'});
 })();
