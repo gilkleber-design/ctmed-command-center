@@ -88,13 +88,22 @@ function flash(txt,isError=false){
  const target=$('#toast');target.textContent=txt;target.className=isError?'toast error':'toast';
  target.hidden=false;clearTimeout(flash.timer);flash.timer=setTimeout(()=>{target.hidden=true},6400);
 }
+function navStatus(sec){
+ if(fixed(sec))return {label:'Fixo',cls:'fixed'};
+ const st=status(sec);
+ if(st==='Revisão aberta')return {label:'Aberto',cls:'review'};
+ if(st==='Consenso em construção')return {label:'Construção',cls:'building'};
+ if(st==='Em debate')return {label:'Debate',cls:'review'};
+ return {label:st,cls:badge(sec)};
+}
 function sideUnit(u){
- const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec),unread=unitUnread(u.id),km=kindMeta(u.kind);
+ const sec=S.sections.find(s=>s.unit_id===u.id),unread=unitUnread(u.id),km=kindMeta(u.kind),ns=navStatus(sec);
+ const title=u.id==='agenda'?'Esqueleto central da LIVE':u.title;
  return '<button class="nav-item '+km.cls+' '+(S.view===u.id?'selected':'')+'" data-open="'+esc(u.id)+'">'+
  '<span class="nav-kind-dot '+km.cls+'" aria-hidden="true"></span>'+
- '<span class="nav-name"><span class="nav-title-line">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+(unread?'<span class="unread-badge">'+unread+'</span>':'')+'</span>'+
+ '<span class="nav-name"><span class="nav-title-line">'+esc(title)+(unread?'<span class="unread-badge">'+unread+'</span>':'')+'</span>'+
  '<span class="kind-mini '+km.cls+'">'+esc(km.short)+'</span></span>'+
- '<span class="nav-state '+badge(sec)+'">'+(fixed(sec)?'✓ ': '')+esc(st)+'</span></button>';
+ '<span class="nav-state '+ns.cls+'">'+(ns.cls==='fixed'?'<span aria-hidden="true">✓</span> ':'')+esc(ns.label)+'</span></button>';
 }
 function renderSidebar(){
  const fixedOnes=S.units.filter(u=>fixed(S.sections.find(s=>s.unit_id===u.id)));
