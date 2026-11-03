@@ -43,7 +43,7 @@ const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_
 if(!url||!key||!window.supabase)throw Error('Configuração do Supabase indisponível');
 const db=window.supabase.createClient(url,key);
 const S={role:null,userId:null,units:[],sections:[],proposals:[],comments:[],events:[],reads:{},view:'agenda',roster:{},busy:false,
- chatDraft:'',consensusDirty:false,proposalDirty:false,proposalDraft:'',proposalOwner:'',
+ chatDraft:'',consensusDirty:false,proposalDirty:false,proposalDraft:'',proposalOwner:'',editorCollapsed:{},
  editVersion:null,typing:false,updated:false,replyTo:null,loading:false,rendered:false};
 const authors=['gil','diego'];
 const selected=()=>S.units.find(u=>u.id===S.view);
@@ -147,9 +147,14 @@ function consensusCard(u,s){
  const msg='<div class="vote-box"><div class="vote"><span>Gil</span><span class="chip '+(approved(s,'gil')?'fixed':'private')+'">'+(approved(s,'gil')?'✓ Aprovou':'Pendente')+'</span></div><div class="vote"><span>Diego</span><span class="chip '+(approved(s,'diego')?'fixed':'private')+'">'+(approved(s,'diego')?'✓ Aprovou':'Pendente')+'</span></div></div>';
  const editing=canEdit()&&!isFixed;
  const text=S.consensusDirty&&S.editVersion===s.version?S._consensusTemp:s.consensus_text;
+ const editorCollapsed=editing&&!!S.editorCollapsed[S.view]&&!!String(text||'').trim();
  return '<section class="consensus card '+(isFixed?'fixed-card':'')+'"><div class="split"><h2>Texto de consenso</h2><span class="chip '+(isFixed?'fixed':one?'review':'private')+'">'+status(s)+'</span></div>'+
  '<p class="small">'+(isFixed?'Card fixo. Alterações exigem nova revisão e dupla aprovação.':'Escrevam aqui apenas o texto que querem consolidar. As propostas individuais e o chat permanecem intactos.')+'</p>'+
- (editing?'<textarea id="consensusInput" rows="13" placeholder="Após a discussão, formulem aqui o texto que ambos poderão aprovar.">'+esc(text||'')+'</textarea>'+
+ (editing?'<div class="consensus-editor '+(editorCollapsed?'collapsed':'')+'">'+
+   '<div class="consensus-editor-head"><div><strong>Texto-fonte</strong><span class="small"> Cole ou ajuste o conteúdo bruto aqui.</span></div>'+
+   '<button type="button" id="toggleConsensusEditor" class="editor-toggle" aria-expanded="'+(!editorCollapsed)+'">'+(editorCollapsed?'Editar texto':'Recolher')+'</button></div>'+
+   '<div class="consensus-editor-body"><textarea id="consensusInput" rows="13" placeholder="Após a discussão, formulem aqui o texto que ambos poderão aprovar.">'+esc(text||'')+'</textarea></div>'+
+  '</div>'+
   '<div class="consensus-preview"><div class="preview-label">VISUALIZAÇÃO PARA APROVAÇÃO</div><div id="consensusPreview" class="rich-text">'+richText(text||'Comece a escrever para ver a versão formatada aqui.')+'</div></div>':
   '<div class="consensus-read rich-text">'+richText(isFixed?lockedText:s.consensus_text||'Ainda não há uma formulação consensual.')+'</div>')+
  (s.fixed_version&&!isFixed?'<div class="previous"><strong>Último consenso fixo · v'+s.fixed_version+'</strong><div class="rich-text compact">'+richText(s.fixed_text)+'</div></div>':'')+
@@ -309,6 +314,16 @@ document.addEventListener('click',async e=>{
  if(b.id==='addSection'){$('#sectionDialog').showModal();return}
  if(b.id==='cancelSection'){$('#sectionDialog').close();return}
  if(b.id==='cancelReply'){S.replyTo=null;$('#replyIndicator').innerHTML='';$('#replyIndicator').hidden=true;return}
+ if(b.id==='toggleConsensusEditor'){
+  const box=b.closest('.consensus-editor');if(!box)return;
+  const next=!box.classList.contains('collapsed');
+  S.editorCollapsed[S.view]=next;
+  box.classList.toggle('collapsed',next);
+  b.textContent=next?'Editar texto':'Recolher';
+  b.setAttribute('aria-expanded',String(!next));
+  if(!next)setTimeout(()=>$('#consensusInput')?.focus(),0);
+  return;
+ }
  if(b.dataset.reply){
   S.replyTo=Number(b.dataset.reply);const ref=$('#replyIndicator');
   if(ref){ref.innerHTML=renderReplyIndicator();ref.hidden=false}
@@ -328,7 +343,20 @@ document.addEventListener('click',async e=>{
 document.addEventListener('input',e=>{
  if(e.target.id==='chatText'){S.chatDraft=e.target.value;S.typing=!!S.chatDraft;return}
  if(e.target.id==='myProposal'){S.proposalDirty=true;S.proposalDraft=e.target.value;return}
- if(e.target.id==='consensusInput'){S.consensusDirty=true;S._consensusTemp=e.target.value;S.editVersion=current()?.version;const p=$('#consensusPreview');if(p)p.innerHTML=richText(e.target.value||'Comece a escrever para ver a versão formatada aqui.');return}
+ if(e.target.id==='consensusInput'){
+  S.consensusDirty=true;S._consensusTemp=e.target.value;S.editVersion=current()?.version;
+  const p=$('#consensusPreview');if(p)p.innerHTML=richText(e.target.value||'Comece a escrever para ver a versão formatada aqui.');
+  if(e.inputType==='insertFromPaste'&&e.target.value.trim()){
+   S.editorCollapsed[S.view]=true;
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const box=e.target.closest('.consensus-editor');if(!box)return;
+    box.classList.add('collapsed');
+    const b=$('#toggleConsensusEditor');if(b){b.textContent='Editar texto';b.setAttribute('aria-expanded','false')}
+    p?.scrollIntoView({block:'nearest'});
+   }));
+  }
+  return;
+ }
 });
 document.addEventListener('submit',async e=>{
  if(e.target.id==='chatForm'){e.preventDefault();await sendChat();return}
