@@ -228,3 +228,89 @@ dialog::backdrop{background:#03101cc9}dialog label{font-size:12px;color:#d3e4f2}
 .consensus-editor.collapsed .consensus-editor-head .small{
   display:none;
 }
+
+
+/* Tipos editoriais: Caso clínico x Planejamento */
+.section-type-row{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex-wrap:wrap;
+}
+.kind-pill,.kind-mini{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  border-radius:999px;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.kind-pill{
+  padding:4px 9px;
+  font-size:9px;
+  border:1px solid currentColor;
+}
+.kind-mini{
+  margin-top:4px;
+  padding:2px 6px;
+  font-size:8px;
+  border:1px solid transparent;
+}
+.kind-case{--kind:#ff9a2f;--kind-bg:#3a2413}
+.kind-topic{--kind:#76c9e8;--kind-bg:#102f40}
+.kind-scene{--kind:#b9a8ff;--kind-bg:#282145}
+.kind-intro{--kind:#9bd6b2;--kind-bg:#163326}
+.kind-closing{--kind:#e7c576;--kind-bg:#362c17}
+.kind-agenda{--kind:#aebfd4;--kind-bg:#1a2838}
+.kind-default{--kind:#9fb4c8;--kind-bg:#1a2938}
+
+.kind-pill.kind-case,.kind-mini.kind-case,
+.kind-pill.kind-topic,.kind-mini.kind-topic,
+.kind-pill.kind-scene,.kind-mini.kind-scene,
+.kind-pill.kind-intro,.kind-mini.kind-intro,
+.kind-pill.kind-closing,.kind-mini.kind-closing,
+.kind-pill.kind-agenda,.kind-mini.kind-agenda,
+.kind-pill.kind-default,.kind-mini.kind-default{
+  color:var(--kind);
+  background:var(--kind-bg);
+}
+.kind-mini.kind-case,.kind-mini.kind-topic,.kind-mini.kind-scene,
+.kind-mini.kind-intro,.kind-mini.kind-closing,.kind-mini.kind-agenda,.kind-mini.kind-default{
+  border-color:color-mix(in srgb,var(--kind) 45%,transparent);
+}
+
+.nav-item{
+  position:relative;
+}
+.nav-kind-dot{
+  width:7px;
+  height:7px;
+  margin-top:5px;
+  border-radius:50%;
+  flex:0 0 auto;
+  background:var(--kind);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--kind) 13%,transparent);
+}
+.nav-item.kind-case{
+  border-left:2px solid color-mix(in srgb,#ff9a2f 70%,transparent);
+}
+.nav-item.kind-topic{
+  border-left:2px solid color-mix(in srgb,#76c9e8 65%,transparent);
+}
+.nav-title-line{display:block}
+.page-title.kind-case{
+  border-left:3px solid #ff9a2f;
+  padding-left:14px;
+}
+.page-title.kind-topic{
+  border-left:3px solid #76c9e8;
+  padding-left:14px;
+}
+
+@supports not (color:color-mix(in srgb,white 50%,black)){
+  .kind-mini{border-color:#45627b}
+  .nav-kind-dot{box-shadow:none}
+  .nav-item.kind-case{border-left-color:#ff9a2f}
+  .nav-item.kind-topic{border-left-color:#76c9e8}
+}
