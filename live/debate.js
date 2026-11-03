@@ -114,9 +114,9 @@ function renderSidebar(){
  const unread=totalUnread();
  document.title=(unread?'('+unread+') ':'')+'CT-MED LIVE · Sala de construção';
  $('#nav').innerHTML=
-  (unread?'<div class="nav-section update-box"><div class="nav-heading">ATUALIZAÇÕES</div><button id="openUnread" class="nav-item unread-summary"><span class="nav-name">● '+unread+' não lida'+(unread===1?'':'s')+'</span><span class="nav-state">Abrir próxima</span></button></div>':'')+
+  (unread?'<div class="nav-section update-box"><div class="nav-heading">ATUALIZAÇÕES</div><button id="openUnread" class="nav-item unread-summary"><span class="unread-copy"><strong>'+unread+'</strong><span>não lida'+(unread===1?'':'s')+'</span></span><span class="nav-state">Abrir próxima →</span></button></div>':'')+
   '<div class="nav-section"><div class="nav-heading">PONTO DE PARTIDA</div>'+
-  '<button data-open="pedagogy" class="nav-item '+(S.view==='pedagogy'?'selected':'')+'"><span class="nav-name">Proposta Pedagógica Prévia</span><span class="nav-state">'+ps+'/2 compartilhadas</span></button></div>'+
+  '<button data-open="pedagogy" class="nav-item plain-nav '+(S.view==='pedagogy'?'selected':'')+'"><span class="nav-name">Proposta Pedagógica Prévia</span><span class="nav-state">'+ps+'/2 compartilhadas</span></button></div>'+
   '<div class="nav-section"><div class="nav-heading">CARDS FIXOS · '+fixedOnes.length+'</div>'+
    (fixedOnes.length?fixedOnes.map(sideUnit).join(''):'<p class="nav-empty">Os consensos aprovados pelos dois professores aparecerão aqui.</p>')+'</div>'+
   '<div class="nav-section"><div class="nav-heading">EM DEBATE</div>'+active.map(sideUnit).join('')+
