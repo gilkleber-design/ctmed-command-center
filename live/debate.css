@@ -413,3 +413,134 @@ dialog::backdrop{background:#03101cc9}dialog label{font-size:12px;color:#d3e4f2}
     grid-template-columns:8px minmax(0,1fr) auto;
   }
 }
+
+
+/* Sidebar utilitária: atualizações e ponto de partida */
+.unread-summary,
+.plain-nav{
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+}
+.update-box{
+  padding:10px;
+  border:1px solid #6b4d1d;
+  border-radius:13px;
+  background:#241b10;
+  margin-bottom:14px;
+}
+.update-box .nav-heading{
+  margin:0 4px 8px;
+  color:#d3b276;
+}
+.unread-summary{
+  padding:10px 11px;
+  background:#2e2114;
+  border-color:#69481d;
+}
+.unread-summary:hover{
+  background:#3a2917;
+  border-color:#8a6027;
+}
+.unread-copy{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+  min-width:0;
+  color:#ffd99c;
+}
+.unread-copy strong{
+  font-size:17px;
+  line-height:1;
+  color:#ffe0a6;
+}
+.unread-copy span{
+  font-size:11px;
+  line-height:1.2;
+  font-weight:750;
+  white-space:nowrap;
+}
+.unread-summary .nav-state{
+  color:#c8d9e6;
+  border-color:#3c5972;
+  background:#13283b;
+}
+.plain-nav{
+  padding:11px 12px;
+}
+.plain-nav .nav-name{
+  font-size:12px;
+  line-height:1.35;
+}
+.plain-nav .nav-state{
+  color:#afc3d5;
+  border-color:#3a536a;
+  background:#102336;
+}
+
+@media(max-width:850px){
+  .left{
+    padding:18px 18px 20px;
+  }
+  .left h2{
+    font-size:18px;
+    margin-left:0;
+  }
+  .identity{
+    margin-left:0;
+  }
+  .left .eyebrow{
+    margin-left:0;
+  }
+  .nav-heading{
+    margin-left:3px;
+  }
+  .nav-item{
+    grid-template-columns:8px minmax(0,1fr);
+    column-gap:10px;
+    padding:10px 10px;
+  }
+  .nav-item .nav-state{
+    grid-column:2;
+    justify-self:start;
+    margin-top:6px;
+  }
+  .unread-summary,
+  .plain-nav{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+  .unread-summary .nav-state,
+  .plain-nav .nav-state{
+    grid-column:2;
+    justify-self:end;
+    margin-top:0;
+  }
+  .unread-copy{
+    align-items:center;
+  }
+  .unread-copy strong{
+    font-size:16px;
+  }
+  .unread-copy span{
+    white-space:normal;
+  }
+}
+
+@media(max-width:520px){
+  .update-box{
+    padding:9px;
+  }
+  .unread-summary,
+  .plain-nav{
+    grid-template-columns:1fr;
+    row-gap:8px;
+  }
+  .unread-summary .nav-state,
+  .plain-nav .nav-state{
+    grid-column:1;
+    justify-self:start;
+    margin-top:0;
+  }
+  .unread-copy{
+    justify-content:flex-start;
+  }
+}
