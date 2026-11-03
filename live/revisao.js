@@ -196,6 +196,35 @@ function renderDiscussion(){
  $('#discussion').innerHTML=content;
 }
 function render(){renderSidebar();renderWork();renderDiscussion()}
+function dataSignature(){
+ return JSON.stringify({
+  units:S.units,
+  comments:S.comments,
+  events:S.events,
+  release:S.release,
+  aiSuggestions:S.aiSuggestions,
+  roster:S.roster
+ });
+}
+function readingPosition(){
+ return {
+  x:window.scrollX,
+  y:window.scrollY,
+  sidebar:document.querySelector('#unitList')?.scrollTop||0
+ };
+}
+function restoreReadingPosition(pos){
+ requestAnimationFrame(()=>{
+  const root=document.documentElement;
+  const previous=root.style.scrollBehavior;
+  root.style.scrollBehavior='auto';
+  const maxY=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+  window.scrollTo(pos.x,Math.min(pos.y,maxY));
+  const sidebar=document.querySelector('#unitList');
+  if(sidebar)sidebar.scrollTop=pos.sidebar;
+  requestAnimationFrame(()=>{root.style.scrollBehavior=previous});
+ });
+}
 async function fetchAll(){
  const [ur,cr,er,rr,ar]=await Promise.all([
  db.from('live_editorial_units').select('*').eq('lesson_id',ID).order('order_index'),
@@ -211,9 +240,17 @@ async function fetchAll(){
 async function refresh(){
  if(S.working)return;
  if(S.dirty||S.composing){S.pendingRefresh=true;$('#conn').textContent='● Outra atualização disponível';return}
- await fetchAll();const now=selected();
+ const before=dataSignature();
+ const pos=readingPosition();
+ await fetchAll();
+ const after=dataSignature();
+ const now=selected();
  if(now&&(S._draftFor!==S.selected||S.baseRev!==now.revision)){S.draft=null;S._draftFor=null}
- render();$('#conn').textContent='● Sincronizado';
+ if(before!==after){
+  render();
+  restoreReadingPosition(pos);
+ }
+ $('#conn').textContent='● Sincronizado';
 }
 async function action(kind,payload={}){
  if(S.working)return;const u=selected();if(!u)return;
