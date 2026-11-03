@@ -70,3 +70,11 @@ dialog{background:#0e2135;color:white;border:1px solid #3e5c78;border-radius:15p
 dialog::backdrop{background:#03101cc9}dialog label{font-size:12px;color:#d3e4f2}dialog input,dialog select{margin:7px 0 15px}
 @media(max-width:1120px){.editor-grid{grid-template-columns:1fr}.thread{max-height:540px}.consensus{order:2}}
 @media(max-width:850px){.shell{display:block}.left{border-right:0;border-bottom:1px solid var(--stroke);padding:12px 14px}.nav-section{margin:8px 0}.main{padding:22px 15px 65px}.proposal-grid{grid-template-columns:1fr}.topbar{height:auto;flex-wrap:wrap}.top-links{gap:11px}.title-split{align-items:flex-start}.proposal-card textarea{min-height:260px}.nav-section .nav-empty{margin-bottom:10px}.archived:not([open]){padding-bottom:8px}}
+
+/* Atualizações não lidas */
+.unread-badge{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;padding:0 6px;margin-left:7px;border-radius:999px;background:var(--orange);color:#101723;font-size:10px;font-weight:950;vertical-align:middle}
+.update-box{padding:8px;border:1px solid #6b4d1d;border-radius:11px;background:#2b2112;margin-bottom:10px}
+.update-box .nav-heading{margin-top:1px}
+.unread-summary{background:#362816;border-color:#765421}
+.unread-summary:hover{background:#47341b}
+.unread-summary .nav-name{color:#ffd99c}
