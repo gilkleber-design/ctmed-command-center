@@ -4,35 +4,35 @@
 const $=q=>document.querySelector(q);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const mdInline=x=>esc(x)
- .replace(/\\*\\*(.+?)\\*\\*/g,'<strong>$1</strong>')
- .replace(/\\`([^\\`]+)\\`/g,'<code>$1</code>')
- .replace(/\\*([^*]+)\\*/g,'<em>$1</em>');
+ .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+ .replace(/\`([^\`]+)\`/g,'<code>$1</code>')
+ .replace(/\*([^*]+)\*/g,'<em>$1</em>');
 function richText(raw){
- const lines=String(raw??'').replace(/\\r/g,'').split('\\n');
+ const lines=String(raw??'').replace(/\r/g,'').split('\n');
  const out=[];let inList=false;
  const closeList=()=>{if(inList){out.push('</ul>');inList=false}};
- const cells=row=>row.trim().replace(/^\\|/,'').replace(/\\|$/,'').split('|').map(x=>x.trim());
+ const cells=row=>row.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(x=>x.trim());
  const isSep=row=>{const a=cells(row);return a.length>0&&a.every(x=>/^:?-{3,}:?$/.test(x))};
  for(let i=0;i<lines.length;i++){
   const t=lines[i].trim();
   if(!t){closeList();out.push('<div class="rich-gap"></div>');continue}
-  if(/^\\|.*\\|$/.test(t)&&i+1<lines.length&&isSep(lines[i+1])){
+  if(/^\|.*\|$/.test(t)&&i+1<lines.length&&isSep(lines[i+1])){
    closeList();const head=cells(t);const rows=[];i+=2;
-   while(i<lines.length&&/^\\|.*\\|$/.test(lines[i].trim())){rows.push(cells(lines[i]));i++}
+   while(i<lines.length&&/^\|.*\|$/.test(lines[i].trim())){rows.push(cells(lines[i]));i++}
    i--;
    out.push('<div class="rich-table-wrap"><table class="rich-table"><thead><tr>'+head.map(x=>'<th>'+mdInline(x)+'</th>').join('')+'</tr></thead><tbody>'+
     rows.map(r=>'<tr>'+r.map(x=>'<td>'+mdInline(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>');
    continue;
   }
   if(/^---+$/.test(t)){closeList();out.push('<hr>');continue}
-  const h=t.match(/^(#{1,4})\\s+(.+)$/);
+  const h=t.match(/^(#{1,4})\s+(.+)$/);
   if(h){closeList();const level=Math.min(4,h[1].length+1);out.push('<h'+level+'>'+mdInline(h[2])+'</h'+level+'>');continue}
-  if(/^>\\s?/.test(t)){closeList();out.push('<blockquote>'+mdInline(t.replace(/^>\\s?/,''))+'</blockquote>');continue}
-  const bullet=t.match(/^[-*•]\\s+(.+)$/);
+  if(/^>\s?/.test(t)){closeList();out.push('<blockquote>'+mdInline(t.replace(/^>\s?/,''))+'</blockquote>');continue}
+  const bullet=t.match(/^[-*•]\s+(.+)$/);
   if(bullet){if(!inList){out.push('<ul>');inList=true}out.push('<li>'+mdInline(bullet[1])+'</li>');continue}
-  const step=t.match(/^→\\s*(.+)$/);
+  const step=t.match(/^→\s*(.+)$/);
   if(step){closeList();out.push('<div class="rich-step">→ <span>'+mdInline(step[1])+'</span></div>');continue}
-  const choice=t.match(/^(○|◯|☐|☑|✅|🔴|🟠|🟢|⚪|🔒)\\s*(.+)$/);
+  const choice=t.match(/^(○|◯|☐|☑|✅|🔴|🟠|🟢|⚪|🔒)\s*(.+)$/);
   if(choice){closeList();out.push('<div class="rich-choice"><span>'+choice[1]+'</span><span>'+mdInline(choice[2])+'</span></div>');continue}
   closeList();out.push('<p>'+mdInline(t)+'</p>');
  }
