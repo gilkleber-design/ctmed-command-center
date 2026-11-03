@@ -173,3 +173,58 @@ dialog::backdrop{background:#03101cc9}dialog label{font-size:12px;color:#d3e4f2}
     margin-bottom:4px;
   }
 }
+
+
+/* Editor de consenso recolhível */
+.consensus-editor{
+  margin-top:10px;
+  border:1px solid #2f4d68;
+  border-radius:11px;
+  background:#0a1a2b;
+  overflow:hidden;
+}
+.consensus-editor-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  background:#10243a;
+  border-bottom:1px solid #29445d;
+}
+.consensus-editor-head strong{font-size:12px}
+.editor-toggle{
+  flex:0 0 auto;
+  border:1px solid #456885;
+  background:#16314a;
+  color:#cce8f8;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:750;
+}
+.editor-toggle:hover{background:#20435f}
+.consensus-editor-body{
+  max-height:430px;
+  opacity:1;
+  overflow:hidden;
+  transition:max-height .2s ease,opacity .15s ease;
+}
+.consensus-editor-body textarea{
+  margin:0;
+  border:0;
+  border-radius:0;
+  min-height:250px;
+  background:#08192b;
+}
+.consensus-editor.collapsed .consensus-editor-head{
+  border-bottom:0;
+}
+.consensus-editor.collapsed .consensus-editor-body{
+  max-height:0;
+  opacity:0;
+  pointer-events:none;
+}
+.consensus-editor.collapsed .consensus-editor-head .small{
+  display:none;
+}
