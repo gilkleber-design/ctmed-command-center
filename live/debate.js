@@ -50,6 +50,14 @@ const selected=()=>S.units.find(u=>u.id===S.view);
 const current=()=>S.sections.find(x=>x.unit_id===S.view);
 const myProposal=()=>S.proposals.find(p=>p.author_role===S.role);
 const roleName=x=>x==='gil'?'Gil':x==='diego'?'Diego':x==='ia'?'IA':String(x||'').toUpperCase();
+const kindMeta=k=>({
+ case:{label:'CASO CLÍNICO',short:'CASO',cls:'kind-case'},
+ topic:{label:'PLANEJAMENTO',short:'PLANEJAMENTO',cls:'kind-topic'},
+ scene:{label:'CENA',short:'CENA',cls:'kind-scene'},
+ intro:{label:'ABERTURA',short:'ABERTURA',cls:'kind-intro'},
+ closing:{label:'FECHAMENTO',short:'FECHAMENTO',cls:'kind-closing'},
+ agenda:{label:'ROTEIRO',short:'ROTEIRO',cls:'kind-agenda'}
+}[k]||{label:String(k||'SEÇÃO').toUpperCase(),short:String(k||'SEÇÃO').toUpperCase(),cls:'kind-default'});
 const fixed=x=>x&&x.fixed_version===x.version;
 const approved=(s,a)=>s&&s[a+'_approved_version']===s.version;
 const status=s=>fixed(s)?'Fixo':s?.fixed_version?'Revisão aberta':approved(s,'gil')||approved(s,'diego')?'Uma aprovação':s?.consensus_text?'Consenso em construção':'Em debate';
@@ -81,9 +89,11 @@ function flash(txt,isError=false){
  target.hidden=false;clearTimeout(flash.timer);flash.timer=setTimeout(()=>{target.hidden=true},6400);
 }
 function sideUnit(u){
- const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec),unread=unitUnread(u.id);
- return '<button class="nav-item '+(S.view===u.id?'selected':'')+'" data-open="'+esc(u.id)+'">'+
- '<span class="nav-name">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+(unread?'<span class="unread-badge">'+unread+'</span>':'')+'</span>'+
+ const sec=S.sections.find(s=>s.unit_id===u.id),st=status(sec),unread=unitUnread(u.id),km=kindMeta(u.kind);
+ return '<button class="nav-item '+km.cls+' '+(S.view===u.id?'selected':'')+'" data-open="'+esc(u.id)+'">'+
+ '<span class="nav-kind-dot '+km.cls+'" aria-hidden="true"></span>'+
+ '<span class="nav-name"><span class="nav-title-line">'+esc(u.id==='agenda'?'Esqueleto central da LIVE':u.title)+(unread?'<span class="unread-badge">'+unread+'</span>':'')+'</span>'+
+ '<span class="kind-mini '+km.cls+'">'+esc(km.short)+'</span></span>'+
  '<span class="nav-state '+badge(sec)+'">'+(fixed(sec)?'✓ ': '')+esc(st)+'</span></button>';
 }
 function renderSidebar(){
@@ -171,12 +181,13 @@ function renderSection(){
  const u=selected(),s=current();
  if(!u||!s){$('#page').innerHTML='<div class="card">Seção não encontrada. Atualize a página.</div>';return}
  const label=u.id==='agenda'?'Esqueleto central da LIVE':u.title;
+ const km=kindMeta(u.kind);
  const n=S.comments.filter(c=>c.unit_id===u.id).length;
  const prior=authors.filter(a=>S.proposals.some(p=>p.author_role===a&&p.shared));
  const comparison=u.id==='agenda'?
   '<div class="info-note"><strong>Propostas pedagógicas originais:</strong> '+(prior.length?prior.map(a=>roleName(a)).join(' e ')+' compartilhou sua proposta.':'Ambas continuam privadas até que cada autor as compartilhe.')+
   ' <button data-open="pedagogy" class="inline-button">Ver propostas →</button></div>':'';
- $('#page').innerHTML='<div class="page-title"><div class="eyebrow">SEÇÃO EM ANÁLISE · '+esc(u.kind.toUpperCase())+'</div>'+
+ $('#page').innerHTML='<div class="page-title '+km.cls+'"><div class="section-type-row"><div class="eyebrow">SEÇÃO EM ANÁLISE</div><span class="kind-pill '+km.cls+'">'+esc(km.label)+'</span></div>'+
  '<div class="split title-split"><h1>'+esc(label)+'</h1><span class="chip '+(fixed(s)?'fixed':'review')+'">'+status(s)+'</span></div>'+
  '<p>A discussão e o consenso abaixo pertencem exclusivamente a este card. Mensagens de outros casos não aparecem aqui.</p></div>'+
  comparison+
