@@ -76,7 +76,7 @@ function render(){
   '<p>O esqueleto pedagógico continua preservado. Aqui cada etapa recebe fala de Gil, fala de Diego, slide para o público e comando técnico. Salvar modifica apenas o roteiro e reinicia as aprovações do bloco.</p>'+
   '<div class="actions">'+progress+'<span class="tag">Conectado como '+(model.role==='gil'?'Gil':'Diego')+'</span>'+
   '<span class="caption">v'+(model.published_version||0)+' publicada · '+percent+'% aprovado</span></div></div>'+
-  '<div class="actions"><a href="./maestro.html?view=maestro&amp;preview=1" class="primary" style="display:inline-block;padding:11px 13px;border-radius:9px;color:#101923;font-weight:850">Pré-visualizar roteiro →</a></div></div>'+
+  '<div class="actions"><a href="./maestro.html?view=maestro&amp;preview=1" class="primary" style="display:inline-block;padding:11px 13px;border-radius:9px;color:#101923;font-weight:850">Pré-visualizar roteiro →</a><button data-act="publish" '+(busy||done!==blocks.length||dirty?'disabled':'')+'>Publicar roteiro aprovado</button></div></div>'+
   '<div class="layout"><aside class="panel sidebar"><h3>Blocos da apresentação</h3><div class="blocklist">'+
   blocks.map(b=>'<button class="block '+(b.id===blockId?'active':'')+'" data-block="'+esc(b.id)+'">'+
    '<span>'+esc(b.title)+'</span><span class="dots '+(fullyApproved(b)?'ok':'')+'">'+(fullyApproved(b)?'✓':b.gil_approved||b.diego_approved?'●':'○')+'</span></button>').join('')+
@@ -215,6 +215,7 @@ root.addEventListener('click',async e=>{
  if(b.id==='publish'){await publish();return}
  if(!b.dataset.act)return;
  const t=b.dataset.act;
+ if(t==='publish')return publish();
  if(t==='save')return action('save_step');
  if(t==='approve')return action('approve');
  if(t==='withdraw')return action('withdraw');
