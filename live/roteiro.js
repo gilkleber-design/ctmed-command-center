@@ -160,7 +160,7 @@ async function action(type,more={}){
   const r=await db.rpc('live_script_action',{p_action:type,p_block_id:b.id,
     p_step_id:more.stepId||stepId,p_payload:payload,p_expected_revision:b.revision});
   if(r.error)throw Error(r.error.message);
-  dirty=false;lastReference='';
+  dirty=false;lastReference='';busy=false;
   await load(true);
   flash(type==='save_step'?'Etapa salva. Aprovações do bloco reiniciadas se necessário.':
     type==='approve'?'Sua aprovação foi registrada para a revisão atual.':
@@ -176,7 +176,7 @@ async function publish(){
  try{
   const r=await db.rpc('live_script_publish');
   if(r.error)throw Error(r.error.message);
-  await load(true);
+  busy=false;await load(true);
   flash('Roteiro operacional v'+r.data.version+' publicado com '+r.data.steps+' etapas. O Maestro está em ensaio.');
  }catch(e){flash('Publicação bloqueada: '+e.message,true)}finally{busy=false}
 }
@@ -191,7 +191,7 @@ async function upload(file){
   const path='sprint-isr/'+crypto.randomUUID()+'-'+cleaned;
   const {error}=await db.storage.from(BUCKET).upload(path,file,{contentType:file.type,upsert:false});
   if(error)throw Error(error.message);
-  draft.slide_asset_path=path;dirty=true;uploadedPath=path;
+  draft.slide_asset_path=path;dirty=true;uploadedPath=path;busy=false;
   render();
   flash('Imagem enviada e anexada à etapa. Clique em "Salvar esta etapa" para confirmar.');
  }catch(e){flash('Falha ao enviar slide: '+e.message,true)}finally{busy=false}
