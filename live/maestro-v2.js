@@ -3,6 +3,27 @@
 const root=document.getElementById('root'),BUCKET='ctmed-live-slides';
 const $=s=>document.querySelector(s);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+const mdInline=x=>esc(x)
+ .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+ .replace(/\`([^\`]+)\`/g,'<code>$1</code>')
+ .replace(/\*([^*]+)\*/g,'<em>$1</em>');
+function richText(raw){
+ const lines=String(raw??'').replace(/\r/g,'').split('\n');
+ const out=[];let inList=false;
+ const closeList=()=>{if(inList){out.push('</ul>');inList=false}};
+ for(const line of lines){
+  const t=line.trim();
+  if(!t){closeList();out.push('<div class="rich-gap"></div>');continue}
+  if(/^---+$/.test(t)){closeList();out.push('<hr>');continue}
+  const hd=t.match(/^(#{1,4})\s+(.+)$/);
+  if(hd){closeList();const n=Math.min(4,hd[1].length+1);out.push('<h'+n+'>'+mdInline(hd[2])+'</h'+n+'>');continue}
+  if(/^>\s?/.test(t)){closeList();out.push('<blockquote>'+mdInline(t.replace(/^>\s?/,''))+'</blockquote>');continue}
+  const bullet=t.match(/^[-*•]\s+(.+)$/);
+  if(bullet){if(!inList){out.push('<ul>');inList=true}out.push('<li>'+mdInline(bullet[1])+'</li>');continue}
+  closeList();out.push('<p>'+mdInline(t)+'</p>');
+ }
+ closeList();return out.join('');
+}
 const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Configuração do Supabase indisponível');
@@ -38,8 +59,9 @@ function stage(slide,role){
   '<p>'+esc(d.slide_body||'Slide em construção')+'</p>'+footer+'</div>';
 }
 function box(title,text,cls='',extra=''){
+ const body=text?richText(text):'<p class="placeholder">Fala ainda não cadastrada no roteiro.</p>';
  return '<div class="presenter '+cls+'"><strong>'+title+'</strong>'+
-  '<p class="'+(!text?'placeholder':'')+'">'+esc(text||'Fala ainda não cadastrada no roteiro.')+'</p>'+extra+'</div>';
+  '<div class="presenter-copy rich-text">'+body+'</div>'+extra+'</div>';
 }
 function roleNotes(scene){
  const d=scene?.data||{};
