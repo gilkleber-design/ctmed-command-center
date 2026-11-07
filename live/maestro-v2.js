@@ -55,7 +55,7 @@ function sceneNav(){
  return (model?.blocks||[]).map(b=>{
    const rows=(b.steps||[]).map(s=>{
      const i=pos++;
-     return '<button class="scene '+(i===index()?'active':'')+'" data-index="'+i+'">'+
+     return '<button class="scene '+(i===index()?'active':'')+'" data-index="'+i+'" '+(!preview&&view!=='maestro'?'disabled':'')+'>'+
        '<span class="no">'+String(i+1).padStart(2,'0')+'</span><span>'+esc(s.data?.title||'Etapa sem título')+'</span></button>';
    }).join('');
    return '<div class="blockname">'+esc(b.title)+'</div>'+rows;
@@ -64,6 +64,7 @@ function sceneNav(){
 function controls(){
  const i=index(),n=flatten().length;
  if(view==='tela')return '';
+ if(!preview&&view!=='maestro')return '<div class="controls"><span class="small">Acompanhamento remoto: a cena muda automaticamente quando o Maestro avança.</span></div>';
  const buttons=
   '<div class="controls"><button data-action="back" '+(i===0?'disabled':'')+'>← Anterior</button>'+
   '<button data-action="next" class="primary" '+(i>=n-1?'disabled':'')+'>Próximo slide →</button>'+
