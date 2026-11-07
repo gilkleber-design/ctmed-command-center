@@ -6,7 +6,7 @@ if(view==='publico'||view==='aluno'){
 }else if(view==='editor'){
   location.replace('./revisao.html');
 }else{
-  params.set('view',['maestro','gil','diego','tecnica'].includes(view)?view:'maestro');
+  params.set('view',['maestro','gil','diego','tecnica','tela'].includes(view)?view:'maestro');
   location.replace('./maestro.html?'+params.toString());
 }
 })();
