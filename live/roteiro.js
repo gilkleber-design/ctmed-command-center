@@ -117,7 +117,7 @@ function render(){
    '<div class="subpanel" style="margin-top:15px"><div class="eyebrow">VALIDAÇÃO DO BLOCO</div>'+
    '<p class="details">✓ '+goodCount(block)+' / '+block.steps.length+' etapas com slide e instruções.</p>'+
    '<p class="details">Gil: '+(block.gil_approved?'aprovou v'+block.revision:'pendente')+' · Diego: '+(block.diego_approved?'aprovou v'+block.revision:'pendente')+'</p>'+
-   '<div class="buttons">'+(model.role==='gil'?block.gil_approved:block.diego_approved?
+   '<div class="buttons">'+((model.role==='gil'?block.gil_approved:block.diego_approved)?
      '<button data-act="withdraw">Retirar minha aprovação</button>':
      '<button data-act="approve" class="secondary" '+(dirty||goodCount(block)!==block.steps.length?'disabled':'')+'>✓ Aprovar bloco v'+block.revision+'</button>')+
    '</div></div></div></div></section>'+
@@ -131,8 +131,8 @@ function render(){
   '</div></div>';
  if(draft.slide_asset_path)loadSlide(draft.slide_asset_path);
 }
-async function load(){
- if(busy||dirty)return;
+async function load(force=false){
+ if(!force&&(busy||dirty))return;
  const {data:{session}}=await db.auth.getSession();
  if(!session){root.innerHTML='<div class="panel empty"><h2>Login necessário</h2><p>Entre no Command Center com sua conta autorizada.</p><a href="../">Abrir login →</a></div>';return}
  const r=await db.rpc('live_script_snapshot',{p_preview:true});
@@ -161,7 +161,7 @@ async function action(type,more={}){
     p_step_id:more.stepId||stepId,p_payload:payload,p_expected_revision:b.revision});
   if(r.error)throw Error(r.error.message);
   dirty=false;lastReference='';
-  await load();
+  await load(true);
   flash(type==='save_step'?'Etapa salva. Aprovações do bloco reiniciadas se necessário.':
     type==='approve'?'Sua aprovação foi registrada para a revisão atual.':
     type==='withdraw'?'Sua aprovação foi retirada.':'Roteiro atualizado.');
@@ -176,7 +176,7 @@ async function publish(){
  try{
   const r=await db.rpc('live_script_publish');
   if(r.error)throw Error(r.error.message);
-  await load();
+  await load(true);
   flash('Roteiro operacional v'+r.data.version+' publicado com '+r.data.steps+' etapas. O Maestro está em ensaio.');
  }catch(e){flash('Publicação bloqueada: '+e.message,true)}finally{busy=false}
 }
