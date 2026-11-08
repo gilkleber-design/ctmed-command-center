@@ -43,7 +43,7 @@ function slideHtml(){
  const d=draft||{},path=d.slide_asset_path||'';
  return '<div id="slidebox" class="slidebox '+(!d.slide_title&&!path?'empty':'')+'">'+
  (path?'<div id="mediaHolder" data-path="'+esc(path)+'" style="position:absolute;inset:0;display:grid;place-items:center"><span class="caption">Carregando imagem privada…</span></div>':
- '<div class="ctmedmark">CT-MED ACADEMY · SPRINT ISR</div>'+
+ '<div class="ctmedmark">CT-MED ACADEMY</div>'+
  '<h3 id="slideTitleView">'+esc(d.slide_title||'Título do slide')+'</h3>'+
  '<p id="slideBodyView">'+esc(d.slide_body||'Adicione o texto que o aluno verá na tela.')+'</p>')+
  '</div>';
@@ -51,6 +51,10 @@ function slideHtml(){
 async function loadSlide(path){
  if(!path)return;
  const holder=$('#mediaHolder');if(!holder||holder.dataset.path!==path)return;
+ if(/^(?:\/|\.\/|\.\.\/|https?:\/\/|data:image\/)/i.test(path)){
+  holder.innerHTML='<img src="'+esc(path)+'" alt="Slide do roteiro" onerror="this.replaceWith(document.createTextNode(\'Não foi possível carregar a imagem\'))">';
+  return;
+ }
  try{
   let signed=slideCache.get(path);
   if(!signed||signed.expire<Date.now()){
