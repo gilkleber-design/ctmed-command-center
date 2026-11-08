@@ -51,6 +51,11 @@ function slideHtml(){
 async function loadSlide(path){
  if(!path)return;
  const holder=$('#mediaHolder');if(!holder||holder.dataset.path!==path)return;
+ const embedded=path.startsWith('case1:')?window.CTMED_CASE1_SLIDES?.[path.slice(6)]:'';
+ if(embedded){
+  holder.innerHTML='<img src="'+esc(embedded)+'" alt="Slide do Caso 1" onerror="this.replaceWith(document.createTextNode(\'Não foi possível carregar a imagem\'))">';
+  return;
+ }
  if(/^(?:\/|\.\/|\.\.\/|https?:\/\/|data:image\/)/i.test(path)){
   holder.innerHTML='<img src="'+esc(path)+'" alt="Slide do roteiro" onerror="this.replaceWith(document.createTextNode(\'Não foi possível carregar a imagem\'))">';
   return;
