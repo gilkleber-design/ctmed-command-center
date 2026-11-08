@@ -12,12 +12,18 @@ let uploadedPath='';
 const slideCache=new Map();
 const getBlock=()=>model?.blocks.find(x=>x.id===blockId);
 const getStep=()=>getBlock()?.steps.find(x=>x.id===stepId);
-const draftValues=()=>structuredClone(getStep()?.data||{});
+const draftValues=()=>{
+ const d=structuredClone(getStep()?.data||{});
+ if(!String(d.scene_script||'').trim()){
+  d.scene_script=[d.gil,d.diego].filter(x=>String(x||'').trim()).join('\n\n');
+ }
+ return d;
+};
 const fullyApproved=b=>b.gil_approved&&b.diego_approved;
 const completeStep=s=>{
  const d=s.data||{};
  return !!String(d.title||'').trim()&&!!String(d.slide_title||d.slide_asset_path||'').trim()&&
- !!(String(d.gil||'').trim()||String(d.diego||'').trim()||String(d.tech||'').trim());
+ !!(String(d.scene_script||'').trim()||String(d.gil||'').trim()||String(d.diego||'').trim()||String(d.tech||'').trim());
 };
 const goodCount=b=>(b.steps||[]).filter(completeStep).length;
 function flash(message,error=false){
@@ -105,8 +111,7 @@ function render(){
    (draft.slide_asset_path?'<div class="buttons"><span class="caption">Imagem anexada: '+esc(draft.slide_asset_path.split('/').at(-1))+'</span><button id="removeAsset" type="button">Remover da etapa</button></div>':'')+
    '<div class="sectionhead">FALAS E DIREÇÃO</div>'+
    '<label class="field"><span>Quem conduz?</span><select data-field="speaker">'+speakerOptions.map(([id,label])=>'<option value="'+id+'" '+(draft.speaker===id?'selected':'')+'>'+label+'</option>').join('')+'</select></label>'+
-   field('Fala / roteiro de Gil','gil',{rows:7,placeholder:'O que Gil vai dizer, perguntas, ganchos e explicações'})+
-   field('Fala / roteiro de Diego','diego',{rows:7,placeholder:'O que Diego vai dizer, perguntas, ganchos e explicações'})+
+   field('Roteiro da cena','scene_script',{rows:12,placeholder:'Falas, perguntas, ganchos e transições da cena, na ordem em que acontecerão'})+
    field('Comando técnico / OBS','tech',{rows:4,placeholder:'Troca de câmera, enquete, monitor, áudio, app, alerta'})+
    field('Próxima ação / deixa','next',{rows:3,placeholder:'Quem fala a seguir e qual slide entra'})+
    field('Duração / minutagem','duration',{max:50,placeholder:'Ex.: 03:00 – 06:00'})+
