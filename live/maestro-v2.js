@@ -7,6 +7,13 @@ const mdInline=x=>esc(x)
  .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
  .replace(/\`([^\`]+)\`/g,'<code>$1</code>')
  .replace(/\*([^*]+)\*/g,'<em>$1</em>');
+function cleanSpeechLine(raw){
+ let s=String(raw??'').trim().replace(/^>\s?/, '');
+ // Remove aspas de fala, preservando Markdown de ênfase.
+ s=s.replace(/^(\*\*|\*|__|_)?[“"]/,'$1');
+ s=s.replace(/[”"](\*\*|\*|__|_)?$/,'$1');
+ return s;
+}
 function richText(raw){
  const lines=String(raw??'').replace(/\r/g,'').split('\n');
  const out=[];let inList=false;
@@ -16,11 +23,11 @@ function richText(raw){
   if(!t){closeList();out.push('<div class="rich-gap"></div>');continue}
   if(/^---+$/.test(t)){closeList();out.push('<hr>');continue}
   const hd=t.match(/^(#{1,4})\s+(.+)$/);
-  if(hd){closeList();const n=Math.min(4,hd[1].length+1);out.push('<h'+n+'>'+mdInline(hd[2])+'</h'+n+'>');continue}
-  if(/^>\s?/.test(t)){closeList();out.push('<blockquote>'+mdInline(t.replace(/^>\s?/,''))+'</blockquote>');continue}
+  if(hd){closeList();const n=Math.min(4,hd[1].length+1);out.push('<h'+n+'>'+mdInline(cleanSpeechLine(hd[2]))+'</h'+n+'>');continue}
+  if(/^>\s?/.test(t)){closeList();out.push('<p>'+mdInline(cleanSpeechLine(t))+'</p>');continue}
   const bullet=t.match(/^[-*•]\s+(.+)$/);
-  if(bullet){if(!inList){out.push('<ul>');inList=true}out.push('<li>'+mdInline(bullet[1])+'</li>');continue}
-  closeList();out.push('<p>'+mdInline(t)+'</p>');
+  if(bullet){if(!inList){out.push('<ul>');inList=true}out.push('<li>'+mdInline(cleanSpeechLine(bullet[1]))+'</li>');continue}
+  closeList();out.push('<p>'+mdInline(cleanSpeechLine(t))+'</p>');
  }
  closeList();return out.join('');
 }
