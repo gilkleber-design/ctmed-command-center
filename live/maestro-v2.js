@@ -51,7 +51,7 @@ function tag(t,klass=''){return '<span class="chip '+klass+'">'+t+'</span>'}
 function stage(slide,role){
  if(!slide)return '<div class="screen"><div class="slidebrand">CT-MED LIVE</div><h2>Fim do roteiro</h2></div>';
  const d=slide.data||{},path=d.slide_asset_path||'';
- const brand='<div class="slidebrand">CT-MED ACADEMY · SPRINT ISR</div>';
+ const brand='<div class="slidebrand">CT-MED ACADEMY</div>';
  const footer='<div class="slidefooter">'+esc(slide.blockTitle||'')+'</div>';
  if(path)return '<div class="screen"><div class="loading" data-path="'+esc(path)+'" data-asset-role="'+esc(role)+'">Carregando slide privado…</div></div>';
  return '<div class="screen">'+brand+
@@ -147,6 +147,14 @@ async function sign(path,role){
  if(!path)return;
  const targets=[...document.querySelectorAll('[data-asset-role]')].filter(el=>el.dataset.path===path&&el.dataset.assetRole===role);
  if(!targets.length)return;
+ if(/^(?:\/|\.\/|\.\.\/|https?:\/\/|data:image\/)/i.test(path)){
+  for(const el of targets){
+   const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=path;
+   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.'};
+   el.replaceChildren(image);
+  }
+  return;
+ }
  try{
   let cached=signedCache.get(path);
   if(!cached||cached.until<Date.now()){
