@@ -65,6 +65,13 @@ function box(title,text,cls='',extra=''){
 }
 function roleNotes(scene){
  const d=scene?.data||{};
+ if(view==='maestro'){
+  const roteiro=[d.gil,d.diego].filter(x=>String(x||'').trim()).join('\n\n');
+  return box('ROTEIRO DA CENA',roteiro,'own',
+   '<div class="small" style="margin-top:8px">Condutor desta etapa: '+esc((d.speaker||'ambos').toUpperCase())+'</div>')+
+   box('CUE · DIREÇÃO TÉCNICA / OBS',d.tech,'tech')+
+   box('PRÓXIMA AÇÃO / DEIXA',d.next);
+ }
  let order=['gil','diego','tech','next'];
  if(view==='diego')order=['diego','gil','tech','next'];
  if(view==='tecnica')order=['tech','next','gil','diego'];
