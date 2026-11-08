@@ -147,6 +147,15 @@ async function sign(path,role){
  if(!path)return;
  const targets=[...document.querySelectorAll('[data-asset-role]')].filter(el=>el.dataset.path===path&&el.dataset.assetRole===role);
  if(!targets.length)return;
+ const embedded=path.startsWith('case1:')?window.CTMED_CASE1_SLIDES?.[path.slice(6)]:'';
+ if(embedded){
+  for(const el of targets){
+   const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=embedded;
+   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.'};
+   el.replaceChildren(image);
+  }
+  return;
+ }
  if(/^(?:\/|\.\/|\.\.\/|https?:\/\/|data:image\/)/i.test(path)){
   for(const el of targets){
    const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=path;
