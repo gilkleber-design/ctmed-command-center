@@ -112,6 +112,8 @@ function nextPreview(){
   '<span class="small" style="margin-top:5px">Condutor: '+esc(s.data?.speaker||'ambos')+'</span></div></div>';
 }
 function ensureActiveSceneVisible(){
+ const params=new URLSearchParams(location.search);
+ if(params.get('preview')==='1')return;
  const active=document.querySelector('.sidebar .scene.active');
  if(!active)return;
  active.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
