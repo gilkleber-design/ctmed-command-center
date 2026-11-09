@@ -7,7 +7,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Não foi possível iniciar o Supabase');
 const db=window.supabase.createClient(url,key);
-let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false,activeTab='conteudo',dragState=null;
+let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false,activeTab='conteudo',dragState=null,sidebarScrollTop=0;
 const expandedBlocks=new Set(['abertura']);
 let uploadedPath='';
 const slideCache=new Map();
@@ -93,6 +93,8 @@ function treeHtml(blocks){
 function tabButton(id,label){return '<button class="tab '+(activeTab===id?'active':'')+'" data-tab="'+id+'">'+label+'</button>'}
 function render(){
  if(!model)return;
+ const currentSidebar=document.querySelector('.sidebar');
+ if(currentSidebar)sidebarScrollTop=currentSidebar.scrollTop;
  const blocks=model.blocks||[],block=getBlock();
  if(!block){root.innerHTML='<div class="panel">Ainda não há blocos cadastrados.</div>';return}
  if(!block.steps.some(x=>x.id===stepId))stepId=block.steps[0]?.id||'';
@@ -152,6 +154,10 @@ function render(){
   '</div>'+
   '</section></main></div>';
  if(draft.slide_asset_path)loadSlide(draft.slide_asset_path);
+ requestAnimationFrame(()=>{
+   const sidebar=document.querySelector('.sidebar');
+   if(sidebar)sidebar.scrollTop=sidebarScrollTop;
+ });
 }
 async function load(force=false){
  if(!force&&(busy||dirty))return;
@@ -218,6 +224,10 @@ async function upload(file){
   flash('Imagem enviada e anexada à etapa. Clique em "Salvar esta etapa" para confirmar.');
  }catch(e){flash('Falha ao enviar slide: '+e.message,true)}finally{busy=false}
 }
+root.addEventListener('scroll',e=>{
+ const sidebar=e.target.closest?.('.sidebar');
+ if(sidebar)sidebarScrollTop=sidebar.scrollTop;
+},true);
 root.addEventListener('input',e=>{
  if(!e.target.matches('[data-field]'))return;
  draft[e.target.dataset.field]=e.target.value;dirty=true;
