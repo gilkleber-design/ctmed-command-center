@@ -7,7 +7,8 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Não foi possível iniciar o Supabase');
 const db=window.supabase.createClient(url,key);
-let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false;
+let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false,activeTab='conteudo';
+const expandedBlocks=new Set(['abertura']);
 let uploadedPath='';
 const slideCache=new Map();
 const getBlock=()=>model?.blocks.find(x=>x.id===blockId);
@@ -77,6 +78,18 @@ function status(b){
  if(b.gil_approved||b.diego_approved)return '<span class="tag warn">Uma aprovação</span>';
  return '<span class="tag warn">Em construção</span>';
 }
+function treeHtml(blocks){
+ return blocks.map(b=>{
+  const open=expandedBlocks.has(b.id),active=b.id===blockId;
+  const state=fullyApproved(b)?'✓':b.gil_approved||b.diego_approved?'●':'○';
+  const steps=(b.steps||[]).map((s,i)=>'<button class="tree-step '+(s.id===stepId?'active':'')+'" data-step="'+esc(s.id)+'" data-blockstep="'+esc(b.id)+'">'+
+   '<span>'+String(i+1).padStart(2,'0')+' · '+esc(s.data?.title||'Sem título')+'</span><span class="step-state '+(completeStep(s)?'ok':'')+'">'+(completeStep(s)?'✓':'·')+'</span></button>').join('');
+  return '<div class="tree-block"><button class="tree-head '+(active?'active':'')+'" data-treeblock="'+esc(b.id)+'">'+
+   '<span class="tree-caret">'+(open?'▾':'▸')+'</span><span>'+esc(b.title)+'</span><span class="tree-status '+(fullyApproved(b)?'ok':'')+'">'+state+'</span></button>'+
+   (open?'<div class="tree-steps">'+steps+'<button class="tree-add" data-addblock="'+esc(b.id)+'">+ Adicionar etapa</button></div>':'')+'</div>';
+ }).join('');
+}
+function tabButton(id,label){return '<button class="tab '+(activeTab===id?'active':'')+'" data-tab="'+id+'">'+label+'</button>'}
 function render(){
  if(!model)return;
  const blocks=model.blocks||[],block=getBlock();
@@ -84,65 +97,59 @@ function render(){
  if(!block.steps.some(x=>x.id===stepId))stepId=block.steps[0]?.id||'';
  const step=getStep();if(!step){root.innerHTML='<div class="panel">Nenhuma etapa encontrada.</div>';return}
  if(!dirty)draft=draftValues();
+ expandedBlocks.add(block.id);
  const done=blocks.filter(fullyApproved).length,percent=Math.round(100*done/Math.max(1,blocks.length));
+ const idx=block.steps.findIndex(s=>s.id===stepId),prev=idx>0?block.steps[idx-1]:null,next=idx<block.steps.length-1?block.steps[idx+1]:null;
  const progress='<span class="tag '+(done===blocks.length?'ok':'warn')+'">'+done+'/'+blocks.length+' blocos aprovados</span>';
+ const approval='<span class="caption">Gil: '+(block.gil_approved?'✓':'—')+' · Diego: '+(block.diego_approved?'✓':'—')+' · revisão '+block.revision+'</span>';
  root.innerHTML=
-  '<div class="intro"><div><span class="eyebrow">CT-MED LIVE · SEGUNDA CAMADA</span><h1>Roteiro de apresentação</h1>'+
-  '<p>O esqueleto pedagógico continua preservado. Aqui cada etapa recebe fala de Gil, fala de Diego, slide para o público e comando técnico. Salvar modifica apenas o roteiro e reinicia as aprovações do bloco.</p>'+
-  '<div class="actions">'+progress+'<span class="tag">Conectado como '+(model.role==='gil'?'Gil':'Diego')+'</span>'+
-  '<span class="caption">v'+(model.published_version||0)+' publicada · '+percent+'% aprovado</span></div></div>'+
-  '<div class="actions"><a href="./maestro.html?view=maestro&amp;preview=1" class="primary" style="display:inline-block;padding:11px 13px;border-radius:9px;color:#101923;font-weight:850">Pré-visualizar roteiro →</a><button data-act="publish" '+(busy||done!==blocks.length||dirty?'disabled':'')+'>Publicar roteiro aprovado</button></div></div>'+
-  '<div class="layout"><aside class="panel sidebar"><h3>Blocos da apresentação</h3><div class="blocklist">'+
-  blocks.map(b=>'<button class="block '+(b.id===blockId?'active':'')+'" data-block="'+esc(b.id)+'">'+
-   '<span>'+esc(b.title)+'</span><span class="dots '+(fullyApproved(b)?'ok':'')+'">'+(fullyApproved(b)?'✓':b.gil_approved||b.diego_approved?'●':'○')+'</span></button>').join('')+
-  '</div><div class="divider"></div><div class="caption">Gil e Diego aprovam a mesma revisão. Qualquer edição reabre o bloco.</div>'+
+  '<div class="intro"><div><span class="eyebrow">CT-MED LIVE · SALA DE CONSTRUÇÃO</span><h1>Roteiro de apresentação</h1>'+
+  '<p>Navegue pelo roteiro na árvore à esquerda. À direita, trabalhe somente na etapa selecionada: conteúdo, slide, técnica e histórico.</p>'+
+  '<div class="actions">'+progress+'<span class="tag">Conectado como '+(model.role==='gil'?'Gil':'Diego')+'</span><span class="caption">v'+(model.published_version||0)+' publicada · '+percent+'% aprovado</span></div></div>'+
+  '<div class="actions"><a href="./maestro.html?view=maestro&amp;preview=1" class="primary" style="display:inline-block;padding:11px 13px;border-radius:9px;color:#101923;font-weight:850">Prévia Maestro →</a><button data-act="publish" '+(busy||done!==blocks.length||dirty?'disabled':'')+'>Publicar aprovado</button></div></div>'+
+  '<div class="layout"><aside class="panel sidebar"><h3>Roteiro</h3>'+treeHtml(blocks)+
+  '<div class="divider"></div><div class="caption">▸ expande bloco · ✓ etapa completa · ● aprovação parcial</div>'+
   '<div class="divider"></div><a href="./revisao.html">← Esqueleto pedagógico aprovado</a></aside>'+
-  '<div><section class="panel"><div class="title-row"><div><span class="eyebrow">BLOCO '+String(blocks.indexOf(block)+1).padStart(2,'0')+' · REVISÃO '+block.revision+'</span>'+
-  '<h2>'+esc(block.title)+'</h2></div>'+status(block)+'</div>'+
-  '<div class="details">'+block.steps.length+' etapa(s) · '+goodCount(block)+' completas para aprovação. As etapas devem ter um slide e pelo menos uma fala ou instrução técnica.</div>'+
-  '<details id="architectureReference" class="reference"><summary>Consultar referência pedagógica aprovada (somente leitura)</summary>'+
-   '<div class="caption" style="margin:9px 0">Documento aprovado de referência. Editar o roteiro aqui não altera este consenso.</div>'+
-   '<pre id="refText">'+esc(lastReference===blockId?reference:'Carregue a referência abrindo esta seção.')+'</pre></details>'+
-  '<div class="stepnav">'+block.steps.map((s,i)=>'<button data-step="'+esc(s.id)+'" class="'+(s.id===stepId?'active':'')+'">'+
-   String(i+1).padStart(2,'0')+' · '+esc(s.data?.title||'Sem título')+(completeStep(s)?' ✓':' · pendente')+'</button>').join('')+'</div>'+
-  '<div class="buttons"><button data-act="add">+ Nova etapa</button><button data-act="up">↑ Mover etapa</button><button data-act="down">↓ Mover etapa</button>'+
-  '<button data-act="delete" class="danger">Excluir etapa</button></div></section>'+
-  '<section class="panel" style="margin-top:15px"><div class="title-row"><div><span class="eyebrow">EDIÇÃO DA ETAPA</span><h2 style="font-size:20px">'+esc(draft.title||'Nova etapa')+'</h2></div>'+
-  '<span id="unsaved" class="tag '+(dirty?'warn':'')+'">'+(dirty?'Alterações não salvas':'Sem alterações')+'</span></div>'+
-  '<div class="stepgrid"><div>'+
-   field('Nome da etapa','title',{max:160,placeholder:'Ex.: Pré-oxigenação e plano de resgate'})+
-   '<div class="sectionhead">O QUE O PÚBLICO VERÁ</div>'+
-   field('Título do slide','slide_title',{max:200,placeholder:'Título visível na apresentação'})+
-   field('Texto do slide (alternativa à imagem)','slide_body',{rows:6,placeholder:'Tópicos, dados clínicos, pergunta ou evolução'})+
-   field('Legenda / observação da imagem','slide_caption',{max:500})+
-   '<label class="field"><span>Enviar slide em PNG, JPG ou WebP (até 10 MB)</span><input id="slideFile" type="file" accept="image/png,image/jpeg,image/webp">'+
-   '<small class="hint">Armazenamento privado. Use exportação de slides para imagem 16:9. A imagem fica visível no Maestro e na Tela da Apresentação.</small></label>'+
-   (draft.slide_asset_path?'<div class="buttons"><span class="caption">Imagem anexada: '+esc(draft.slide_asset_path.split('/').at(-1))+'</span><button id="removeAsset" type="button">Remover da etapa</button></div>':'')+
-   '<div class="sectionhead">FALAS E DIREÇÃO</div>'+
-   '<label class="field"><span>Quem conduz?</span><select data-field="speaker">'+speakerOptions.map(([id,label])=>'<option value="'+id+'" '+(draft.speaker===id?'selected':'')+'>'+label+'</option>').join('')+'</select></label>'+
-   field('Roteiro da cena','scene_script',{rows:12,placeholder:'Falas, perguntas, ganchos e transições da cena, na ordem em que acontecerão'})+
-   field('Comando técnico / OBS','tech',{rows:4,placeholder:'Troca de câmera, enquete, monitor, áudio, app, alerta'})+
-   field('Próxima ação / deixa','next',{rows:3,placeholder:'Quem fala a seguir e qual slide entra'})+
-   field('Duração / minutagem','duration',{max:50,placeholder:'Ex.: 03:00 – 06:00'})+
-   '<div class="buttons"><button class="primary" data-act="save" '+(busy?'disabled':'')+'>Salvar esta etapa</button>'+
-   '<span class="caption">Aprovações do bloco são reiniciadas ao salvar alterações.</span></div>'+
-  '</div><div><div class="subpanel"><div class="eyebrow">PRÉVIA EXATA DO SLIDE</div><p class="hint">O mesmo conteúdo visual aparecerá para Diego e na saída de tela.</p>'+
-   slideHtml()+'<p class="hint" style="margin:12px 0 0">Imagem enviada tem prioridade sobre texto no slide. O texto permanece disponível no roteiro do professor.</p></div>'+
-   '<div class="subpanel" style="margin-top:15px"><div class="eyebrow">VALIDAÇÃO DO BLOCO</div>'+
-   '<p class="details">✓ '+goodCount(block)+' / '+block.steps.length+' etapas com slide e instruções.</p>'+
-   '<p class="details">Gil: '+(block.gil_approved?'aprovou v'+block.revision:'pendente')+' · Diego: '+(block.diego_approved?'aprovou v'+block.revision:'pendente')+'</p>'+
-   '<div class="buttons">'+((model.role==='gil'?block.gil_approved:block.diego_approved)?
-     '<button data-act="withdraw">Retirar minha aprovação</button>':
-     '<button data-act="approve" class="secondary" '+(dirty||goodCount(block)!==block.steps.length?'disabled':'')+'>✓ Aprovar bloco v'+block.revision+'</button>')+
-   '</div></div></div></div></section>'+
-  '<section class="panel publish"><div class="title-row"><div><span class="eyebrow">PUBLICAÇÃO CONTROLADA</span>'+
-  '<h3>Enviar roteiro aprovado ao Maestro</h3><p class="caption">Publicar congela uma versão independente. Não inicia a transmissão e não altera o esqueleto original.</p></div>'+
-  '<button id="publish" class="primary" '+(busy||done!==blocks.length||dirty?'disabled':'')+'>Publicar nova versão</button></div>'+
-  (done!==blocks.length?'<div class="statusbox">Faltam '+(blocks.length-done)+' blocos aprovados por Gil e Diego para liberar a publicação.</div>':
-  '<div class="statusbox ok">Todos os blocos estão aprovados e prontos para uma versão de ensaio.</div>')+
-  '<div class="buttons"><a href="./maestro.html?view=maestro">Maestro publicado ↗</a><a href="./maestro.html?view=diego">Roteiro remoto de Diego ↗</a>'+
-  '<a href="./maestro.html?view=tela">Tela da apresentação (OBS) ↗</a></div></section>'+
-  '</div></div>';
+  '<main class="editor-shell"><section class="panel"><div class="editor-head"><div><div class="breadcrumb">'+esc(block.title)+' › '+String(idx+1).padStart(2,'0')+'</div>'+
+  '<h2>'+esc(draft.title||'Nova etapa')+'</h2><div class="actions"><span id="unsaved" class="tag '+(dirty?'warn':'')+'">'+(dirty?'Alterações não salvas':'Salvo')+'</span>'+approval+'</div></div>'+
+  '<div class="editor-actions"><button data-stepnav="prev" '+(!prev?'disabled':'')+'>← Anterior</button><button data-stepnav="next" '+(!next?'disabled':'')+'>Próximo →</button></div></div>'+
+  '<div class="tabs">'+tabButton('conteudo','CONTEÚDO')+tabButton('slide','SLIDE')+tabButton('tecnica','TÉCNICA')+tabButton('historico','HISTÓRICO')+'</div>'+
+  '<div class="tabpane" data-pane="conteudo" '+(activeTab!=='conteudo'?'hidden':'')+'>'+
+   '<div class="stepgrid"><div>'+
+    field('Nome da etapa','title',{max:160,placeholder:'Ex.: Pré-oxigenação e plano de resgate'})+
+    '<label class="field"><span>Quem conduz?</span><select data-field="speaker">'+speakerOptions.map(([id,label])=>'<option value="'+id+'" '+(draft.speaker===id?'selected':'')+'>'+label+'</option>').join('')+'</select></label>'+
+    field('Roteiro da cena','scene_script',{rows:14,placeholder:'Falas, perguntas, ganchos e transições, na ordem em que acontecerão'})+
+    field('Próxima ação / deixa','next',{rows:4,placeholder:'Quem fala a seguir e qual slide entra'})+
+    field('Duração / minutagem','duration',{max:50,placeholder:'Ex.: 03:00 – 06:00'})+
+    '<div class="buttons"><button class="primary" data-act="save" '+(busy?'disabled':'')+'>Salvar etapa</button></div>'+
+   '</div><div class="subpanel"><div class="eyebrow">SLIDE ATUAL</div><p class="hint">Prévia rápida. Para trocar o arquivo, use a aba SLIDE.</p>'+slideHtml()+
+   '<div class="buttons"><button data-tabjump="slide">Editar slide</button><button data-tabjump="tecnica">Direção técnica</button></div></div></div>'+
+  '</div>'+
+  '<div class="tabpane" data-pane="slide" '+(activeTab!=='slide'?'hidden':'')+'>'+
+   '<div class="stepgrid"><div>'+
+    field('Título do slide','slide_title',{max:200,placeholder:'Título visível na apresentação'})+
+    field('Texto do slide (alternativa à imagem)','slide_body',{rows:7,placeholder:'Tópicos, dados clínicos, pergunta ou evolução'})+
+    field('Legenda / observação da imagem','slide_caption',{max:500})+
+    '<label class="field"><span>Enviar slide em PNG, JPG ou WebP (até 10 MB)</span><input id="slideFile" type="file" accept="image/png,image/jpeg,image/webp"><small class="hint">A imagem enviada tem prioridade na apresentação.</small></label>'+
+    (draft.slide_asset_path?'<div class="buttons"><span class="caption">Arquivo: '+esc(draft.slide_asset_path.split('/').at(-1))+'</span><button id="removeAsset" type="button">Remover da etapa</button></div>':'')+
+    '<div class="buttons"><button class="primary" data-act="save" '+(busy?'disabled':'')+'>Salvar etapa</button></div>'+
+   '</div><div class="subpanel"><div class="eyebrow">PRÉVIA EXATA DO SLIDE</div><p class="hint">É isto que aparece no Maestro e na saída de tela.</p>'+slideHtml()+'</div></div>'+
+  '</div>'+
+  '<div class="tabpane" data-pane="tecnica" '+(activeTab!=='tecnica'?'hidden':'')+'>'+
+    field('Comando técnico / OBS','tech',{rows:12,placeholder:'Troca de câmera, enquete, monitor, áudio, app, alerta'})+
+    '<div class="buttons"><button class="primary" data-act="save" '+(busy?'disabled':'')+'>Salvar etapa</button></div>'+
+  '</div>'+
+  '<div class="tabpane" data-pane="historico" '+(activeTab!=='historico'?'hidden':'')+'>'+
+   '<div class="subpanel"><div class="eyebrow">CONTROLE DO BLOCO</div><p class="details">Bloco: '+esc(block.title)+'</p>'+
+   '<p class="details">'+block.steps.length+' etapas · '+goodCount(block)+' completas</p>'+
+   '<p class="details">Revisão atual: '+block.revision+' · Gil: '+(block.gil_approved?'aprovou':'pendente')+' · Diego: '+(block.diego_approved?'aprovou':'pendente')+'</p>'+
+   '<div class="buttons">'+((model.role==='gil'?block.gil_approved:block.diego_approved)?'<button data-act="withdraw">Retirar minha aprovação</button>':'<button data-act="approve" class="secondary" '+(dirty||goodCount(block)!==block.steps.length?'disabled':'')+'>✓ Aprovar bloco v'+block.revision+'</button>')+
+   '<button data-act="up">↑ Mover etapa</button><button data-act="down">↓ Mover etapa</button><button data-act="delete" class="danger">Excluir etapa</button></div></div>'+
+   '<details id="architectureReference" class="reference"><summary>Referência pedagógica aprovada</summary><div class="caption" style="margin:9px 0">Somente leitura.</div><pre id="refText">'+esc(lastReference===blockId?reference:'Abra esta seção para carregar a referência.')+'</pre></details>'+
+   '<div class="subpanel" style="margin-top:15px"><div class="eyebrow">PUBLICAÇÃO</div><p class="details">A publicação só é liberada quando todos os blocos têm dupla aprovação.</p>'+
+   '<div class="buttons"><button data-act="publish" class="primary" '+(busy||done!==blocks.length||dirty?'disabled':'')+'>Publicar nova versão</button><a href="./maestro.html?view=maestro">Maestro publicado ↗</a></div></div>'+
+  '</div>'+
+  '</section></main></div>';
  if(draft.slide_asset_path)loadSlide(draft.slide_asset_path);
 }
 async function load(force=false){
@@ -223,8 +230,29 @@ root.addEventListener('change',e=>{
 root.addEventListener('toggle',e=>{if(e.target.id==='architectureReference'&&e.target.open&&lastReference!==blockId)refRead()},true);
 root.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.block){if(!askDiscard())return;blockId=b.dataset.block;stepId='';dirty=false;lastReference='';draft=null;render();return}
- if(b.dataset.step){if(!askDiscard())return;stepId=b.dataset.step;dirty=false;draft=draftValues();render();return}
+ if(b.dataset.treeblock){
+   const id=b.dataset.treeblock;
+   if(id===blockId){expandedBlocks.has(id)?expandedBlocks.delete(id):expandedBlocks.add(id);render();return}
+   if(!askDiscard())return;
+   blockId=id;stepId='';dirty=false;lastReference='';draft=null;expandedBlocks.add(id);activeTab='conteudo';render();return;
+ }
+ if(b.dataset.blockstep){
+   if(!askDiscard())return;
+   blockId=b.dataset.blockstep;expandedBlocks.add(blockId);stepId=b.dataset.step;dirty=false;draft=draftValues();activeTab='conteudo';render();return;
+ }
+ if(b.dataset.addblock){
+   if(!askDiscard())return;
+   blockId=b.dataset.addblock;expandedBlocks.add(blockId);
+   const name=prompt('Título da nova etapa:','Nova etapa');if(!name?.trim())return;
+   return action('add_step',{title:name.trim()});
+ }
+ if(b.dataset.tab){activeTab=b.dataset.tab;render();return}
+ if(b.dataset.tabjump){activeTab=b.dataset.tabjump;render();return}
+ if(b.dataset.stepnav){
+   if(!askDiscard())return;
+   const block=getBlock(),i=block.steps.findIndex(s=>s.id===stepId),n=b.dataset.stepnav==='prev'?i-1:i+1;
+   if(n>=0&&n<block.steps.length){stepId=block.steps[n].id;dirty=false;draft=draftValues();render()}return;
+ }
  if(b.id==='removeAsset'){draft.slide_asset_path='';dirty=true;render();return}
  if(b.id==='publish'){await publish();return}
  if(!b.dataset.act)return;
