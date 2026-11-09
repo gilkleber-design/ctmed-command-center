@@ -130,7 +130,7 @@ function render(){
  const opActions=isOperator()?'<div class="tools" style="margin-top:9px">'+
   '<button data-action="mode" class="'+(model.session_mode==='ao-vivo'?'primary':'')+'">'+
   (model.session_mode==='ao-vivo'?'Encerrar transmissão (voltar ao ensaio)':'Marcar transmissão ao vivo')+'</button></div>':'';
- const notes='<div>'+roleNotes(s)+'</div>';
+ const notes='<div class="notes-column" id="notesColumn">'+roleNotes(s)+'</div>';
  root.innerHTML='<div class="heading"><div><span class="eyebrow">SPRINT ISR · ROTEIRO AUDIOVISUAL</span>'+
   '<h1>'+names[view]+'</h1><p>'+esc(s.blockTitle)+' · '+esc(s.data?.title||'')+'</p>'+
   '<div class="switch">'+viewBtns+'</div></div>'+
@@ -143,12 +143,21 @@ function render(){
   (s.data?.duration?' · '+esc(s.data.duration):'')+'</div></div>'+
   (view!=='tela'&&s.data?.slide_asset_path?tag('SLIDE · IMAGEM PRIVADA'):'')+'</div>'+
   controls()+
-  '<div class="main-grid"><div><div class="card"><div style="margin-bottom:10px" class="eyebrow">TELA QUE O PÚBLICO VERÁ</div>'+stage(s,'main')+
+  '<div class="main-grid"><div class="left-stack" id="leftStack"><div class="card"><div style="margin-bottom:10px" class="eyebrow">TELA QUE O PÚBLICO VERÁ</div>'+stage(s,'main')+
   (s.data?.slide_caption?'<p class="small">'+esc(s.data.slide_caption)+'</p>':'')+'</div>'+nextPreview()+'</div>'+notes+'</div>'+
   '<div class="footnote">A saída “Tela para apresentação” contém apenas o slide, para captura no OBS. Utilize-a autenticado no Command Center. Votação pública do módulo legado não faz parte desta sincronização.</div>'+
   '</section></div>';
  const imageNodes=[...document.querySelectorAll('[data-asset-role]')];
  for(const e of imageNodes)sign(e.dataset.path,e.dataset.assetRole);
+ requestAnimationFrame(syncNotesHeight);
+}
+function syncNotesHeight(){
+ const left=document.getElementById('leftStack'),notes=document.getElementById('notesColumn');
+ if(!left||!notes)return;
+ if(matchMedia('(max-width:1140px)').matches){notes.style.height='';notes.style.maxHeight='';return}
+ const h=Math.round(left.getBoundingClientRect().height);
+ notes.style.height=h+'px';
+ notes.style.maxHeight=h+'px';
 }
 async function sign(path,role){
  if(!path)return;
@@ -158,7 +167,8 @@ async function sign(path,role){
  if(embedded){
   for(const el of targets){
    const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=embedded;
-   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.'};
+   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.';syncNotesHeight()};
+   image.onload=syncNotesHeight;
    el.replaceChildren(image);
   }
   return;
@@ -166,7 +176,8 @@ async function sign(path,role){
  if(/^(?:\/|\.\/|\.\.\/|https?:\/\/|data:image\/)/i.test(path)){
   for(const el of targets){
    const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=path;
-   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.'};
+   image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.';syncNotesHeight()};
+   image.onload=syncNotesHeight;
    el.replaceChildren(image);
   }
   return;
@@ -180,7 +191,8 @@ async function sign(path,role){
   }
   for(const el of [...document.querySelectorAll('[data-asset-role]')].filter(x=>x.dataset.path===path&&x.dataset.assetRole===role)){
     const image=document.createElement('img');image.alt='Slide apresentado na LIVE';image.src=cached.src;
-    image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.'};
+    image.onerror=()=>{el.textContent='Não foi possível visualizar a imagem do slide.';syncNotesHeight()};
+    image.onload=syncNotesHeight;
     el.replaceChildren(image);
   }
  }catch(e){
@@ -249,6 +261,7 @@ root.addEventListener('click',async e=>{
  if(b.dataset.action==='reset'){changeScene(0);return}
  if(b.dataset.action==='mode'){changeMode();return}
 });
+window.addEventListener('resize',()=>requestAnimationFrame(syncNotesHeight));
 window.addEventListener('keydown',e=>{
  if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.metaKey||e.altKey||e.ctrlKey)return;
  if(e.code==='Escape'&&view==='tela'){view='maestro';setUrl();lastSig='';render();return}
