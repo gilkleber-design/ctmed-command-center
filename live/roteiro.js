@@ -100,7 +100,6 @@ function render(){
  if(!block.steps.some(x=>x.id===stepId))stepId=block.steps[0]?.id||'';
  const step=getStep();if(!step){root.innerHTML='<div class="panel">Nenhuma etapa encontrada.</div>';return}
  if(!dirty)draft=draftValues();
- expandedBlocks.add(block.id);
  const done=blocks.filter(fullyApproved).length,percent=Math.round(100*done/Math.max(1,blocks.length));
  const idx=block.steps.findIndex(s=>s.id===stepId),prev=idx>0?block.steps[idx-1]:null,next=idx<block.steps.length-1?block.steps[idx+1]:null;
  const progress='<span class="tag '+(done===blocks.length?'ok':'warn')+'">'+done+'/'+blocks.length+' blocos aprovados</span>';
