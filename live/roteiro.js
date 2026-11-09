@@ -7,7 +7,7 @@ const cfg=await fetch('../index.html',{cache:'no-store'}).then(r=>r.text());
 const url=cfg.match(/SUPABASE_URL:'([^']+)'/)?.[1],key=cfg.match(/SUPABASE_ANON_KEY:'([^']+)'/)?.[1];
 if(!url||!key||!window.supabase)throw Error('Não foi possível iniciar o Supabase');
 const db=window.supabase.createClient(url,key);
-let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false,activeTab='conteudo';
+let model=null,blockId='abertura',stepId='',draft=null,dirty=false,busy=false,reference='',lastReference='',readyFirst=false,activeTab='conteudo',dragState=null;
 const expandedBlocks=new Set(['abertura']);
 let uploadedPath='';
 const slideCache=new Map();
@@ -82,7 +82,7 @@ function treeHtml(blocks){
  return blocks.map(b=>{
   const open=expandedBlocks.has(b.id),active=b.id===blockId;
   const state=fullyApproved(b)?'✓':b.gil_approved||b.diego_approved?'●':'○';
-  const steps=(b.steps||[]).map((s,i)=>'<div class="tree-step-row"><button class="tree-step '+(s.id===stepId?'active':'')+'" data-step="'+esc(s.id)+'" data-blockstep="'+esc(b.id)+'">'+
+  const steps=(b.steps||[]).map((s,i)=>'<div class="tree-step-row" draggable="true" data-dragstep="'+esc(s.id)+'" data-dragblock="'+esc(b.id)+'"><span class="drag-handle" title="Arraste para reordenar">☷</span><button class="tree-step '+(s.id===stepId?'active':'')+'" data-step="'+esc(s.id)+'" data-blockstep="'+esc(b.id)+'">'+
    '<span>'+String(i+1).padStart(2,'0')+' · '+esc(s.data?.title||'Sem título')+'</span><span class="step-state '+(completeStep(s)?'ok':'')+'">'+(completeStep(s)?'✓':'·')+'</span></button>'+
    '<button class="tree-delete" title="Excluir etapa" aria-label="Excluir '+esc(s.data?.title||'etapa')+'" data-deletestep="'+esc(s.id)+'" data-deleteblock="'+esc(b.id)+'">✕</button></div>').join('');
   return '<div class="tree-block"><button class="tree-head '+(active?'active':'')+'" data-treeblock="'+esc(b.id)+'">'+
@@ -229,6 +229,58 @@ root.addEventListener('change',e=>{
  if(e.target.id==='slideFile'&&e.target.files?.[0])upload(e.target.files[0]);
 });
 root.addEventListener('toggle',e=>{if(e.target.id==='architectureReference'&&e.target.open&&lastReference!==blockId)refRead()},true);
+root.addEventListener('dragstart',e=>{
+ const row=e.target.closest('.tree-step-row[draggable="true"]');
+ if(!row||dirty||busy){e.preventDefault();return}
+ dragState={stepId:row.dataset.dragstep,blockId:row.dataset.dragblock};
+ row.classList.add('dragging');
+ e.dataTransfer.effectAllowed='move';
+ e.dataTransfer.setData('text/plain',dragState.stepId);
+});
+root.addEventListener('dragover',e=>{
+ const row=e.target.closest('.tree-step-row[draggable="true"]');
+ if(!row||!dragState||row.dataset.dragblock!==dragState.blockId||row.dataset.dragstep===dragState.stepId)return;
+ e.preventDefault();
+ e.dataTransfer.dropEffect='move';
+ document.querySelectorAll('.tree-step-row.drop-before,.tree-step-row.drop-after').forEach(x=>x.classList.remove('drop-before','drop-after'));
+ const rect=row.getBoundingClientRect();
+ row.classList.add(e.clientY<rect.top+rect.height/2?'drop-before':'drop-after');
+});
+root.addEventListener('dragleave',e=>{
+ const row=e.target.closest('.tree-step-row[draggable="true"]');
+ if(row&&!row.contains(e.relatedTarget))row.classList.remove('drop-before','drop-after');
+});
+root.addEventListener('drop',async e=>{
+ const row=e.target.closest('.tree-step-row[draggable="true"]');
+ if(!row||!dragState||row.dataset.dragblock!==dragState.blockId||row.dataset.dragstep===dragState.stepId)return;
+ e.preventDefault();
+ const source=dragState;
+ const rect=row.getBoundingClientRect();
+ const before=e.clientY<rect.top+rect.height/2;
+ document.querySelectorAll('.tree-step-row').forEach(x=>x.classList.remove('dragging','drop-before','drop-after'));
+ dragState=null;
+ if(!askDiscard())return;
+ const block=model.blocks.find(x=>x.id===source.blockId);
+ if(!block)return;
+ busy=true;
+ try{
+   const r=await db.rpc('live_script_reorder_step',{
+     p_block_id:source.blockId,
+     p_step_id:source.stepId,
+     p_target_step_id:row.dataset.dragstep,
+     p_before:before,
+     p_expected_revision:block.revision
+   });
+   if(r.error)throw Error(r.error.message);
+   blockId=source.blockId;stepId=source.stepId;dirty=false;lastReference='';busy=false;
+   await load(true);
+   flash('Ordem dos slides atualizada.');
+ }catch(err){flash(err.message,true)}finally{busy=false}
+});
+root.addEventListener('dragend',()=>{
+ document.querySelectorAll('.tree-step-row').forEach(x=>x.classList.remove('dragging','drop-before','drop-after'));
+ dragState=null;
+});
 root.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.treeblock){
