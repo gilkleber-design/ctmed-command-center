@@ -111,6 +111,11 @@ function nextPreview(){
   '<span class="small">'+esc(s.blockTitle)+'</span>'+
   '<span class="small" style="margin-top:5px">Condutor: '+esc(s.data?.speaker||'ambos')+'</span></div></div>';
 }
+function ensureActiveSceneVisible(){
+ const active=document.querySelector('.sidebar .scene.active');
+ if(!active)return;
+ active.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
+}
 function render(){
  if(!model)return;
  const all=flatten(),s=mainScene(),n=all.length;
