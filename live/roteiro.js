@@ -82,11 +82,12 @@ function treeHtml(blocks){
  return blocks.map(b=>{
   const open=expandedBlocks.has(b.id),active=b.id===blockId;
   const state=fullyApproved(b)?'✓':b.gil_approved||b.diego_approved?'●':'○';
-  const steps=(b.steps||[]).map((s,i)=>'<button class="tree-step '+(s.id===stepId?'active':'')+'" data-step="'+esc(s.id)+'" data-blockstep="'+esc(b.id)+'">'+
-   '<span>'+String(i+1).padStart(2,'0')+' · '+esc(s.data?.title||'Sem título')+'</span><span class="step-state '+(completeStep(s)?'ok':'')+'">'+(completeStep(s)?'✓':'·')+'</span></button>').join('');
+  const steps=(b.steps||[]).map((s,i)=>'<div class="tree-step-row"><button class="tree-step '+(s.id===stepId?'active':'')+'" data-step="'+esc(s.id)+'" data-blockstep="'+esc(b.id)+'">'+
+   '<span>'+String(i+1).padStart(2,'0')+' · '+esc(s.data?.title||'Sem título')+'</span><span class="step-state '+(completeStep(s)?'ok':'')+'">'+(completeStep(s)?'✓':'·')+'</span></button>'+
+   '<button class="tree-delete" title="Excluir etapa" aria-label="Excluir '+esc(s.data?.title||'etapa')+'" data-deletestep="'+esc(s.id)+'" data-deleteblock="'+esc(b.id)+'">✕</button></div>').join('');
   return '<div class="tree-block"><button class="tree-head '+(active?'active':'')+'" data-treeblock="'+esc(b.id)+'">'+
    '<span class="tree-caret">'+(open?'▾':'▸')+'</span><span>'+esc(b.title)+'</span><span class="tree-status '+(fullyApproved(b)?'ok':'')+'">'+state+'</span></button>'+
-   (open?'<div class="tree-steps">'+steps+'<button class="tree-add" data-addblock="'+esc(b.id)+'">+ Adicionar etapa</button></div>':'')+'</div>';
+   (open?'<div class="tree-steps">'+steps+'</div>':'')+'</div>';
  }).join('');
 }
 function tabButton(id,label){return '<button class="tab '+(activeTab===id?'active':'')+'" data-tab="'+id+'">'+label+'</button>'}
@@ -112,7 +113,7 @@ function render(){
   '<div class="divider"></div><a href="./revisao.html">← Esqueleto pedagógico aprovado</a></aside>'+
   '<main class="editor-shell"><section class="panel"><div class="editor-head"><div><div class="breadcrumb">'+esc(block.title)+' › '+String(idx+1).padStart(2,'0')+'</div>'+
   '<h2>'+esc(draft.title||'Nova etapa')+'</h2><div class="actions"><span id="unsaved" class="tag '+(dirty?'warn':'')+'">'+(dirty?'Alterações não salvas':'Salvo')+'</span>'+approval+'</div></div>'+
-  '<div class="editor-actions"><button data-stepnav="prev" '+(!prev?'disabled':'')+'>← Anterior</button><button data-stepnav="next" '+(!next?'disabled':'')+'>Próximo →</button></div></div>'+
+  '<div class="editor-actions"><button data-stepnav="prev" '+(!prev?'disabled':'')+'>← Anterior</button><button data-stepnav="next" '+(!next?'disabled':'')+'>Próximo →</button><button data-addcurrent="1" class="secondary">+ Adicionar etapa</button></div></div>'+
   '<div class="tabs">'+tabButton('conteudo','CONTEÚDO')+tabButton('slide','SLIDE')+tabButton('tecnica','TÉCNICA')+tabButton('historico','HISTÓRICO')+'</div>'+
   '<div class="tabpane" data-pane="conteudo" '+(activeTab!=='conteudo'?'hidden':'')+'>'+
    '<div class="stepgrid"><div>'+
@@ -239,6 +240,19 @@ root.addEventListener('click',async e=>{
  if(b.dataset.blockstep){
    if(!askDiscard())return;
    blockId=b.dataset.blockstep;expandedBlocks.add(blockId);stepId=b.dataset.step;dirty=false;draft=draftValues();activeTab='conteudo';render();return;
+ }
+ if(b.dataset.deletestep){
+   if(!askDiscard())return;
+   const targetBlock=b.dataset.deleteblock,targetStep=b.dataset.deletestep;
+   const target=model.blocks.find(x=>x.id===targetBlock)?.steps.find(x=>x.id===targetStep);
+   if(!confirm('Excluir "'+(target?.data?.title||'esta etapa')+'" do roteiro? O material já publicado anteriormente será preservado.'))return;
+   blockId=targetBlock;stepId=targetStep;expandedBlocks.add(blockId);dirty=false;draft=draftValues();
+   return action('delete_step',{stepId:targetStep});
+ }
+ if(b.dataset.addcurrent){
+   if(!askDiscard())return;
+   const name=prompt('Título da nova etapa:','Nova etapa');if(!name?.trim())return;
+   return action('add_step',{title:name.trim()});
  }
  if(b.dataset.addblock){
    if(!askDiscard())return;
