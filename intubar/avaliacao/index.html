@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Avaliação final · IntubAR · CT-MED Academy</title>
+<meta name="robots" content="noindex">
+<style>
+@font-face{font-family:"Figtree";src:url(figtree-var.woff2) format("woff2");font-weight:300 900;font-display:swap}
+@font-face{font-family:"Barlow Condensed";src:url(barlow-condensed-600.woff2) format("woff2");font-weight:500 600;font-display:swap}
+:root{--line:#2b5276;--txt2:#bccbdd;--or2:#ff7a0f}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#f3f6fb;background:#12304a;
+  background-image:radial-gradient(900px 600px at 0% 0%,rgba(54,120,169,.35),transparent 70%),radial-gradient(700px 500px at 100% 0%,rgba(255,95,0,.10),transparent 70%);background-repeat:no-repeat;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 70px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:34px}
+.top img.logo{height:44px}
+.top .por{display:flex;align-items:center;gap:8px;color:var(--txt2);font-size:13px;font-weight:600}
+.top .por img{width:22px}
+.eyebrow{font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--or2);font-size:13px;margin:0 0 10px}
+h1{font-size:clamp(30px,6vw,44px);line-height:1.08;margin:0 0 12px;font-weight:900;letter-spacing:-.02em}
+h1 span{color:var(--or2)}
+.intro p{color:var(--txt2);max-width:640px;margin:0 0 26px;font-size:16.5px;line-height:1.55}
+fieldset.q{min-width:0}
+.q{background:linear-gradient(180deg,rgba(29,70,104,.75),rgba(22,56,86,.75));border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 12px}
+.q p{margin:0 0 14px;font-weight:700;font-size:16.5px;line-height:1.45}
+.q p em{font-style:normal;color:var(--or2);font-family:"Barlow Condensed",sans-serif;font-size:18px;margin-right:6px}
+.q label.opt{display:flex;gap:12px;align-items:flex-start;font-weight:500;font-size:15.5px;padding:11px 12px;margin:0 0 8px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:rgba(10,30,48,.45)}
+.q label.opt:has(input:checked){border-color:var(--or2);background:rgba(255,95,0,.10)}
+.q input[type=radio]{accent-color:#ff7a0f;margin-top:3px;flex:0 0 auto}
+.q.wrong{border-color:rgba(255,122,15,.9)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:12px 22px;border-radius:10px;border:0;cursor:pointer;font:inherit;font-weight:800;font-size:14px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  background:linear-gradient(180deg,#ff8f24,#ff7405);color:#170f06;box-shadow:0 12px 30px -12px rgba(255,116,5,.8)}
+.msg{margin:16px 0 0;padding:14px 16px;border-radius:12px;font-size:15.5px;line-height:1.5}
+.msg.err{background:rgba(255,95,0,.12);border:1px solid rgba(255,122,15,.5);color:#ffd9bf}
+.ok{background:linear-gradient(180deg,rgba(29,70,104,.85),rgba(22,56,86,.85));border:1px solid rgba(80,190,140,.6);border-radius:16px;padding:26px}
+.ok h2{margin:0 0 8px;font-size:28px}
+.ok h2 span{color:#7fe0b0}
+.ok ol{margin:14px 0 20px;padding-left:20px;color:#dfe8f2;line-height:1.6}
+.wait{background:linear-gradient(180deg,rgba(29,70,104,.75),rgba(22,56,86,.75));border:1px solid var(--line);border-radius:14px;padding:22px;color:#dfe8f2;line-height:1.55}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <img class="logo" src="intubar-logo-branco.svg" alt="IntubAR · Muito além do tubo">
+    <div class="por">por <img src="../assets/escudo.png" alt=""> <b>CT-MED Academy</b></div>
+  </header>
+
+  <section class="intro">
+    <p class="eyebrow">Avaliação final · certificado de 10h</p>
+    <h1>Avaliação final <span>do IntubAR.</span></h1>
+    <p id="intro">10 questões em casos, uma de cada momento do curso. Para ser aprovado, acerte pelo menos 70%. Se errar, você vê quais questões precisa revisar e pode enviar de novo.</p>
+  </section>
+
+  <div id="wait" class="wait" hidden>A avaliação final é liberada junto com as aulas gravadas, em <b>15/01/2027</b>. Até lá, aproveite o encontro ao vivo da primeira turma, as lives e os apps na área de membros.</div>
+
+  <section id="quiz" hidden>
+    <div id="qs"></div>
+    <button id="qsend" class="btn" type="button">Enviar respostas</button>
+    <div id="qmsg" class="msg err" hidden></div>
+  </section>
+
+  <section id="done" class="ok" hidden>
+    <h2>Aprovado <span id="nota"></span></h2>
+    <p style="margin:0;color:#dfe8f2">Agora falta um passo para o seu certificado de 10h:</p>
+    <ol>
+      <li>Volte para a área de membros do IntubAR.</li>
+      <li>Abra a aula <b>“Avaliação final”</b> e marque como concluída.</li>
+      <li>Com todas as aulas do curso concluídas, o certificado é emitido automaticamente e aparece na sua área de membros, com código de validação.</li>
+    </ol>
+    <a class="btn" href="https://aluno.cakto.com.br/" rel="noopener">Voltar para a área de membros</a>
+  </section>
+</div>
+
+<script src="quiz.js"></script>
+<script>
+(function(){
+  var LIBERA = "2027-01-15T00:00:00-03:00";   /* mesma data de liberação das aulas na Cakto */
+  var Q = window.QUIZ || {minimo:.7, questoes:[]};
+  var $ = function(id){return document.getElementById(id)};
+  var teste = /[?&]teste=1\b/.test(location.search);   /* ensaio antes da liberação: .../avaliacao/?teste=1 */
+  if(!teste && new Date() < new Date(LIBERA)){ $("wait").hidden=false; $("intro").hidden=true; return; }
+
+  var html="";
+  Q.questoes.forEach(function(q,i){
+    html+='<fieldset class="q" id="q'+i+'"><p><em>'+(i+1)+'.</em>'+q.q+'</p>';
+    q.a.forEach(function(a,j){ html+='<label class="opt"><input type="radio" name="r'+i+'" value="'+j+'"><span>'+a+'</span></label>'; });
+    html+='</fieldset>';
+  });
+  $("qs").innerHTML=html; $("quiz").hidden=false;
+
+  $("qsend").addEventListener("click",function(){
+    var faltam=[], erradas=[], certas=0;
+    Q.questoes.forEach(function(q,i){
+      var r=document.querySelector('input[name="r'+i+'"]:checked'); $("q"+i).classList.remove("wrong");
+      if(!r){faltam.push(i+1);return}
+      if(+r.value===q.c) certas++; else erradas.push(i);
+    });
+    var m=$("qmsg");
+    if(faltam.length){ m.textContent="Responda todas as questões. Faltam: "+faltam.join(", ")+"."; m.hidden=false; return; }
+    var nota=certas/Q.questoes.length;
+    if(nota>=Q.minimo){
+      $("quiz").hidden=true; $("intro").hidden=true; $("nota").textContent="com "+Math.round(nota*100)+"%";
+      $("done").hidden=false; $("done").scrollIntoView({block:"start"}); return;
+    }
+    erradas.forEach(function(i){$("q"+i).classList.add("wrong")});
+    m.textContent="Você acertou "+certas+" de "+Q.questoes.length+" ("+Math.round(nota*100)+"%). O mínimo é "+Math.round(Q.minimo*100)+"%. As questões marcadas em laranja estão incorretas: revise e envie de novo.";
+    m.hidden=false; m.scrollIntoView({block:"center"});
+  });
+})();
+</script>
+</body>
+</html>
