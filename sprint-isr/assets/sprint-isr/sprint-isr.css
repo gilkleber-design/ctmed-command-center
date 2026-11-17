@@ -287,6 +287,12 @@ h1 span{color:var(--orange)}
 .caso__de-novo:hover{color:#fff}
 
 
+/* trecho da aula: vídeo vertical 9:16, só baixa quando a pessoa aperta o play */
+.trecho{display:grid;justify-items:center;gap:20px}
+.trecho__video{display:block;width:100%;height:auto;aspect-ratio:9/16;border:1px solid var(--line);border-radius:var(--radius);background:#000;object-fit:cover}
+.trecho .cta{width:100%}
+@media (min-width:600px){.trecho__video{max-width:360px}.trecho .cta{width:auto;min-width:360px;white-space:nowrap}}
+
 /* depoimentos em vídeo: capa + play; o vídeo só é baixado quando a pessoa clica */
 .depo{position:relative;z-index:1;max-width:640px;margin-inline:auto;padding-inline:var(--pad)}
 .depo__head h2{margin-top:.55em;font-size:clamp(28px,7.8cqw,44px);font-weight:900;line-height:1.08;letter-spacing:-.028em;text-wrap:balance}
@@ -376,7 +382,7 @@ html:has(.cine[open]){overflow:hidden}
   .sec--quem .card{min-height:calc(var(--u) * 16.6)}
   .sec--aprender .card{min-height:calc(var(--u) * 13.4)}
 
-  .kit{grid-template-columns:repeat(6,minmax(0,1fr));gap:calc(var(--u) * .22)}
+  .kit{grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--u) * .22)}
   .kit li{padding:calc(var(--u) * 1.5) calc(var(--u) * 1.15) calc(var(--u) * 1.6)}
   .kit .ic{width:calc(var(--u) * 3.5);height:calc(var(--u) * 3.5)}
   .kit h3{font-size:max(13.5px,calc(var(--u) * 1.24))}
