@@ -75,6 +75,7 @@ button{font:inherit;color:inherit}
 .chip--live{background:linear-gradient(180deg,#ff8f24,#ff7405);color:#170f06;box-shadow:0 6px 22px -6px rgba(255,116,5,.75)}
 .chip--online{padding-left:.8em;border:1.5px solid var(--orange);background:rgba(255,122,15,.14);color:#fff}
 .chip .ic{width:1.3em;height:1.3em;stroke-width:2;color:var(--orange-hi)}
+.chip--live .ic{width:1em;height:1em;color:currentColor}
 .live-tag__dot{width:.72em;height:.72em;border-radius:50%;background:#fff;animation:live 1.6s ease-out infinite}
 @keyframes live{0%{box-shadow:0 0 0 0 rgba(255,255,255,.8)}100%{box-shadow:0 0 0 .7em rgba(255,255,255,0)}}
 
